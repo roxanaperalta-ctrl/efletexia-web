@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi cuenta — Efletexia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A; --bg2:#111111; --bg3:#1A1A1A; --bg4:#050505;
+  --brand:#F97316; --brand400:#FB923C; --brand600:#EA580C;
+  --line:#262626; --n300:#D4D4D4; --n400:#A3A3A3; --n500:#737373;
+  --green:#00FF94; --cyan:#00D4FF; --purple:#B388FF; --amber:#FBBF24; --orange:#FF6B35;
+  --red:#ef4444;
+  --grad:linear-gradient(135deg,#FB923C,#F97316 50%,#EA580C);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:'Inter',sans-serif}
+
+/* ── TOPBAR ── */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px 28px;border-bottom:1px solid var(--line);background:rgba(10,10,10,.9);
+  position:sticky;top:0;z-index:50;flex-wrap:wrap}
+.brand{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.brand i{font-style:normal;color:var(--brand)}
+.badge{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--n400);
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;margin-left:12px}
+.tright{display:flex;align-items:center;gap:14px}
+.av{width:36px;height:36px;border-radius:50%;background:var(--grad);color:#0A0A0A;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.uname{font-size:13.5px;font-weight:600;line-height:1.2}
+.urole{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--n500);margin-top:2px}
+.out{border:1px solid var(--line);background:transparent;color:var(--n400);border-radius:10px;
+  padding:8px 14px;font-size:12.5px;cursor:pointer;transition:all .2s}
+.out:hover{color:#fff;border-color:var(--brand)}
+
+/* ── LAYOUT ── */
+.wrap{display:grid;grid-template-columns:280px 1fr;gap:28px;max-width:1280px;margin:0 auto;padding:28px}
+.side-t{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--n500);margin-bottom:14px}
+.sol-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  background:rgba(17,17,17,.6);border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px;margin-bottom:10px;transition:all .25s;color:inherit}
+.sol-item:hover{border-color:rgba(249,115,22,.4);transform:translateX(3px)}
+.sol-item.on{border-color:rgba(249,115,22,.6);background:rgba(249,115,22,.07)}
+.sol-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.sol-n{font-size:14.5px;font-weight:600}
+.sol-s{font-size:11px;color:var(--n500);margin-top:3px}
+.sol-c{margin-left:auto;font-size:11px;color:var(--n500);white-space:nowrap}
+.sol-item.locked{opacity:.5;cursor:default}
+.sol-item.locked:hover{transform:none;border-color:var(--line)}
+.go{width:26px;height:26px;border-radius:8px;border:1px solid var(--line);display:flex;
+  align-items:center;justify-content:center;font-size:12px;color:var(--n500);flex-shrink:0;
+  transition:all .2s}
+.go:hover{color:#fff;border-color:var(--brand);background:rgba(249,115,22,.12)}
+.lockpill{margin-left:auto;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--n500)}
+
+/* ── PANEL ── */
+.card{background:rgba(17,17,17,.5);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.phead{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+  padding:26px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ptitle{font-size:24px;font-weight:700;letter-spacing:-.6px;display:flex;align-items:center;gap:11px}
+.psub{font-size:13.5px;color:var(--n400);margin-top:7px;max-width:520px;line-height:1.6}
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;border-radius:12px;
+  padding:11px 20px;font-size:13.5px;font-weight:500;transition:all .25s}
+.btn-p{background:var(--brand);color:#fff;box-shadow:0 0 22px rgba(249,115,22,.28)}
+.btn-p:hover:not(:disabled){background:var(--brand600);transform:translateY(-2px)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.btn-o{background:rgba(255,255,255,.03);border:1px solid #525252;color:var(--n300)}
+.btn-o:hover{border-color:#a3a3a3;color:#fff}
+
+.meter{padding:18px 28px;border-bottom:1px solid var(--line);display:flex;
+  align-items:center;gap:18px;flex-wrap:wrap}
+.mbar{flex:1;min-width:180px;height:7px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.mbar i{display:block;height:100%;background:var(--grad);transition:width .4s ease}
+.mtxt{font-size:12.5px;color:var(--n400)}
+.mtxt b{color:#fff}
+
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--n500);
+  text-align:left;font-weight:500;padding:13px 28px;border-bottom:1px solid var(--line)}
+td{padding:16px 28px;border-bottom:1px solid rgba(38,38,38,.6);vertical-align:middle;font-size:13.5px}
+tr:last-child td{border-bottom:none}
+.p-n{font-weight:600}
+.p-m{font-size:12px;color:var(--n500);margin-top:3px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:10.5px;padding:4px 10px;border-radius:999px;border:1px solid rgba(249,115,22,.28);
+  background:rgba(249,115,22,.08);color:var(--brand400);white-space:nowrap}
+.chip.off{border-color:var(--line);background:transparent;color:var(--n500)}
+.st{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:999px;white-space:nowrap}
+.st-ok{background:rgba(0,255,148,.1);border:1px solid rgba(0,255,148,.28);color:#66FFC0}
+.st-wait{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#FBBF24}
+.st-block{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.mini{font-size:11px;padding:6px 11px;border-radius:9px;cursor:pointer;background:transparent;
+  border:1px solid var(--line);color:var(--n400);transition:all .2s}
+.mini:hover{color:#fff;border-color:rgba(249,115,22,.5)}
+.mini.warn:hover{color:#fca5a5;border-color:rgba(239,68,68,.5)}
+.foot{padding:16px 28px;font-size:12.5px;color:var(--n500);line-height:1.6;border-top:1px solid var(--line)}
+.foot b{color:var(--brand400)}
+.empty{padding:44px 28px;text-align:center;color:var(--n500);font-size:13.5px}
+
+/* integración */
+.ext{display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;border:1px solid var(--line);border-radius:999px;
+  padding:5px 11px;color:var(--n500);vertical-align:middle}
+.ext::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.intbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:14px 28px;border-bottom:1px solid var(--line);background:rgba(0,212,255,.03)}
+.intxt{font-size:12.5px;color:var(--n400);line-height:1.6}
+.intxt b{color:var(--n300)}
+.host{font-size:12px;color:var(--cyan);background:rgba(0,212,255,.08);
+  border:1px solid rgba(0,212,255,.25);border-radius:8px;padding:4px 10px;white-space:nowrap}
+.st-sync{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:#66E2FF}
+.nota-modal{font-size:12px;color:var(--n500);line-height:1.6;background:rgba(0,212,255,.05);
+  border:1px solid rgba(0,212,255,.2);border-radius:11px;padding:12px 14px;margin-top:16px}
+
+/* ── MODAL ── */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;padding:24px;z-index:90}
+.ov.on{display:flex}
+.modal{width:100%;max-width:540px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:18px;overflow:hidden;max-height:90vh;display:flex;flex-direction:column}
+.mhead{padding:22px 26px;border-bottom:1px solid var(--line);display:flex;
+  align-items:center;justify-content:space-between;gap:14px}
+.mtitle{font-size:17px;font-weight:600}
+.mclose{background:transparent;border:none;color:var(--n500);font-size:20px;cursor:pointer;line-height:1}
+.mclose:hover{color:#fff}
+.mbody{padding:24px 26px;overflow-y:auto}
+.fl{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--n500);margin-bottom:8px}
+.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:11px;
+  padding:11px 13px;color:#fff;font-family:'Inter',sans-serif;font-size:13.5px;margin-bottom:18px}
+.inp:focus{outline:none;border-color:var(--brand)}
+.inp::placeholder{color:#525252}
+.opts{display:flex;flex-direction:column;gap:9px;margin-bottom:6px}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:12px 14px;border-radius:12px;
+  border:1px solid var(--line);cursor:pointer;transition:all .2s}
+.opt:hover{border-color:rgba(249,115,22,.4)}
+.opt input{accent-color:var(--brand);margin-top:2px;width:15px;height:15px;cursor:pointer}
+.opt-n{font-size:13.5px;font-weight:500}
+.opt-d{font-size:11.5px;color:var(--n500);margin-top:3px;line-height:1.5}
+.mfoot{padding:18px 26px;border-top:1px solid var(--line);display:flex;
+  justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.err{font-size:12.5px;color:#fca5a5;display:none}
+.err.on{display:block}
+
+@media(max-width:940px){
+  .wrap{grid-template-columns:1fr;padding:20px}
+  th,td{padding-left:18px;padding-right:18px}
+  .phead,.meter,.foot{padding-left:20px;padding-right:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="top">
+  <div style="display:flex;align-items:center">
+    <a href="index.html" class="brand">EFLETEX<i>IA</i></a>
+    <span class="badge">Mi cuenta</span>
+  </div>
+  <div class="tright">
+    <div class="av">CV</div>
+    <div>
+      <div class="uname">Carlos López</div>
+      <div class="urole">Cliente · Transportes Colón</div>
+    </div>
+    <button class="out" onclick="location.href='login.html'">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- MIS SOLUCIONES -->
+  <aside>
+    <div class="side-t">Mis soluciones</div>
+    <div id="lista"></div>
+
+    <div class="side-t" style="margin-top:26px">No contratadas</div>
+    <div class="sol-item locked">
+      <span class="sol-dot" style="background:var(--green)"></span>
+      <div><div class="sol-n">Eflexy</div><div class="sol-s">Robots de última milla</div></div>
+      <span class="lockpill">Solicitar</span>
+    </div>
+    <div class="sol-item locked">
+      <span class="sol-dot" style="background:var(--cyan)"></span>
+      <div><div class="sol-n">Viax</div><div class="sol-s">Navegación de carga</div></div>
+      <span class="lockpill">Solicitar</span>
+    </div>
+  </aside>
+
+  <!-- PANEL DE LA SOLUCION -->
+  <main>
+    <div class="card">
+      <div class="phead">
+        <div>
+          <div class="ptitle"><span class="sol-dot" id="hdot" style="width:14px;height:14px"></span><span id="hname"></span><span class="ext">Sistema externo</span></div>
+          <div class="psub" id="hsub"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn btn-o" id="btnApp" href="#" target="_blank" rel="noopener">Entrar a la plataforma ↗</a>
+          <button class="btn btn-p" id="btnInv" onclick="abrir()">+ Invitar persona</button>
+        </div>
+      </div>
+
+      <div class="intbar">
+        <span class="host" id="host"></span>
+        <span class="intxt" id="intxt"></span>
+      </div>
+
+      <div class="meter">
+        <div class="mbar"><i id="bar"></i></div>
+        <div class="mtxt" id="cnt"></div>
+      </div>
+
+      <div id="tabla"></div>
+
+      <div class="foot">
+        Cada solución permite hasta <b>10 accesos</b>. Las personas que invites entran con su propio correo y su propia contraseña, y solo ven los módulos que les habilites de <b id="fname"></b>. Un acceso de una solución no sirve para las demás: <b id="fname2"></b> es un sistema independiente y cada uno maneja sus propios accesos. Lo que haces aquí —invitar, cambiar permisos, bloquear— se replica allá por la integración, y <b>Entrar a la plataforma</b> te lleva a ese sistema con tu misma cuenta.
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: INVITAR -->
+<div class="ov" id="ov" onclick="if(event.target===this)cerrar()">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle">Invitar a <span id="mSol"></span></div>
+      <button class="mclose" onclick="cerrar()">✕</button>
+    </div>
+    <div class="mbody">
+      <label class="fl" for="mNom">Nombre de la persona</label>
+      <input class="inp" id="mNom" type="text" placeholder="Nombre y apellido">
+
+      <label class="fl" for="mMail">Correo electrónico</label>
+      <input class="inp" id="mMail" type="email" placeholder="persona@empresa.com">
+
+      <label class="fl">Permisos en esta solución</label>
+      <div class="opts" id="mMods"></div>
+      <p class="err" id="mErr"></p>
+      <p class="nota-modal" id="mNota"></p>
+    </div>
+    <div class="mfoot">
+      <span style="font-size:12px;color:var(--n500)">Recibirá una invitación por correo para crear su contraseña.</span>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-o" onclick="cerrar()">Cancelar</button>
+        <button class="btn btn-p" onclick="invitar()">Enviar invitación</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LIMITE = 10;
+
+const SOLS = {
+  qubo: {
+    nombre: 'Qubo', desc: 'Simulador de cubicaje y distribución de carga', color: 'var(--purple)',
+    app: 'app-qubo.html',
+    host: 'qubo.efletexia.com', sync: 'Hoy · 09:12 · correcta',
+    modulos: [
+      ['requerimientos', 'Requerimientos del día', 'Cargar y editar los pedidos que entran a despacho.'],
+      ['olas',           'Olas de despacho',       'Declarar la flota disponible y planificar cada ola.'],
+      ['ordenes',        'Órdenes de carga',       'Emitir órdenes y asignar unidad y chofer.'],
+      ['estiba',         'Estiba y manifiesto',    'Ver el plano de acomodo y el manifiesto de pesos por eje.'],
+      ['maestros',       'Maestros',               'Editar productos, vehículos y certificados. Acceso sensible.']
+    ],
+    gente: [
+      {n:'Ernesto Cabrera', m:'e.cabrera@empresa.mx', p:['requerimientos','olas','ordenes','estiba'], s:'ok',    u:'Hoy · 08:40'},
+      {n:'Paola Rivas',     m:'p.rivas@empresa.mx',   p:['requerimientos','olas'],                    s:'ok',    u:'Ayer · 17:12'},
+      {n:'Marco Silva',     m:'m.silva@empresa.mx',   p:['estiba'],                                   s:'ok',    u:'12 sep'},
+      {n:'Lucía Arias',     m:'l.arias@empresa.mx',   p:['requerimientos'],                           s:'wait',  u:'—'}
+    ]
+  },
+  bi: {
+    nombre: 'Efletexia BI', desc: 'Centro de control de la operación', color: 'var(--amber)',
+    app: 'app-bi.html',
+    host: 'bi.efletexia.com', sync: 'Hoy · 08:47 · correcta',
+    modulos: [
+      ['seguimiento', 'Seguimiento por referencia', 'Consultar dónde va cada viaje.'],
+      ['alertas',     'Alertas',                    'Ver las referencias con alerta activa en Torre de Control.'],
+      ['tc',          'Reporte de Torre de Control','Estados, orígenes y coordinadores del corte.'],
+      ['opl',         'Facturación OPL',            'Utilidad por operación, cliente y transportista. Información sensible.'],
+      ['flota',       'Cobertura de flota',         'Flota propia contra terceros, mes a mes.'],
+      ['total',       'eFletexia Total',            'Tablero de proyectos con estado y responsable.']
+    ],
+    gente: [
+      {n:'Sofía Herrera', m:'s.herrera@empresa.mx', p:['seguimiento','alertas','tc','opl','flota','total'], s:'ok',   u:'Hoy · 09:05'},
+      {n:'Raúl Ponce',    m:'r.ponce@empresa.mx',   p:['seguimiento','alertas'],                            s:'ok',   u:'Hoy · 07:50'},
+      {n:'Gabriela Luna', m:'g.luna@empresa.mx',    p:['tc','flota'],                                       s:'block',u:'05 sep'}
+    ]
+  }
+};
+
+let actual = 'qubo';
+const $ = id => document.getElementById(id);
+
+function pintarLista() {
+  $('lista').innerHTML = Object.entries(SOLS).map(([k, s]) => `
+    <button class="sol-item ${k === actual ? 'on' : ''}" onclick="elegir('${k}')">
+      <span class="sol-dot" style="background:${s.color}"></span>
+      <div><div class="sol-n">${s.nombre}</div><div class="sol-s">${s.desc}</div></div>
+      <span class="sol-c">${s.gente.length}/${LIMITE}</span>
+      <span class="go" title="Entrar a ${s.nombre}" onclick="event.stopPropagation();window.open('${s.app}','_blank')">↗</span>
+    </button>`).join('');
+}
+
+function etiqueta(e) {
+  return e === 'ok'    ? '<span class="st st-ok">Activa</span>'
+       : e === 'sync'  ? '<span class="st st-sync">Dando de alta…</span>'
+       : e === 'wait'  ? '<span class="st st-wait">Invitación enviada</span>'
+       :                 '<span class="st st-block">Bloqueada</span>';
+}
+
+function pintarPanel() {
+  const s = SOLS[actual];
+  $('hdot').style.background = s.color;
+  $('hname').textContent = s.nombre;
+  $('fname').textContent = s.nombre;
+  $('fname2').textContent = s.nombre;
+  $('hsub').textContent = 'Personas de tu equipo con acceso a ' + s.nombre + ', cada una con los módulos que le habilites.';
+  $('btnApp').href = s.app;
+  $('btnApp').textContent = 'Entrar a ' + s.nombre + ' ↗';
+  $('host').textContent = s.host;
+  $('intxt').innerHTML = s.nombre + ' corre en su propio sistema. Entras con esta misma cuenta y los accesos que crees aquí se dan de alta allá solos · <b>Última sincronización: ' + s.sync + '</b>';
+
+  const n = s.gente.length;
+  $('bar').style.width = (n / LIMITE * 100) + '%';
+  $('cnt').innerHTML = `<b>${n}</b> de ${LIMITE} accesos usados · quedan <b>${LIMITE - n}</b>`;
+  $('btnInv').disabled = n >= LIMITE;
+  $('btnInv').textContent = n >= LIMITE ? 'Límite alcanzado' : '+ Invitar persona';
+
+  if (!n) {
+    $('tabla').innerHTML = '<div class="empty">Todavía no has dado acceso a nadie de tu equipo.</div>';
+    return;
+  }
+
+  $('tabla').innerHTML = `
+    <table>
+      <thead><tr><th>Persona</th><th>Permisos</th><th>Estado</th><th>Último acceso</th><th>Acciones</th></tr></thead>
+      <tbody>${s.gente.map((p, i) => `
+        <tr>
+          <td><div class="p-n">${p.n}</div><div class="p-m">${p.m}</div></td>
+          <td><div class="chips">${s.modulos.map(m =>
+            `<span class="chip ${p.p.includes(m[0]) ? '' : 'off'}">${m[1]}</span>`).join('')}</div></td>
+          <td>${etiqueta(p.s)}</td>
+          <td style="color:var(--n500);font-size:12.5px">${p.u}</td>
+          <td><div class="acts">
+            <button class="mini" onclick="editar(${i})">Permisos</button>
+            ${p.s === 'block'
+              ? `<button class="mini" onclick="alternar(${i})">Activar</button>`
+              : `<button class="mini warn" onclick="alternar(${i})">Bloquear</button>`}
+            <button class="mini warn" onclick="quitar(${i})">Quitar</button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function elegir(k) { actual = k; pintarLista(); pintarPanel(); }
+function alternar(i) {
+  const p = SOLS[actual].gente[i];
+  p.s = p.s === 'block' ? 'ok' : 'block';
+  pintarPanel();
+}
+function quitar(i) {
+  if (!confirm('¿Quitar el acceso de ' + SOLS[actual].gente[i].n + ' a ' + SOLS[actual].nombre + '?')) return;
+  SOLS[actual].gente.splice(i, 1);
+  pintarLista(); pintarPanel();
+}
+
+let editando = null;
+
+function pintarModulos(marcados) {
+  $('mMods').innerHTML = SOLS[actual].modulos.map(m => `
+    <label class="opt">
+      <input type="checkbox" value="${m[0]}" ${marcados.includes(m[0]) ? 'checked' : ''}>
+      <span><span class="opt-n">${m[1]}</span><span class="opt-d">${m[2]}</span></span>
+    </label>`).join('');
+}
+
+function abrir() {
+  editando = null;
+  $('mSol').textContent = SOLS[actual].nombre;
+  $('mNom').value = ''; $('mMail').value = '';
+  $('mNom').disabled = false; $('mMail').disabled = false;
+  pintarModulos([]);
+  $('mNota').textContent = 'El alta se envía al sistema de ' + SOLS[actual].nombre + ' y puede tardar unos minutos. La persona recibe el correo para crear su contraseña cuando queda lista.';
+  $('mErr').classList.remove('on');
+  $('ov').classList.add('on');
+}
+
+function editar(i) {
+  const p = SOLS[actual].gente[i];
+  editando = i;
+  $('mSol').textContent = SOLS[actual].nombre;
+  $('mNom').value = p.n; $('mMail').value = p.m;
+  $('mNom').disabled = true; $('mMail').disabled = true;
+  pintarModulos(p.p);
+  $('mNota').textContent = 'El cambio de permisos se replica en el sistema de ' + SOLS[actual].nombre + '.';
+  $('mErr').classList.remove('on');
+  $('ov').classList.add('on');
+}
+
+function cerrar() { $('ov').classList.remove('on'); }
+
+function invitar() {
+  const s = SOLS[actual];
+  const mods = [...$('mMods').querySelectorAll('input:checked')].map(c => c.value);
+  const err = m => { $('mErr').textContent = m; $('mErr').classList.add('on'); };
+
+  if (editando !== null) {
+    if (!mods.length) return err('Marca al menos un módulo.');
+    s.gente[editando].p = mods;
+    cerrar(); pintarPanel(); return;
+  }
+
+  const nom = $('mNom').value.trim(), mail = $('mMail').value.trim();
+  if (!nom) return err('Escribe el nombre de la persona.');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) return err('Escribe un correo válido.');
+  if (s.gente.some(p => p.m.toLowerCase() === mail.toLowerCase()))
+    return err('Ese correo ya tiene acceso a ' + s.nombre + '.');
+  if (!mods.length) return err('Marca al menos un módulo.');
+  if (s.gente.length >= LIMITE) return err('Ya usaste los ' + LIMITE + ' accesos de esta solución.');
+
+  const nuevo = {n: nom, m: mail, p: mods, s: 'sync', u: '—'};
+  s.gente.push(nuevo);
+  cerrar(); pintarLista(); pintarPanel();
+  // el alta se replica en el sistema externo y luego queda a la espera de que la persona entre
+  setTimeout(() => { nuevo.s = 'wait'; pintarPanel(); }, 2200);
+}
+
+pintarLista();
+pintarPanel();
+</script>
+</body>
+</html>

@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Efletexia — Panel Administrador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:    #040810;
+  --bg2:   #060C18;
+  --bg3:   #091220;
+  --card:  #0A1628;
+  --card2: #0E1E36;
+  --b1:    rgba(255,107,26,.18);
+  --b2:    rgba(255,107,26,.08);
+  --b3:    rgba(255,255,255,.06);
+  --orange:#FF6B1A;
+  --amber: #F5A82A;
+  --grad:  linear-gradient(135deg,#FF6B1A,#F5A82A);
+  --text:  #E2EDF8;
+  --muted: #4E6A8A;
+  --mono:  'Share Tech Mono', monospace;
+  --sidebar-w: 240px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;display:flex;flex-direction:column}
+
+/* ── SCANLINE ── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.025) 0,rgba(0,0,0,.025) 1px,transparent 1px,transparent 2px)}
+
+/* ── TOP BAR ── */
+.topbar{height:56px;background:rgba(4,8,16,.95);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;
+  position:relative;z-index:100;flex-shrink:0}
+.topbar::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--orange),var(--amber),transparent);opacity:.5}
+.tb-left{display:flex;align-items:center;gap:16px}
+.tb-logo{font-family:var(--mono);font-size:15px;font-weight:900;letter-spacing:2px;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tb-sep{width:1px;height:20px;background:var(--b1)}
+.tb-badge{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--orange);background:rgba(255,107,26,.08);border:1px solid rgba(255,107,26,.2);
+  padding:3px 10px;border-radius:100px}
+.tb-right{display:flex;align-items:center;gap:14px}
+.tb-notif{position:relative;width:32px;height:32px;border-radius:4px;border:1px solid var(--b1);
+  background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.tb-notif:hover{border-color:var(--orange)}
+.tb-notif svg{opacity:.6}
+.notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;
+  background:var(--orange);box-shadow:0 0 6px rgba(255,107,26,.8)}
+.tb-avatar{display:flex;align-items:center;gap:10px;cursor:pointer;padding:5px 10px;
+  border-radius:4px;border:1px solid var(--b1);background:var(--card);transition:all .2s}
+.tb-avatar:hover{border-color:var(--orange)}
+.av-circle{width:28px;height:28px;border-radius:50%;background:var(--grad);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff}
+.av-info{display:flex;flex-direction:column}
+.av-name{font-size:12px;font-weight:800;color:var(--text);line-height:1}
+.av-role{font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:1px;margin-top:2px}
+.tb-pulse{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.6);
+  animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 6px rgba(34,197,94,0)}}
+
+/* ── LAYOUT ── */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--b1);
+  display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;position:relative}
+.sidebar::after{content:'';position:absolute;top:0;right:-1px;bottom:0;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(255,107,26,.3),transparent)}
+
+.sb-section{padding:16px 12px 8px}
+.sb-label{font-family:var(--mono);font-size:9px;color:rgba(255,107,26,.5);
+  text-transform:uppercase;letter-spacing:2.5px;margin-bottom:6px;padding:0 8px}
+
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:4px;
+  cursor:pointer;transition:all .2s;position:relative;text-decoration:none;color:var(--muted);
+  font-size:13px;font-weight:700;letter-spacing:.3px;border:1px solid transparent;margin-bottom:2px}
+.sb-item:hover{background:rgba(255,107,26,.06);color:var(--text);border-color:rgba(255,107,26,.1)}
+.sb-item.active{background:rgba(255,107,26,.1);color:var(--orange);border-color:rgba(255,107,26,.2)}
+.sb-item.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:2px;
+  background:var(--grad);border-radius:0 2px 2px 0}
+.sb-icon{width:18px;height:18px;opacity:.7;flex-shrink:0}
+.sb-item.active .sb-icon{opacity:1}
+.sb-item:hover .sb-icon{opacity:.9}
+.sb-pill{margin-left:auto;font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:100px;
+  background:rgba(255,107,26,.12);color:var(--orange);border:1px solid rgba(255,107,26,.2)}
+.sb-pill.new{background:rgba(34,197,94,.1);color:#22c55e;border-color:rgba(34,197,94,.25)}
+
+.sb-divider{height:1px;background:var(--b1);margin:8px 12px}
+
+.sb-footer{margin-top:auto;padding:12px;border-top:1px solid var(--b1)}
+.sb-user-card{background:var(--card);border:1px solid var(--b1);border-radius:4px;padding:12px;
+  display:flex;align-items:center;gap:10px}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--grad);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0}
+.sb-uinfo{flex:1;min-width:0}
+.sb-uname{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-urole{font-family:var(--mono);font-size:9px;color:var(--orange);letter-spacing:1px;margin-top:1px}
+.sb-logout{width:26px;height:26px;border-radius:3px;border:1px solid var(--b1);background:transparent;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
+.sb-logout:hover{border-color:rgba(255,80,80,.4);background:rgba(255,80,80,.08)}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;overflow-y:auto;background:var(--bg);position:relative}
+
+/* ── PAGE HEADER ── */
+.page-hdr{padding:24px 28px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.ph-left{}
+.ph-crumb{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:6px}
+.ph-crumb span{color:var(--orange)}
+.ph-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.ph-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.ph-actions{display:flex;gap:10px;align-items:center}
+.btn-sm{padding:7px 16px;font-size:11px;font-weight:800;border-radius:3px;cursor:pointer;
+  font-family:'Nunito',sans-serif;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;border:none}
+.btn-sm-ghost{background:transparent;border:1px solid var(--b1);color:var(--muted)}
+.btn-sm-ghost:hover{border-color:var(--orange);color:var(--orange)}
+.btn-sm-primary{background:var(--grad);color:#fff;box-shadow:0 0 16px rgba(255,107,26,.3)}
+.btn-sm-primary:hover{box-shadow:0 0 24px rgba(255,107,26,.5);transform:translateY(-1px)}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:20px 28px}
+.kpi{background:var(--card);border:1px solid var(--b1);border-radius:5px;padding:18px 20px;
+  position:relative;overflow:hidden;transition:all .25s;cursor:default}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);
+  transform:scaleX(0);transition:transform .4s;transform-origin:left}
+.kpi:hover{border-color:rgba(255,107,26,.3);background:var(--card2)}
+.kpi:hover::before{transform:scaleX(1)}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kpi-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+.kpi-icon{width:32px;height:32px;border-radius:4px;background:rgba(255,107,26,.08);border:1px solid rgba(255,107,26,.15);
+  display:flex;align-items:center;justify-content:center}
+.kpi-val{font-family:var(--mono);font-size:26px;font-weight:900;color:#fff;line-height:1}
+.kpi-val span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.kpi-delta{font-size:11px;margin-top:5px;font-weight:700;display:flex;align-items:center;gap:4px}
+.delta-up{color:#22c55e}.delta-dn{color:#ef4444}
+.kpi-glow{position:absolute;bottom:-20px;right:-20px;width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,26,.08),transparent 70%)}
+
+/* ── GRID ── */
+.content-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:0 28px 28px}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--b1);border-radius:5px;overflow:hidden}
+.card-hdr{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-family:var(--mono);font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'//';color:var(--orange);font-size:10px;font-weight:900}
+.card-action{font-family:var(--mono);font-size:10px;color:var(--orange);cursor:pointer;opacity:.7;
+  transition:opacity .2s;background:none;border:none;padding:0}
+.card-action:hover{opacity:1}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;
+  padding:10px 18px;text-align:left;border-bottom:1px solid var(--b1);font-weight:400}
+.tbl td{padding:11px 18px;font-size:12px;border-bottom:1px solid rgba(255,255,255,.03);font-weight:600}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,107,26,.03)}
+.tbl-id{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.tbl-name{font-weight:700;color:var(--text)}
+.tbl-email{font-size:11px;color:var(--muted)}
+.status{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1px}
+.st-active{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2)}
+.st-pending{background:rgba(245,168,42,.1);color:var(--amber);border:1px solid rgba(245,168,42,.2)}
+.st-inactive{background:rgba(100,100,100,.1);color:#666;border:1px solid rgba(100,100,100,.2)}
+.status::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── ACTIVITY FEED ── */
+.act-list{padding:4px 0}
+.act-item{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.03);display:flex;gap:12px;align-items:flex-start;transition:background .2s}
+.act-item:last-child{border-bottom:none}
+.act-item:hover{background:rgba(255,107,26,.03)}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.ad-orange{background:var(--orange);box-shadow:0 0 6px rgba(255,107,26,.5)}
+.ad-amber{background:var(--amber);box-shadow:0 0 6px rgba(245,168,42,.5)}
+.ad-green{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
+.ad-blue{background:#3b82f6;box-shadow:0 0 6px rgba(59,130,246,.5)}
+.act-body{flex:1}
+.act-text{font-size:12px;color:var(--text);font-weight:600;line-height:1.45}
+.act-text b{color:var(--orange)}
+.act-time{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:.5px}
+
+/* ── MINI CHART (bars) ── */
+.mini-bars{display:flex;align-items:flex-end;gap:3px;height:48px;padding:0 18px 14px}
+.mbar{flex:1;background:rgba(255,107,26,.2);border-radius:2px 2px 0 0;transition:background .2s;
+  position:relative;cursor:default}
+.mbar:hover{background:rgba(255,107,26,.5)}
+.mbar.hi{background:var(--grad)}
+.bar-labels{display:flex;gap:3px;padding:0 18px 10px;border-top:1px solid var(--b1)}
+.bl{flex:1;text-align:center;font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:.5px}
+
+/* ── MODULE CARDS (right col) ── */
+.mod-list{padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.mod-item{background:var(--bg3);border:1px solid var(--b1);border-radius:4px;padding:11px 14px;
+  display:flex;align-items:center;gap:12px;transition:all .2s;cursor:pointer;position:relative;overflow:hidden}
+.mod-item::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:1px;
+  background:var(--grad);transition:left .35s ease}
+.mod-item:hover::after{left:0}
+.mod-item:hover{border-color:rgba(255,107,26,.25);background:var(--card)}
+.mod-item.active-mod{border-color:rgba(255,107,26,.3);background:rgba(255,107,26,.05)}
+.mod-icon{width:36px;height:36px;border-radius:4px;background:rgba(255,107,26,.08);border:1px solid rgba(255,107,26,.15);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.mod-info{flex:1}
+.mod-name{font-size:13px;font-weight:800;color:var(--text)}
+.mod-desc{font-size:11px;color:var(--muted);margin-top:1px}
+.mod-arrow{font-family:var(--mono);font-size:14px;color:var(--orange);opacity:.5}
+.mod-item:hover .mod-arrow{opacity:1}
+
+/* ── PREVIEW BADGE ── */
+.preview-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;
+  color:var(--amber);background:rgba(245,168,42,.08);border:1px solid rgba(245,168,42,.2);
+  padding:2px 8px;border-radius:100px;margin-left:6px}
+.preview-badge svg{opacity:.8}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,107,26,.2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,107,26,.4)}
+
+/* ── TOOLTIP (preview eye) ── */
+.preview-wrap{position:relative;display:inline-flex;align-items:center;gap:6px}
+.eye-btn{background:rgba(245,168,42,.08);border:1px solid rgba(245,168,42,.2);border-radius:3px;
+  padding:3px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .2s;
+  font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:1px}
+.eye-btn:hover{background:rgba(245,168,42,.15);border-color:rgba(245,168,42,.4)}
+
+/* ── MODAL PREVIEW ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(4,8,16,.85);z-index:500;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--b1);border-radius:6px;width:520px;max-width:90vw;overflow:hidden;
+  transform:translateY(20px);transition:transform .25s;position:relative}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-hdr{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:var(--mono);font-size:11px;color:var(--amber);text-transform:uppercase;letter-spacing:2px}
+.modal-close{background:transparent;border:1px solid var(--b1);border-radius:3px;width:24px;height:24px;
+  cursor:pointer;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{border-color:rgba(255,80,80,.4);color:#ef4444}
+.modal-body{padding:18px}
+.preview-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:4px;
+  background:var(--bg3);border:1px solid var(--b1);margin-bottom:8px;transition:all .2s}
+.preview-item:last-child{margin-bottom:0}
+.prev-num{font-family:var(--mono);font-size:10px;color:var(--muted);width:20px}
+.prev-name{font-size:13px;font-weight:800;color:var(--text);flex:1}
+.prev-status{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:100px}
+.ps-on{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2)}
+.ps-new{background:rgba(245,168,42,.1);color:var(--amber);border:1px solid rgba(245,168,42,.2)}
+.modal-note{font-size:11px;color:var(--muted);text-align:center;padding-top:12px;font-style:italic}
+
+
+/* acciones por fila */
+.rowact{display:flex;gap:6px}
+.mini{font-family:var(--mono);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;
+  padding:4px 9px;border-radius:4px;cursor:pointer;background:transparent;
+  border:1px solid var(--b1);color:var(--muted);transition:all .2s}
+.mini:hover{color:var(--text);border-color:rgba(255,107,26,.45)}
+.mini.warn:hover{color:#ef4444;border-color:rgba(239,68,68,.45)}
+.mini.ok:hover{color:#22c55e;border-color:rgba(34,197,94,.45)}
+.st-blocked{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.22)}
+.hint{font-size:11px;color:var(--muted);padding:12px 18px;border-top:1px solid var(--b3);line-height:1.6}
+.hint b{color:var(--amber)}
+.quote{font-size:12px;color:var(--text);line-height:1.6;font-style:italic}
+.qmeta{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;letter-spacing:.5px}
+.qrow{padding:14px 18px;border-bottom:1px solid var(--b3)}
+.qrow:last-child{border-bottom:none}
+.qactions{display:flex;gap:6px;margin-top:10px}
+
+/* vistas */
+.view{display:none}
+.view.on{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* barra de busqueda y filtros */
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 18px;
+  border-bottom:1px solid var(--b3)}
+.search{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--b1);border-radius:4px;
+  padding:9px 12px;color:var(--text);font-family:'Nunito',sans-serif;font-size:12.5px}
+.search:focus{outline:none;border-color:var(--orange)}
+.search::placeholder{color:var(--muted)}
+.fbtn{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  padding:8px 13px;border-radius:4px;cursor:pointer;background:transparent;
+  border:1px solid var(--b1);color:var(--muted);transition:all .2s}
+.fbtn:hover{color:var(--text)}
+.fbtn.on{background:rgba(255,107,26,.1);color:var(--orange);border-color:rgba(255,107,26,.35)}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:14px 18px;border-bottom:1px solid var(--b3)}
+.setrow:last-child{border-bottom:none}
+.setl{font-size:12.5px;color:var(--text);font-weight:600}
+.setd{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5}
+.setv{font-family:var(--mono);font-size:13px;color:var(--amber);white-space:nowrap}
+@media(max-width:1100px){.twocol{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-left">
+    <a class="tb-logo" href="index.html" style="text-decoration:none;color:inherit" title="Ir al sitio">EFLETEXIA</a>
+    <div class="tb-sep"></div>
+    <div class="tb-badge">ADMIN PANEL</div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-pulse">
+      <div class="pulse-dot"></div>
+      SISTEMA ACTIVO
+    </div>
+    <div class="tb-notif">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1.5C4.5 1.5 3 3.5 3 5.5V9L2 10.5H12L11 9V5.5C11 3.5 9.5 1.5 7 1.5Z" stroke="var(--text)" stroke-width="1.1"/>
+        <path d="M5.5 10.5C5.5 11.3 6.2 12 7 12C7.8 12 8.5 11.3 8.5 10.5" stroke="var(--text)" stroke-width="1.1"/>
+      </svg>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="tb-avatar">
+      <div class="av-circle">JR</div>
+      <div class="av-info">
+        <div class="av-name">Juan Ramírez</div>
+        <div class="av-role">ADMINISTRADOR</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sb-section">
+      <div class="sb-label">PANEL</div>
+      <a class="sb-item active" href="#" data-view="resumen" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="10" y="1" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="10" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="10" y="10" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        Resumen
+      </a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-label">GESTIÓN</div>
+      <a class="sb-item" href="#" data-view="clientes" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><circle cx="7" cy="6" r="2.6" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 15c0-2.5 2-4.2 4.5-4.2s4.5 1.7 4.5 4.2" stroke="currentColor" stroke-width="1.2"/><path d="M12.5 5.2a2.4 2.4 0 0 1 0 4.4M13.5 15c0-2 .8-3.2 2-3.8" stroke="currentColor" stroke-width="1.1" opacity=".6"/></svg>
+        Clientes
+        <span class="sb-pill">128</span>
+      </a>
+      <a class="sb-item" href="#" data-view="accesos" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><circle cx="6" cy="9" r="3.2" stroke="currentColor" stroke-width="1.2"/><path d="M9.2 9H16M13.5 9v2.6M15.4 9v1.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Accesos y contraseñas
+        <span class="sb-pill new">2</span>
+      </a>
+      <a class="sb-item" href="#" data-view="comentarios" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M2.5 4.2h13v8H9.5L6 15v-2.8H2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        Comentarios
+        <span class="sb-pill new">4</span>
+      </a>
+      <a class="sb-item" href="#" data-view="solicitudes" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M2.6 5l6.4 4.6L15.4 5" stroke="currentColor" stroke-width="1.2"/></svg>
+        Solicitudes
+        <span class="sb-pill">9</span>
+      </a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-label">MANTENIMIENTO</div>
+
+      <a class="sb-item" href="#" data-view="productos" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M9 2l6 3v8l-6 3-6-3V5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M3 5l6 3 6-3M9 8v8" stroke="currentColor" stroke-width="1.1" opacity=".6"/></svg>
+        Productos
+        <span class="sb-pill">5</span>
+      </a>
+
+      <a class="sb-item" href="#" data-view="bitacora" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+        Bitácora
+      </a>
+    </div>
+
+    <div class="sb-footer">
+      <div class="sb-user-card">
+        <div class="sb-av">JR</div>
+        <div class="sb-uinfo">
+          <div class="sb-uname">Juan Ramírez</div>
+          <div class="sb-urole">ADMINISTRADOR</div>
+        </div>
+        <button class="sb-logout" title="Cerrar sesión" onclick="location.href='login.html'">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M5 2H2V11H5M8.5 4.5L11 6.5L8.5 8.5M5 6.5H11" stroke="#ef4444" stroke-width="1.1" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="view on" id="v-resumen">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <span>Resumen</span></div>
+        <div class="ph-title">Clientes y accesos</div>
+        <div class="ph-sub">Quién está registrado, el estado de su contraseña y qué comentarios están por publicar.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button><button class="btn-sm btn-sm-primary">+ Nuevo cliente</button></div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-top"><div class="kpi-label">Clientes registrados</div></div>
+        <div class="kpi-val"><span>128</span></div><div class="kpi-delta delta-up">▲ +6 este mes</div><div class="kpi-glow"></div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-label">Solicitudes nuevas</div></div>
+        <div class="kpi-val"><span>9</span></div><div class="kpi-delta delta-up">▲ 3 sin atender</div><div class="kpi-glow"></div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-label">Cuentas bloqueadas</div></div>
+        <div class="kpi-val"><span>2</span></div><div class="kpi-delta delta-dn">▼ requieren desbloqueo</div><div class="kpi-glow"></div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-label">Comentarios por aprobar</div></div>
+        <div class="kpi-val"><span>4</span></div><div class="kpi-delta delta-dn">▼ pendientes de revisión</div><div class="kpi-glow"></div></div>
+    </div>
+
+    <div class="content-grid">
+      <div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-hdr"><div class="card-title">Clientes con acceso</div>
+            <button class="card-action" onclick="irAVista('clientes')">VER TODOS →</button></div>
+          <table class="tbl">
+            <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Producto</th><th>Acceso</th><th>Acciones</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="tbl-id">#C-0091</td>
+                <td class="tbl-name">Carlos López</td>
+                <td class="tbl-email">carlos.lopez@gmail.com</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
+                <td><span class="status st-active">ACTIVO</span></td>
+                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0090</td>
+                <td class="tbl-name">María Torres</td>
+                <td class="tbl-email">m.torres@logco.pe</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
+                <td><span class="status st-active">ACTIVO</span></td>
+                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0089</td>
+                <td class="tbl-name">Diego Fuentes</td>
+                <td class="tbl-email">d.fuentes@transp.co</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">VIAX</span></td>
+                <td><span class="status st-blocked">BLOQUEADO</span></td>
+                <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0088</td>
+                <td class="tbl-name">Ana Ríos</td>
+                <td class="tbl-email">ana.rios@fletex.ec</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
+                <td><span class="status st-pending">CLAVE PENDIENTE</span></td>
+                <td><div class="rowact"><button class="mini ok">Enviar clave</button><button class="mini warn">Bloquear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0087</td>
+                <td class="tbl-name">Luis Méndez</td>
+                <td class="tbl-email">luis.m@cargo.gt</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLEXY</span></td>
+                <td><span class="status st-inactive">INACTIVO</span></td>
+                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini ok">Activar</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Intentos de acceso fallidos</div>
+            <button class="card-action" onclick="irAVista('accesos')">HISTORIAL →</button></div>
+          <table class="tbl">
+            <thead><tr><th>Cliente</th><th>Fecha y hora</th><th>IP</th><th>Captcha</th><th>Intentos</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="tbl-name">Diego Fuentes</td>
+                <td class="tbl-email">Hoy · 09:42</td>
+                <td class="tbl-id">190.12.44.7</td>
+                <td><span class="status st-inactive">NO SUPERADO</span></td>
+                <td><span class="status st-blocked">3 · BLOQUEADO</span></td>
+              </tr>
+              <tr>
+                <td class="tbl-name">Nadia Ocampo</td>
+                <td class="tbl-email">Hoy · 09:10</td>
+                <td class="tbl-id">168.90.21.4</td>
+                <td><span class="status st-inactive">NO SUPERADO</span></td>
+                <td><span class="status st-blocked">3 · BLOQUEADO</span></td>
+              </tr>
+              <tr>
+                <td class="tbl-name">Ana Ríos</td>
+                <td class="tbl-email">Hoy · 08:15</td>
+                <td class="tbl-id">201.44.9.120</td>
+                <td><span class="status st-active">OK</span></td>
+                <td><span class="status st-pending">2 · EN RIESGO</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="hint">Al <b>tercer intento fallido</b> la cuenta se bloquea sola y solo el administrador puede liberarla. El captcha no superado cuenta como intento.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-hdr"><div class="card-title">Comentarios por aprobar</div>
+            <button class="card-action" onclick="irAVista('comentarios')">VER TODOS →</button></div>
+          <div class="qrow">
+            <div class="quote">“El manifiesto de pesos sale impreso con la orden y dejamos de tener problemas en balanza.”</div>
+            <div class="qmeta">ERNESTO CABRERA · QUBO · HACE 2 H</div>
+            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+          </div>
+          <div class="qrow">
+            <div class="quote">“Entro, filtro por mi compañía y ahí está todo: viajes en ruta, alertas y cierre del mes.”</div>
+            <div class="qmeta">SOFÍA HERRERA · EFLETEXIA BI · HACE 5 H</div>
+            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+          </div>
+          <div class="qrow">
+            <div class="quote">“Cualquiera del equipo cotiza en minutos y con el mismo criterio.”</div>
+            <div class="qmeta">PATRICIA NÚÑEZ · FLETEX · AYER</div>
+            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+          </div>
+          <div class="hint">Solo se pueden publicar comentarios de clientes que ya tienen el producto contratado.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Solicitudes de información</div>
+            <button class="card-action" onclick="irAVista('solicitudes')">TODAS →</button></div>
+          <div class="act-list">
+            <div class="act-item" style="display:flex;gap:10px;padding:12px 18px">
+              <div class="act-dot" style="background:var(--orange)"></div>
+              <div class="act-body"><div class="act-text">Jorge Lazo · Andina Cargo</div>
+              <div class="act-time">QUBO · PERÚ · HOY · 09:20</div></div>
+            </div>
+            <div class="act-item" style="display:flex;gap:10px;padding:12px 18px">
+              <div class="act-dot" style="background:var(--orange)"></div>
+              <div class="act-body"><div class="act-text">Rocío Paredes · Distribuidora Sur</div>
+              <div class="act-time">EFLETEXIA BI · ECUADOR · HOY · 08:05</div></div>
+            </div>
+            <div class="act-item" style="display:flex;gap:10px;padding:12px 18px">
+              <div class="act-dot" style="background:var(--orange)"></div>
+              <div class="act-body"><div class="act-text">Hugo Ramírez · Transportes Colón</div>
+              <div class="act-time">FLETEX · GUATEMALA · HOY · 06:41</div></div>
+            </div>
+            <div class="act-item" style="display:flex;gap:10px;padding:12px 18px">
+              <div class="act-dot" style="background:var(--muted)"></div>
+              <div class="act-body"><div class="act-text">Elena Ruiz · Log Andes</div>
+              <div class="act-time">ASESORÍA · PERÚ · AYER · 16:12</div></div>
+            </div>
+          </div>
+          <div class="hint">Vienen del formulario de la web. <b>No son usuarios</b>: se convierten en cliente cuando contratan.</div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="view" id="v-clientes">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <span>Clientes</span></div>
+        <div class="ph-title">Clientes</div>
+        <div class="ph-sub">Todos los clientes con acceso a la plataforma y el producto que contrataron.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button><button class="btn-sm btn-sm-primary">+ Nuevo cliente</button></div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <input class="search" placeholder="Buscar por nombre, correo o producto…">
+        <button class="fbtn on">Todos</button>
+        <button class="fbtn">Activos</button>
+        <button class="fbtn">Bloqueados</button>
+        <button class="fbtn">Clave pendiente</button>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Producto</th><th>Subcuentas</th><th>Alta</th><th>Acceso</th><th>Acciones</th></tr></thead>
+        <tbody>
+              <tr>
+                <td class="tbl-id">#C-0091</td>
+                <td class="tbl-name">Carlos López</td>
+                <td class="tbl-email">carlos.lopez@gmail.com</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
+                <td class="tbl-id" style="color:var(--muted)">4 / 10</td>
+                <td class="tbl-email">12 ago 2026</td>
+                <td><span class="status st-active">ACTIVO</span></td>
+                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0090</td>
+                <td class="tbl-name">María Torres</td>
+                <td class="tbl-email">m.torres@logco.pe</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
+                <td class="tbl-id" style="color:var(--muted)">2 / 5</td>
+                <td class="tbl-email">03 ago 2026</td>
+                <td><span class="status st-active">ACTIVO</span></td>
+                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0089</td>
+                <td class="tbl-name">Diego Fuentes</td>
+                <td class="tbl-email">d.fuentes@transp.co</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">VIAX</span></td>
+                <td class="tbl-id" style="color:var(--muted)">7 / 10</td>
+                <td class="tbl-email">28 jul 2026</td>
+                <td><span class="status st-blocked">BLOQUEADO</span></td>
+                <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0088</td>
+                <td class="tbl-name">Ana Ríos</td>
+                <td class="tbl-email">ana.rios@fletex.ec</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
+                <td class="tbl-id" style="color:var(--muted)">1 / 5</td>
+                <td class="tbl-email">21 jul 2026</td>
+                <td><span class="status st-pending">CLAVE PENDIENTE</span></td>
+                <td><div class="rowact"><button class="mini ok">Enviar clave</button><button class="mini warn">Bloquear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0087</td>
+                <td class="tbl-name">Luis Méndez</td>
+                <td class="tbl-email">luis.m@cargo.gt</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLEXY</span></td>
+                <td class="tbl-id" style="color:var(--muted)">0 / 3</td>
+                <td class="tbl-email">14 jul 2026</td>
+                <td><span class="status st-inactive">INACTIVO</span></td>
+                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini ok">Activar</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0086</td>
+                <td class="tbl-name">Rosa Delgado</td>
+                <td class="tbl-id" style="color:var(--muted)">3 / 10</td>
+                <td class="tbl-email">r.delgado@andina.pe</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
+                <td class="tbl-email">02 jul 2026</td>
+                <td><span class="status st-active">ACTIVO</span></td>
+                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0085</td>
+                <td class="tbl-name">Iván Guzmán</td>
+                <td class="tbl-id" style="color:#ef4444">5 / 5</td>
+                <td class="tbl-email">ivan.g@nortecarga.mx</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
+                <td class="tbl-email">27 jun 2026</td>
+                <td><span class="status st-active">ACTIVO</span></td>
+                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-id">#C-0084</td>
+                <td class="tbl-name">Nadia Ocampo</td>
+                <td class="tbl-id" style="color:var(--muted)">2 / 10</td>
+                <td class="tbl-email">n.ocampo@surlog.cr</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
+                <td class="tbl-email">15 jun 2026</td>
+                <td><span class="status st-blocked">BLOQUEADO</span></td>
+                <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td>
+              </tr>
+        </tbody>
+      </table>
+      <div class="hint">128 clientes registrados · se muestran los 8 más recientes. La columna <b>Subcuentas</b> es solo informativa: cada cliente crea y administra las suyas dentro de la solución que contrató.</div>
+    </div>
+    </div>
+
+    <div class="view" id="v-accesos">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <span>Accesos y contraseñas</span></div>
+        <div class="ph-title">Accesos y contraseñas</div>
+        <div class="ph-sub">Intentos fallidos, cuentas bloqueadas y las reglas de seguridad del ingreso.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
+    </div>
+
+    <div class="twocol" style="margin-bottom:18px">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Cuentas bloqueadas</div></div>
+        <table class="tbl">
+          <thead><tr><th>Cliente</th><th>Motivo</th><th>Desde</th><th>Acciones</th></tr></thead>
+          <tbody>
+            <tr><td class="tbl-name">Diego Fuentes</td><td class="tbl-email">3 intentos fallidos</td>
+              <td class="tbl-email">Hoy · 09:42</td>
+              <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td></tr>
+            <tr><td class="tbl-name">Nadia Ocampo</td><td class="tbl-email">Captcha no superado</td>
+              <td class="tbl-email">Hoy · 09:10</td>
+              <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td></tr>
+          </tbody>
+        </table>
+        <div class="hint">Al desbloquear se envía una contraseña temporal al correo del cliente.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Reglas de ingreso</div></div>
+        <div class="setrow">
+          <div><div class="setl">Intentos permitidos</div><div class="setd">Al superarlos, la cuenta se bloquea sola.</div></div>
+          <div class="setv">3</div>
+        </div>
+        <div class="setrow">
+          <div><div class="setl">Captcha en el login</div><div class="setd">Frena los intentos automatizados. Si no se supera, cuenta como intento fallido.</div></div>
+          <div class="setv">ACTIVO</div>
+        </div>
+        <div class="setrow">
+          <div><div class="setl">Vigencia de la clave temporal</div><div class="setd">Tiempo para que el cliente cambie la contraseña que se le envió.</div></div>
+          <div class="setv">24 H</div>
+        </div>
+        <div class="setrow">
+          <div><div class="setl">Quién puede desbloquear</div><div class="setd">El cliente no puede liberarse solo.</div></div>
+          <div class="setv">ADMIN</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Intentos de acceso fallidos</div>
+        <button class="card-action">EXPORTAR →</button></div>
+      <table class="tbl">
+        <thead><tr><th>Cliente</th><th>Fecha y hora</th><th>IP</th><th>Captcha</th><th>Intentos</th></tr></thead>
+        <tbody>
+              <tr>
+                <td class="tbl-name">Diego Fuentes</td>
+                <td class="tbl-email">Hoy · 09:42</td>
+                <td class="tbl-id">190.12.44.7</td>
+                <td><span class="status st-inactive">NO SUPERADO</span></td>
+                <td><span class="status st-blocked">3 · BLOQUEADO</span></td>
+              </tr>
+              <tr>
+                <td class="tbl-name">Nadia Ocampo</td>
+                <td class="tbl-email">Hoy · 09:10</td>
+                <td class="tbl-id">168.90.21.4</td>
+                <td><span class="status st-inactive">NO SUPERADO</span></td>
+                <td><span class="status st-blocked">3 · BLOQUEADO</span></td>
+              </tr>
+              <tr>
+                <td class="tbl-name">Ana Ríos</td>
+                <td class="tbl-email">Hoy · 08:15</td>
+                <td class="tbl-id">201.44.9.120</td>
+                <td><span class="status st-active">OK</span></td>
+                <td><span class="status st-pending">2 · EN RIESGO</span></td>
+              </tr>
+              <tr>
+                <td class="tbl-name">Luis Méndez</td>
+                <td class="tbl-email">Ayer · 17:08</td>
+                <td class="tbl-id">186.77.2.31</td>
+                <td><span class="status st-active">OK</span></td>
+                <td><span class="status st-pending">1</span></td>
+              </tr>
+              <tr>
+                <td class="tbl-name">Carlos López</td>
+                <td class="tbl-email">Ayer · 09:55</td>
+                <td class="tbl-id">189.203.7.88</td>
+                <td><span class="status st-active">OK</span></td>
+                <td><span class="status st-pending">1</span></td>
+              </tr>
+        </tbody>
+      </table>
+      <div class="hint">Cada intento queda registrado con su fecha, su IP y si superó el captcha.</div>
+    </div>
+    </div>
+
+    <div class="view" id="v-comentarios">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <span>Comentarios</span></div>
+        <div class="ph-title">Comentarios</div>
+        <div class="ph-sub">Las referencias que escriben los clientes sobre los productos que contrataron.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <input class="search" placeholder="Buscar por cliente o producto…">
+        <button class="fbtn on">Por aprobar</button>
+        <button class="fbtn">Publicados</button>
+        <button class="fbtn">Rechazados</button>
+      </div>
+          <div class="qrow">
+            <div class="quote">“El manifiesto de pesos sale impreso con la orden y dejamos de tener problemas en balanza.”</div>
+            <div class="qmeta">ERNESTO CABRERA · QUBO · HACE 2 H</div>
+            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+          </div>
+          <div class="qrow">
+            <div class="quote">“Entro, filtro por mi compañía y ahí está todo: viajes en ruta, alertas y cierre del mes.”</div>
+            <div class="qmeta">SOFÍA HERRERA · EFLETEXIA BI · HACE 5 H</div>
+            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+          </div>
+          <div class="qrow">
+            <div class="quote">“Cualquiera del equipo cotiza en minutos y con el mismo criterio.”</div>
+            <div class="qmeta">PATRICIA NÚÑEZ · FLETEX · AYER</div>
+            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+          </div>
+          <div class="qrow">
+            <div class="quote">“Las restricciones de altura y horario vienen cargadas, y eso nos quitó dos o tres sustos por semana.”</div>
+            <div class="qmeta">JULIO BENÍTEZ · VIAX · AYER</div>
+            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+          </div>
+          <div class="qrow">
+            <div class="quote">“El agente recibe, orienta y deja registro a cualquier hora.”</div>
+            <div class="qmeta">MARCELA RÍOS · EFLEXY · 12 SEP · PUBLICADO</div>
+            <div class="qactions"><span class="status st-active">PUBLICADO</span></div>
+          </div>
+      <div class="hint">Solo puede comentar un cliente que ya tiene el producto contratado. Lo que se publica aparece en la sección de referencias de la web.</div>
+    </div>
+    </div>
+
+    <div class="view" id="v-solicitudes">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <span>Solicitudes</span></div>
+        <div class="ph-title">Solicitudes de información</div>
+        <div class="ph-sub">Lo que llega del formulario de la web. Todavía no son clientes.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <input class="search" placeholder="Buscar por nombre, empresa o país…">
+        <button class="fbtn on">Todas</button>
+        <button class="fbtn">Nuevas</button>
+        <button class="fbtn">Contactadas</button>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>Fecha</th><th>Nombre</th><th>Empresa</th><th>Correo</th><th>País</th><th>Interés</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody>
+              <tr>
+                <td class="tbl-email">Hoy · 09:20</td>
+                <td class="tbl-name">Jorge Lazo</td>
+                <td class="tbl-email">Andina Cargo</td>
+                <td class="tbl-email">j.lazo@andinacargo.pe</td>
+                <td class="tbl-email">Perú</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
+                <td><span class="status st-pending">NUEVA</span></td>
+                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Hoy · 08:05</td>
+                <td class="tbl-name">Rocío Paredes</td>
+                <td class="tbl-email">Distribuidora Sur</td>
+                <td class="tbl-email">rocio@dsur.ec</td>
+                <td class="tbl-email">Ecuador</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
+                <td><span class="status st-pending">NUEVA</span></td>
+                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Hoy · 06:41</td>
+                <td class="tbl-name">Hugo Ramírez</td>
+                <td class="tbl-email">Transportes Colón</td>
+                <td class="tbl-email">hugo.r@tcolon.gt</td>
+                <td class="tbl-email">Guatemala</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
+                <td><span class="status st-pending">NUEVA</span></td>
+                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Ayer · 16:12</td>
+                <td class="tbl-name">Elena Ruiz</td>
+                <td class="tbl-email">Log Andes</td>
+                <td class="tbl-email">e.ruiz@logandes.pe</td>
+                <td class="tbl-email">Perú</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">ASESORÍA</span></td>
+                <td><span class="status st-active">CONTACTADA</span></td>
+                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Ayer · 11:30</td>
+                <td class="tbl-name">Pablo Sierra</td>
+                <td class="tbl-email">Cargo Norte</td>
+                <td class="tbl-email">p.sierra@cargonorte.mx</td>
+                <td class="tbl-email">México</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">VIAX</span></td>
+                <td><span class="status st-active">CONTACTADA</span></td>
+                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
+              </tr>
+              <tr>
+                <td class="tbl-email">12 sep</td>
+                <td class="tbl-name">Lucía Barrios</td>
+                <td class="tbl-email">Frío Express</td>
+                <td class="tbl-email">lucia@frioexpress.cr</td>
+                <td class="tbl-email">Costa Rica</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
+                <td><span class="status st-inactive">SIN INTERÉS</span></td>
+                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
+              </tr>
+        </tbody>
+      </table>
+      <div class="hint">Una solicitud <b>no crea usuario ni contraseña</b>. Si la persona contrata, ventas la da de alta como cliente y ahí se le genera el acceso.</div>
+    </div>
+    </div>
+
+    <div class="view" id="v-productos">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <span>Productos</span></div>
+        <div class="ph-title">Productos</div>
+        <div class="ph-sub">Las cinco soluciones del catálogo: lo que se muestra en la web y cuántas subcuentas admite cada una.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-hdr"><div class="card-title">Catálogo</div></div>
+      <table class="tbl">
+        <thead><tr><th>Producto</th><th>Descripción corta</th><th>En la web</th><th>Admite subcuentas</th><th>Tope de subcuentas</th><th>Acciones</th></tr></thead>
+        <tbody>
+              <tr>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLEXY</span></td>
+                <td class="tbl-name">Robots de última milla</td>
+                <td><span class="status st-active">VISIBLE</span></td>
+                <td class="tbl-email">Sí</td>
+                <td class="tbl-id">10</td>
+                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+              </tr>
+              <tr>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">VIAX</span></td>
+                <td class="tbl-name">Navegación y millas</td>
+                <td><span class="status st-active">VISIBLE</span></td>
+                <td class="tbl-email">Sí</td>
+                <td class="tbl-id">10</td>
+                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+              </tr>
+              <tr>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
+                <td class="tbl-name">Simulador de tarifas</td>
+                <td><span class="status st-active">VISIBLE</span></td>
+                <td class="tbl-email">Sí</td>
+                <td class="tbl-id">10</td>
+                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+              </tr>
+              <tr>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
+                <td class="tbl-name">Simulador de cubicaje</td>
+                <td><span class="status st-active">VISIBLE</span></td>
+                <td class="tbl-email">Sí</td>
+                <td class="tbl-id">10</td>
+                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+              </tr>
+              <tr>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
+                <td class="tbl-name">Centro de control</td>
+                <td><span class="status st-active">VISIBLE</span></td>
+                <td class="tbl-email">Sí</td>
+                <td class="tbl-id">10</td>
+                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+              </tr>
+        </tbody>
+      </table>
+      <div class="hint">Este catálogo alimenta las tarjetas de la web y el selector de <b>producto de interés</b> del formulario. El tope es el máximo de accesos que el cliente puede crear dentro de esa solución.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Configuración del sitio</div></div>
+      <div class="setrow">
+        <div><div class="setl">Correo que recibe las solicitudes</div><div class="setd">A dónde llega lo que se envía desde el formulario de la web.</div></div>
+        <div class="setv">comercial@efletexia.com</div>
+      </div>
+      <div class="setrow">
+        <div><div class="setl">WhatsApp de contacto</div><div class="setd">El número del botón “Hablar con un especialista”.</div></div>
+        <div class="setv">+52 222 328 4900</div>
+      </div>
+      <div class="setrow">
+        <div><div class="setl">Países del formulario</div><div class="setd">Los que aparecen en la lista desplegable.</div></div>
+        <div class="setv">10 PAÍSES</div>
+      </div>
+      <div class="setrow">
+        <div><div class="setl">Referencias visibles en la web</div><div class="setd">Cuántos comentarios aprobados se muestran en la sección de referencias.</div></div>
+        <div class="setv">6</div>
+      </div>
+    </div>
+    </div>
+
+    <div class="view" id="v-bitacora">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <span>Bitácora</span></div>
+        <div class="ph-title">Bitácora</div>
+        <div class="ph-sub">Quién hizo qué y cuándo. Toda acción sobre una contraseña o un comentario queda registrada.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <input class="search" placeholder="Buscar por administrador, acción o cliente…">
+        <button class="fbtn on">Todo</button>
+        <button class="fbtn">Contraseñas</button>
+        <button class="fbtn">Comentarios</button>
+        <button class="fbtn">Clientes</button>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>Fecha</th><th>Quién</th><th>Acción</th><th>Sobre</th><th>Detalle</th></tr></thead>
+        <tbody>
+              <tr>
+                <td class="tbl-email">Hoy · 09:44</td>
+                <td class="tbl-name">Juan Ramírez</td>
+                <td class="tbl-email">Desbloqueó cuenta</td>
+                <td class="tbl-name">Diego Fuentes</td>
+                <td class="tbl-email">Tras 3 intentos fallidos</td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Hoy · 09:12</td>
+                <td class="tbl-name">Juan Ramírez</td>
+                <td class="tbl-email">Publicó comentario</td>
+                <td class="tbl-name">Ernesto Cabrera</td>
+                <td class="tbl-email">Referencia de Qubo</td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Hoy · 08:30</td>
+                <td class="tbl-name">Sistema</td>
+                <td class="tbl-email">Bloqueó cuenta</td>
+                <td class="tbl-name">Nadia Ocampo</td>
+                <td class="tbl-email">Captcha no superado</td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Ayer · 18:05</td>
+                <td class="tbl-name">Juan Ramírez</td>
+                <td class="tbl-email">Reseteó contraseña</td>
+                <td class="tbl-name">Ana Ríos</td>
+                <td class="tbl-email">Clave temporal enviada</td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Ayer · 15:20</td>
+                <td class="tbl-name">Marta Díaz</td>
+                <td class="tbl-email">Dio de alta cliente</td>
+                <td class="tbl-name">Rosa Delgado</td>
+                <td class="tbl-email">Contrató Qubo</td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Ayer · 10:02</td>
+                <td class="tbl-name">Juan Ramírez</td>
+                <td class="tbl-email">Rechazó comentario</td>
+                <td class="tbl-name">—</td>
+                <td class="tbl-email">Texto fuera de contexto</td>
+              </tr>
+              <tr>
+                <td class="tbl-email">12 sep · 16:40</td>
+                <td class="tbl-name">Marta Díaz</td>
+                <td class="tbl-email">Editó producto</td>
+                <td class="tbl-name">Efletexia BI</td>
+                <td class="tbl-email">Actualizó la descripción</td>
+              </tr>
+        </tbody>
+      </table>
+      <div class="hint">Las acciones marcadas como <b>Sistema</b> las ejecuta la propia plataforma: por ejemplo, el bloqueo automático al tercer intento fallido.</div>
+    </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── Navegación entre vistas
+function mostrar(vista) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  const v = document.getElementById('v-' + vista);
+  if (v) v.classList.add('on');
+  document.querySelectorAll('.sb-item').forEach(i =>
+    i.classList.toggle('active', i.dataset.view === vista));
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+function irA(el) { mostrar(el.dataset.view); }
+function irAVista(vista) { mostrar(vista); }
+
+// ── Filtros de la maqueta
+document.querySelectorAll('.toolbar').forEach(tb => {
+  tb.querySelectorAll('.fbtn').forEach(b => {
+    b.addEventListener('click', () => {
+      tb.querySelectorAll('.fbtn').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+    });
+  });
+});
+</script>
+
+</body>
+</html>

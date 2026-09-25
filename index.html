@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EfletexIA — Software de distribución y logística con IA</title>
+<meta name="description" content="Plataforma integral de distribución y logística con IA para LatAm: gestión de flotas, ruteo inteligente, cubicaje, cotización y torre de control.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:      #0A0A0A;   /* dark-900 */
+  --bg2:     #111111;   /* dark-800 */
+  --bg3:     #1A1A1A;   /* dark-700 */
+  --bg4:     #050505;   /* dark-950 */
+  --brand:   #F97316;   /* brand-500 */
+  --brand400:#FB923C;
+  --brand600:#EA580C;
+  --line:    #262626;   /* neutral-800 */
+  --n300:    #D4D4D4;
+  --n400:    #A3A3A3;
+  --n500:    #737373;
+  --green:   #00FF94;
+  --cyan:    #00D4FF;
+  --orange:  #FF6B35;
+  --purple:  #B388FF;
+  --amber:   #FBBF24;
+  --grad:    linear-gradient(135deg,#FB923C,#F97316 50%,#EA580C);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+img{max-width:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.gradient-text{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* progreso de scroll, como en el sitio */
+.scroll-progress{position:fixed;top:0;left:0;height:2px;z-index:100;width:0;
+  background:linear-gradient(90deg,#F97316,#EA580C)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.rv.on{opacity:1;transform:none}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;
+  gap:18px;padding:14px 32px;background:rgba(10,10,10,.8);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(38,38,38,.6);flex-wrap:wrap}
+.brand{font-size:19px;font-weight:700;letter-spacing:-.4px}
+.brand i{font-style:normal;color:var(--brand)}
+.nav-links{display:flex;gap:30px;list-style:none}
+.nav-links a{font-size:14px;font-weight:500;color:var(--n400);transition:color .2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;
+  font-size:14px;font-weight:500;transition:all .3s ease;cursor:pointer;border:none;
+  font-family:'Inter',sans-serif;padding:10px 20px}
+.btn-p{background:var(--brand);color:#fff;box-shadow:0 0 24px rgba(249,115,22,.3)}
+.btn-p:hover{background:var(--brand600);box-shadow:0 0 48px rgba(249,115,22,.5);transform:translateY(-2px)}
+.btn-o{border:1px solid #525252;color:var(--n300);background:rgba(255,255,255,.03)}
+.btn-o:hover{border-color:#a3a3a3;color:#fff}
+.btn-lg{padding:14px 32px}
+.btn-txt{color:var(--n400);font-size:14px;font-weight:500;padding:10px 6px}
+.btn-txt:hover{color:#fff}
+
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;padding:88px 0 76px;text-align:center;
+  background:radial-gradient(900px 480px at 50% -10%,rgba(249,115,22,.14),transparent 62%),var(--bg)}
+.hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(249,115,22,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(249,115,22,.045) 1px,transparent 1px);
+  background-size:56px 56px;mask-image:linear-gradient(180deg,#000,transparent 78%)}
+.hero .wrap{position:relative;z-index:2}
+.pill{display:inline-flex;align-items:center;gap:9px;background:rgba(249,115,22,.1);
+  border:1px solid rgba(249,115,22,.2);border-radius:999px;padding:7px 17px;margin-bottom:30px}
+.pill span{font-size:12px;font-weight:500;color:var(--brand400);letter-spacing:.2px}
+.dot-live{width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-size:clamp(34px,6vw,70px);font-weight:700;letter-spacing:-2px;line-height:1.08;margin-bottom:24px}
+.hero-sub{font-size:clamp(16px,2vw,20px);color:var(--n300);font-weight:300;line-height:1.65;
+  max-width:640px;margin:0 auto 38px}
+.hbtns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
+.counters{display:flex;flex-wrap:wrap;gap:40px;justify-content:center}
+.ct-l{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px}
+.ct-d{width:6px;height:6px;border-radius:50%;background:var(--brand);animation:pulse 2.4s infinite}
+.ct-t{font-size:10px;color:var(--n500);text-transform:uppercase;letter-spacing:.18em}
+.ct-n{font-size:30px;font-weight:700;letter-spacing:-1px}
+
+/* ── PAISES ── */
+.belt{border-top:1px solid rgba(38,38,38,.6);border-bottom:1px solid rgba(38,38,38,.6);
+  background:var(--bg2);padding:28px 0;overflow:hidden}
+.belt-t{text-align:center;font-size:11px;color:var(--n500);text-transform:uppercase;
+  letter-spacing:.2em;margin-bottom:18px}
+.belt-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.cpill{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;
+  padding:7px 15px;font-size:13px;color:var(--n400);transition:all .25s}
+.cpill:hover{border-color:rgba(249,115,22,.4);color:#fff}
+
+/* ── SECCIONES ── */
+section.blk{padding:96px 0}
+.blk.alt{background:var(--bg2);border-top:1px solid rgba(38,38,38,.6);border-bottom:1px solid rgba(38,38,38,.6)}
+.head{text-align:center;max-width:720px;margin:0 auto 56px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;
+  color:var(--brand400);margin-bottom:18px}
+.eyebrow::before{content:'';width:18px;height:1px;background:var(--brand)}
+.eyebrow::after{content:'';width:18px;height:1px;background:var(--brand)}
+h2{font-size:clamp(26px,4.4vw,48px);font-weight:700;letter-spacing:-1.4px;line-height:1.1;margin-bottom:20px}
+.head p{color:var(--n400);font-size:18px;font-weight:300;line-height:1.7}
+
+/* ── TARJETAS DE SOLUCION ── */
+.sols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.sol{position:relative;overflow:hidden;display:block;height:100%;
+  background:rgba(17,17,17,.4);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:32px;
+  transition:all .4s ease}
+.sol::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sol:hover{box-shadow:0 20px 40px rgba(0,0,0,.3);transform:translateY(-3px)}
+.sol-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.2em;margin-bottom:14px}
+.sol-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.sol-name{font-size:24px;font-weight:700;line-height:1.1}
+.sol-tag{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;border:1px solid;
+  padding:5px 9px;flex-shrink:0;border-radius:999px}
+.sol-desc{font-size:14px;color:var(--n400);line-height:1.7;margin-bottom:20px}
+.sol-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.sol-list li{font-size:14px;color:var(--n400);display:flex;gap:9px;line-height:1.55}
+.sol-more{font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:gap .25s}
+.sol:hover .sol-more{gap:12px}
+.g{color:var(--green)} .c{color:var(--cyan)} .o{color:var(--orange)}
+.p{color:var(--purple)} .a{color:var(--amber)}
+.sol-g::before{background:linear-gradient(90deg,transparent,#00FF94,transparent)}
+.sol-c::before{background:linear-gradient(90deg,transparent,#00D4FF,transparent)}
+.sol-o::before{background:linear-gradient(90deg,transparent,#FF6B35,transparent)}
+.sol-p::before{background:linear-gradient(90deg,transparent,#B388FF,transparent)}
+.sol-a::before{background:linear-gradient(90deg,transparent,#FBBF24,transparent)}
+.sol-g:hover{border-color:rgba(0,255,148,.3)}
+.sol-c:hover{border-color:rgba(0,212,255,.3)}
+.sol-o:hover{border-color:rgba(255,107,53,.3)}
+.sol-p:hover{border-color:rgba(179,136,255,.3)}
+.sol-a:hover{border-color:rgba(251,191,36,.3)}
+.sol-wide{grid-column:1 / -1}
+
+/* ── INCLUIDO EN CADA SOLUCIÓN ── */
+.incl{margin-top:24px;border:1px solid rgba(255,255,255,.06);border-radius:16px;
+  background:rgba(17,17,17,.4);padding:30px 32px}
+.incl-t{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand400);
+  margin-bottom:22px;display:flex;align-items:center;gap:9px}
+.incl-t::before{content:'';width:16px;height:1px;background:var(--brand)}
+.incl-g{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.incl-c b{display:block;font-size:15.5px;font-weight:600;margin-bottom:7px}
+.incl-c span{font-size:13.5px;color:var(--n400);line-height:1.7}
+@media(max-width:820px){.incl-g{grid-template-columns:1fr;gap:20px}.incl{padding:24px}}
+
+/* ── CAPACIDADES ── */
+.caps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.cap{background:rgba(17,17,17,.4);border:1px solid rgba(255,255,255,.05);border-radius:16px;
+  padding:28px;transition:all .3s ease}
+.cap:hover{border-color:rgba(249,115,22,.3);background:var(--bg3);transform:translateY(-3px)}
+.cap-n{font-size:10px;letter-spacing:.2em;color:var(--brand400);margin-bottom:14px}
+.cap h3{font-size:17px;font-weight:600;margin-bottom:9px}
+.cap p{font-size:14px;color:var(--n400);line-height:1.7}
+
+/* ── REFERENCIAS ── */
+.refs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ref{background:rgba(17,17,17,.4);border:1px solid rgba(255,255,255,.05);border-radius:16px;
+  padding:28px;display:flex;flex-direction:column;gap:18px;position:relative;overflow:hidden;
+  transition:all .3s ease}
+.ref:hover{border-color:rgba(249,115,22,.25);transform:translateY(-3px);box-shadow:0 20px 40px rgba(0,0,0,.3)}
+.ref::before{content:'\201C';position:absolute;top:4px;right:18px;font-family:Georgia,serif;
+  font-size:66px;line-height:1;color:rgba(249,115,22,.12);pointer-events:none}
+.ref-tag{align-self:flex-start;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 11px;border-radius:999px;background:rgba(249,115,22,.1);
+  border:1px solid rgba(249,115,22,.25);color:var(--brand400)}
+.ref-q{font-size:14.5px;line-height:1.75;color:var(--n300);font-weight:300;flex:1}
+.ref-w{display:flex;align-items:center;gap:13px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)}
+.ref-av{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1px solid var(--line)}
+.ref-av svg{display:block;width:100%;height:100%}
+.ref-n{font-size:14px;font-weight:600}
+.ref-r{font-size:11.5px;color:var(--n500);margin-top:3px}
+.note{display:block;text-align:center;font-size:11px;color:var(--n500);text-transform:uppercase;
+  letter-spacing:.16em;border:1px dashed var(--line);border-radius:12px;padding:12px 18px;margin-top:28px}
+
+/* ── FORMULARIO ── */
+.formbox{max-width:780px;margin:0 auto;background:rgba(17,17,17,.5);
+  border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:36px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.fl{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.16em;
+  color:var(--n500);margin-bottom:8px}
+.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;color:#fff;font-family:'Inter',sans-serif;font-size:14px;
+  transition:border-color .2s,box-shadow .2s}
+.inp:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(249,115,22,.14)}
+.inp::placeholder{color:#525252}
+select.inp{cursor:pointer}
+select.inp option{background:var(--bg2);color:#fff}
+textarea.inp{resize:vertical;min-height:104px}
+.ffoot{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:24px}
+.fnote{font-size:13px;color:var(--n500);line-height:1.6;max-width:400px}
+.fok{display:none;margin-top:18px;padding:14px 16px;border-radius:12px;font-size:14px;
+  background:rgba(0,255,148,.07);border:1px solid rgba(0,255,148,.3);color:#66FFC0}
+
+/* ── FOOTER ── */
+footer{background:var(--bg4);border-top:1px solid rgba(38,38,38,.5);padding:56px 0 28px}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:44px}
+.fgrid>div>p{font-size:13px;color:var(--n500);line-height:1.7;margin-top:14px;max-width:290px}
+.fcol h5{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#fff;margin-bottom:16px}
+.fcol ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.fcol a{font-size:13.5px;color:var(--n500);transition:color .2s}
+.fcol a:hover{color:var(--brand400)}
+.socs{display:flex;gap:10px;margin-top:20px}
+.soc{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);display:flex;
+  align-items:center;justify-content:center;color:var(--n400);font-size:12px;font-weight:600;
+  transition:all .2s}
+.soc:hover{color:#fff;border-color:rgba(249,115,22,.5);background:rgba(255,255,255,.05)}
+.fbot{border-top:1px solid rgba(38,38,38,.5);padding-top:24px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--n500)}
+
+@media(max-width:1000px){
+  nav{padding:14px 20px}
+  .nav-links{display:none}
+  .sols,.caps,.refs{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr 1fr}
+  .counters{gap:26px}
+}
+@media(max-width:620px){
+  .f2{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr}
+  .sol,.cap,.ref,.formbox{padding:24px}
+}
+
+/* ── BANDA / CTA INTERMEDIA ── */
+.band{margin-top:40px;background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.2);
+  border-radius:16px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;
+  gap:22px;flex-wrap:wrap}
+.band h4{font-size:19px;font-weight:600}
+.band p{font-size:14px;color:var(--n400);margin-top:6px}
+
+/* ── FLUJO OPERATIVO ── */
+.step-head{max-width:760px;margin-bottom:40px}
+.step-k{display:inline-flex;align-items:center;gap:9px;font-size:11px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--brand400);margin-bottom:16px}
+.step-k b{font-weight:700;color:var(--brand)}
+.step-head h3{font-size:clamp(24px,3.6vw,40px);font-weight:700;letter-spacing:-1.2px;
+  line-height:1.12;margin-bottom:16px}
+.step-head p{font-size:16px;color:var(--n400);font-weight:300;line-height:1.7}
+.caps4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+
+/* franja destacada */
+.hl{margin-top:22px;border-left:2px solid var(--brand);background:rgba(249,115,22,.04);
+  border-radius:0 16px 16px 0;padding:22px 26px}
+.hl h4{font-size:15px;font-weight:600;margin-bottom:8px}
+.hl p{font-size:14px;color:var(--n400);line-height:1.7}
+
+/* lista numerada de la torre */
+.flow2{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:start}
+.nums{list-style:none;display:flex;flex-direction:column;gap:2px}
+.nums li{display:flex;gap:18px;padding:18px 0;border-bottom:1px solid rgba(38,38,38,.7)}
+.nums li:last-child{border-bottom:none}
+.nums b{font-size:12px;font-weight:600;color:var(--brand);letter-spacing:.1em;flex-shrink:0;padding-top:2px}
+.nums h4{font-size:15.5px;font-weight:600;margin-bottom:5px}
+.nums p{font-size:13.5px;color:var(--n400);line-height:1.65}
+
+/* panel en vivo */
+.live{background:rgba(17,17,17,.6);border:1px solid rgba(255,255,255,.06);border-radius:16px;
+  overflow:hidden;position:sticky;top:90px}
+.live-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;
+  border-bottom:1px solid rgba(38,38,38,.7)}
+.live-t{font-size:12px;font-weight:600;color:var(--n300)}
+.live-c{display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:#66FFC0;border:1px solid rgba(0,255,148,.3);
+  background:rgba(0,255,148,.08);border-radius:999px;padding:4px 10px}
+.live-c::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.8s infinite}
+.live-b{padding:8px 18px 18px}
+.live-r{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:16px 0;border-bottom:1px solid rgba(38,38,38,.55)}
+.live-r:last-child{border-bottom:none}
+.live-l{font-size:12px;color:var(--n500);text-transform:uppercase;letter-spacing:.14em}
+.live-v{font-size:26px;font-weight:700;letter-spacing:-.8px}
+
+/* tarjetas con viñetas */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.g3 .cap ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.g3 .cap ul li{font-size:13px;color:var(--n500);display:flex;gap:8px;line-height:1.55}
+.g3 .cap ul li::before{content:'·';color:var(--brand);font-weight:700}
+
+/* banda de cifras */
+.statband{margin-top:30px;background:rgba(17,17,17,.5);border:1px solid rgba(255,255,255,.06);
+  border-radius:16px;padding:30px;display:flex;align-items:center;justify-content:space-between;
+  gap:28px;flex-wrap:wrap}
+.statband h4{font-size:17px;font-weight:600;margin-bottom:8px}
+.statband p{font-size:14px;color:var(--n400);line-height:1.7;max-width:520px}
+.stnums{display:flex;gap:34px;flex-wrap:wrap}
+.stn{font-size:26px;font-weight:700;letter-spacing:-.8px}
+.stl{font-size:10px;color:var(--n500);text-transform:uppercase;letter-spacing:.16em;margin-top:6px}
+
+/* CTA final */
+.final{padding:104px 0;text-align:center;position:relative;overflow:hidden;
+  background:radial-gradient(760px 340px at 50% 0%,rgba(249,115,22,.13),transparent 66%),var(--bg)}
+.final h2{margin-bottom:18px}
+.final p{font-size:17px;color:var(--n400);font-weight:300;max-width:520px;margin:0 auto 34px;line-height:1.65}
+.final-legal{margin-top:24px;font-size:12.5px;color:var(--n500)}
+
+@media(max-width:1000px){
+  .caps4,.g3{grid-template-columns:1fr 1fr}
+  .flow2{grid-template-columns:1fr;gap:32px}
+  .live{position:static}
+}
+@media(max-width:620px){.caps4,.g3{grid-template-columns:1fr}.band,.statband{padding:22px}}
+
+/* ── BLOQUE DESTACADO CON GRAFICO ── */
+.feat{margin-top:44px;position:relative;overflow:hidden;border-radius:16px;
+  border:1px solid rgba(249,115,22,.22);
+  background:
+    radial-gradient(620px 300px at 88% 50%,rgba(249,115,22,.10),transparent 68%),
+    linear-gradient(120deg,rgba(17,17,17,.9),rgba(10,10,10,.9));
+  display:grid;grid-template-columns:1.12fr .88fr;gap:40px;align-items:center;
+  padding:40px 44px}
+.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--brand),transparent)}
+.feat-k{display:inline-flex;align-items:center;gap:8px;font-size:10.5px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--brand400);margin-bottom:16px}
+.feat-k::before{content:'';width:16px;height:1px;background:var(--brand)}
+.feat h4{font-size:clamp(20px,2.6vw,27px);font-weight:700;letter-spacing:-.7px;
+  line-height:1.2;margin-bottom:12px}
+.feat>div>p{font-size:15px;color:var(--n400);font-weight:300;line-height:1.7;max-width:430px}
+.feat-chips{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 26px}
+.fchip{font-size:11.5px;color:var(--n400);border:1px solid var(--line);border-radius:999px;
+  padding:6px 13px;transition:all .25s}
+.fchip:hover{border-color:rgba(249,115,22,.45);color:#fff}
+
+/* radar de la torre */
+.radar{width:100%;max-width:290px;margin:0 auto;display:block;overflow:visible}
+.radar .sweep{transform-origin:110px 110px;animation:spin 5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.radar .blip{animation:blink 2.6s ease-in-out infinite}
+.radar .blip2{animation:blink 2.6s ease-in-out .9s infinite}
+.radar .blip3{animation:blink 2.6s ease-in-out 1.7s infinite}
+@keyframes blink{0%,100%{opacity:.25}45%{opacity:1}}
+.radar .ring{animation:ripple 3.4s ease-out infinite}
+.radar .ring2{animation:ripple 3.4s ease-out 1.7s infinite}
+@keyframes ripple{0%{r:22px;opacity:.55}100%{r:96px;opacity:0}}
+
+@media(max-width:1000px){
+  .feat{grid-template-columns:1fr;padding:32px 26px;gap:30px}
+  .feat-gfx{order:-1}
+}
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="sp"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#top" class="brand">EFLETEX<i>IA</i></a>
+  <ul class="nav-links">
+    <li><a href="#soluciones">Soluciones</a></li>
+    <li><a href="#distribucion">Logística</a></li>
+    <li><a href="#medida">Desarrollo a Medida</a></li>
+    <li><a href="#referencias">Referencias</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-txt">Log in</a>
+    <a href="#contacto" class="btn btn-p">Solicitar información</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="pill"><span class="dot-live"></span><span>Plataforma Integral de Distribución · LatAm</span></div>
+    <h1>
+      <span>Software de distribución</span><br>
+      <span class="gradient-text">y logística con IA.</span><br>
+      <span class="gradient-text">Control total.</span>
+    </h1>
+    <p class="hero-sub">Un solo lugar para conocer todas las soluciones de Efletexia: robots de última milla, navegación de carga, cotización, cubicaje y el centro de control de la operación.</p>
+    <div class="hbtns">
+      <a href="#contacto" class="btn btn-p btn-lg">Solicitar información</a>
+      <a href="#soluciones" class="btn btn-o btn-lg">Ver las soluciones</a>
+    </div>
+    <div class="counters">
+      <div>
+        <div class="ct-l"><span class="ct-d"></span><span class="ct-t">Viajes en curso</span></div>
+        <div class="ct-n" data-to="1240">0</div>
+      </div>
+      <div>
+        <div class="ct-l"><span class="ct-d" style="animation-delay:.6s"></span><span class="ct-t">Avance colocación</span></div>
+        <div class="ct-n" data-to="94" data-suf="%">0</div>
+      </div>
+      <div>
+        <div class="ct-l"><span class="ct-d" style="animation-delay:1.2s"></span><span class="ct-t">Cumplimiento en SLA</span></div>
+        <div class="ct-n" data-to="98" data-suf="%">0</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAISES -->
+<div class="belt">
+  <p class="belt-t">Operaciones activas en 10 países de LatAm</p>
+  <div class="wrap belt-row">
+    <span class="cpill">🇲🇽 México</span>
+    <span class="cpill">🇬🇹 Guatemala</span>
+    <span class="cpill">🇭🇳 Honduras</span>
+    <span class="cpill">🇸🇻 El Salvador</span>
+    <span class="cpill">🇳🇮 Nicaragua</span>
+    <span class="cpill">🇨🇷 Costa Rica</span>
+    <span class="cpill">🇵🇦 Panamá</span>
+    <span class="cpill">🇨🇴 Colombia</span>
+    <span class="cpill">🇪🇨 Ecuador</span>
+    <span class="cpill">🇵🇪 Perú</span>
+  </div>
+</div>
+
+<!-- SOLUCIONES -->
+<section class="blk" id="soluciones">
+  <div class="wrap">
+    <div class="head rv">
+      <div class="eyebrow">Ecosistema de Soluciones</div>
+      <h2>Tecnología especializada para <span class="gradient-text">cada reto logístico</span></h2>
+      <p>Cinco productos de alto impacto que complementan toda la operación.</p>
+    </div>
+    <div class="sols">
+
+      <a class="sol sol-g rv" href="eflexy.html">
+        <div class="sol-kicker g">Última Milla Autónoma</div>
+        <div class="sol-top">
+          <div class="sol-name g">EFLEXY</div>
+          <span class="sol-tag g" style="border-color:rgba(0,255,148,.3)">Automatización Robótica</span>
+        </div>
+        <p class="sol-desc">Distribución autónoma en entornos comerciales. Reduce costos de última milla mediante navegación robótica.</p>
+        <ul class="sol-list">
+          <li><span class="g">·</span>Navegación autónoma en campus y zonas urbanas</li>
+          <li><span class="g">·</span>Confirmación por código o biometría</li>
+          <li><span class="g">·</span>Panel de monitoreo de flota en tiempo real</li>
+        </ul>
+        <span class="sol-more g">Conocer Eflexy →</span>
+      </a>
+
+      <a class="sol sol-c rv" href="viax.html">
+        <div class="sol-kicker c">Copiloto Digital · Transporte Pesado</div>
+        <div class="sol-top">
+          <div class="sol-name c">Viax</div>
+          <span class="sol-tag c" style="border-color:rgba(0,212,255,.3)">Navegación IA</span>
+        </div>
+        <p class="sol-desc">Navegación para carga pesada con restricciones reales: alturas, pesos por eje y zonas de riesgo. Funciona sin señal.</p>
+        <ul class="sol-list">
+          <li><span class="c">·</span>13 pasos estandarizados con recompensas</li>
+          <li><span class="c">·</span>Registro de eventos y evidencias en ruta</li>
+          <li><span class="c">·</span>Integración con GPS y Torre de Control</li>
+        </ul>
+        <span class="sol-more c">Conocer Viax →</span>
+      </a>
+
+      <a class="sol sol-o rv" href="fletex.html">
+        <div class="sol-kicker o">Cotizador · Transporte Pesado</div>
+        <div class="sol-top">
+          <div class="sol-name o">Fletex</div>
+          <span class="sol-tag o" style="border-color:rgba(255,107,53,.3)">Cotización IA</span>
+        </div>
+        <p class="sol-desc">Cotización instantánea considerando combustible, peajes, tiempos y márgenes por corredor.</p>
+        <ul class="sol-list">
+          <li><span class="o">·</span>Costo técnico real, concepto por concepto</li>
+          <li><span class="o">·</span>Tarifa mínima, objetivo y margen realizado</li>
+          <li><span class="o">·</span>Configuración independiente por país</li>
+        </ul>
+        <span class="sol-more o">Conocer Fletex →</span>
+      </a>
+
+      <a class="sol sol-p rv" href="qubo.html">
+        <div class="sol-kicker p">Cubicación Inteligente</div>
+        <div class="sol-top">
+          <div class="sol-name p">Qubo</div>
+          <span class="sol-tag p" style="border-color:rgba(179,136,255,.3)">Optimización 3D</span>
+        </div>
+        <p class="sol-desc">Optimización volumétrica del cargue. Maximiza capacidad cúbica, reduce viajes y valida el peso por eje.</p>
+        <ul class="sol-list">
+          <li><span class="p">·</span>Acomodo con restricciones de peso y fragilidad</li>
+          <li><span class="p">·</span>Plano de estiba y manifiesto por ejes</li>
+          <li><span class="p">·</span>Planificación del despacho por olas</li>
+        </ul>
+        <span class="sol-more p">Conocer Qubo →</span>
+      </a>
+
+      <a class="sol sol-a sol-wide rv" href="efletexia-bi.html">
+        <div class="sol-kicker a">Centro de Control · Operación</div>
+        <div class="sol-top">
+          <div class="sol-name a">Efletexia BI</div>
+          <span class="sol-tag a" style="border-color:rgba(251,191,36,.3)">Seguimiento y Reportes</span>
+        </div>
+        <p class="sol-desc">Centraliza la operación logística en una sola web: seguimiento por referencia, alertas de Torre de Control y reportería, más el tablero de proyectos eFletexia Total. Todo filtrado por país y compañía según el perfil del usuario.</p>
+        <ul class="sol-list">
+          <li><span class="a">·</span>Seguimiento por referencia: dónde va cada viaje</li>
+          <li><span class="a">·</span>Reportes de Torre de Control, facturación OPL y cobertura de flota</li>
+          <li><span class="a">·</span>Usuarios con permisos por reporte, país y compañía</li>
+        </ul>
+        <span class="sol-more a">Conocer Efletexia BI →</span>
+      </a>
+
+    </div>
+
+    <div class="incl rv">
+      <div class="incl-t">Incluido en toda solución que contrates</div>
+      <div class="incl-g">
+        <div class="incl-c"><b>Hasta 10 accesos</b><span>Das de alta a tu equipo desde tu propia cuenta, sin pedírselo a soporte.</span></div>
+        <div class="incl-c"><b>Permisos por persona</b><span>Cada quien entra con su correo y ve solo los módulos que le habilitas.</span></div>
+        <div class="incl-c"><b>Un solo ingreso</b><span>Entras con tu cuenta de Efletexia y desde ahí pasas a la solución que contrataste.</span></div>
+      </div>
+    </div>
+
+    <div class="feat rv">
+      <div>
+        <div class="feat-k">Desarrollo a medida</div>
+        <h4>¿Tu operación requiere un software único?</h4>
+        <p>No todo cabe en un catálogo. Diseñamos e implementamos la solución que tu cadena de distribución necesita, conectada al mismo ecosistema y a la Torre de Control.</p>
+        <div class="feat-chips">
+          <span class="fchip">Diagnóstico operativo</span>
+          <span class="fchip">Integración con tu TMS o ERP</span>
+          <span class="fchip">Automatización con IA</span>
+          <span class="fchip">Dashboards y KPIs</span>
+        </div>
+        <a href="#medida" class="btn btn-p">Diseñar solución a la medida</a>
+      </div>
+
+      <div class="feat-gfx">
+        <svg class="radar" viewBox="0 0 220 220" role="img" aria-label="Torre de control: cobertura de la operación en tiempo real">
+          <defs>
+            <linearGradient id="sw" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#F97316" stop-opacity=".55"/>
+              <stop offset="1" stop-color="#F97316" stop-opacity="0"/>
+            </linearGradient>
+            <radialGradient id="cen">
+              <stop offset="0" stop-color="#FB923C"/>
+              <stop offset="1" stop-color="#EA580C"/>
+            </radialGradient>
+          </defs>
+
+          <!-- retícula -->
+          <circle cx="110" cy="110" r="96" fill="none" stroke="#262626"/>
+          <circle cx="110" cy="110" r="70" fill="none" stroke="#262626"/>
+          <circle cx="110" cy="110" r="44" fill="none" stroke="#262626"/>
+          <line x1="110" y1="14" x2="110" y2="206" stroke="#262626"/>
+          <line x1="14" y1="110" x2="206" y2="110" stroke="#262626"/>
+
+          <!-- pulsos -->
+          <circle class="ring" cx="110" cy="110" r="22" fill="none" stroke="#F97316" stroke-opacity=".5"/>
+          <circle class="ring2" cx="110" cy="110" r="22" fill="none" stroke="#F97316" stroke-opacity=".5"/>
+
+          <!-- barrido -->
+          <g class="sweep">
+            <path d="M110 110 L110 14 A96 96 0 0 1 178 42 Z" fill="url(#sw)"/>
+            <line x1="110" y1="110" x2="110" y2="14" stroke="#F97316" stroke-opacity=".8"/>
+          </g>
+
+          <!-- unidades detectadas -->
+          <circle class="blip"  cx="152" cy="72"  r="4.5" fill="#00FF94"/>
+          <circle class="blip2" cx="74"  cy="148" r="4.5" fill="#00D4FF"/>
+          <circle class="blip3" cx="158" cy="146" r="4.5" fill="#FBBF24"/>
+          <circle class="blip2" cx="66"  cy="82"  r="3.5" fill="#B388FF"/>
+
+          <!-- nodos del ecosistema -->
+          <g fill="none" stroke="#262626">
+            <rect x="96" y="2" width="28" height="18" rx="5"/>
+            <rect x="192" y="96" width="26" height="28" rx="5"/>
+            <rect x="96" y="200" width="28" height="18" rx="5"/>
+            <rect x="2" y="96" width="26" height="28" rx="5"/>
+          </g>
+          <g fill="#737373" font-family="Inter, sans-serif" font-size="7.5" text-anchor="middle" letter-spacing="1">
+            <text x="110" y="14">TMS</text>
+            <text x="205" y="113">GPS</text>
+            <text x="110" y="212">ERP</text>
+            <text x="15" y="113">WMS</text>
+          </g>
+
+          <!-- centro -->
+          <circle cx="110" cy="110" r="15" fill="url(#cen)"/>
+          <circle cx="110" cy="110" r="23" fill="none" stroke="#F97316" stroke-opacity=".35"/>
+          <path d="M104 116 v-9 l6-5 6 5 v9 z" fill="#0A0A0A"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REFERENCIAS -->
+<section class="blk alt" id="referencias">
+  <div class="wrap">
+    <div class="head rv">
+      <div class="eyebrow">Lo que dicen nuestros clientes</div>
+      <h2>Referencias <span class="gradient-text">reales</span></h2>
+      <p>Operaciones que ya trabajan con el ecosistema Efletexia.</p>
+    </div>
+    <!-- TESTIMONIOS DE MUESTRA: personas y empresas ficticias. Reemplazar por
+         referencias reales autorizadas por cada cliente antes de publicar. -->
+    <div class="refs rv">
+
+      <div class="ref">
+        <span class="ref-tag">Eflexy</span>
+        <p class="ref-q">Teníamos el lobby cubierto solo en horario de oficina. Ahora el agente recibe, orienta y deja registro a cualquier hora, y el equipo de recepción se dedica a lo que sí necesita una persona.</p>
+        <div class="ref-w">
+          <div class="ref-av"><svg viewBox="0 0 64 64" role="img" aria-label="Marcela Ríos"><defs><linearGradient id="av1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00FF94"/><stop offset="1" stop-color="#00D4FF"/></linearGradient></defs><rect width="64" height="64" fill="url(#av1)"/><text x="32" y="41" text-anchor="middle" font-family="Inter, sans-serif" font-size="23" font-weight="700" fill="#0A0A0A">MR</text></svg></div>
+          <div><div class="ref-n">Marcela Ríos</div><div class="ref-r">Jefa de Operaciones · Distribuidora Andina</div></div>
+        </div>
+      </div>
+
+      <div class="ref">
+        <span class="ref-tag">Viax</span>
+        <p class="ref-q">Los conductores ya no improvisan la ruta ni se meten donde no pasa el tráiler. Las restricciones de altura y horario vienen cargadas, y eso nos quitó de encima dos o tres sustos por semana.</p>
+        <div class="ref-w">
+          <div class="ref-av"><svg viewBox="0 0 64 64" role="img" aria-label="Julio Benítez"><defs><linearGradient id="av2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00D4FF"/><stop offset="1" stop-color="#B388FF"/></linearGradient></defs><rect width="64" height="64" fill="url(#av2)"/><text x="32" y="41" text-anchor="middle" font-family="Inter, sans-serif" font-size="23" font-weight="700" fill="#0A0A0A">JB</text></svg></div>
+          <div><div class="ref-n">Julio Benítez</div><div class="ref-r">Gerente de Flota · Transportes del Valle</div></div>
+        </div>
+      </div>
+
+      <div class="ref">
+        <span class="ref-tag">Fletex</span>
+        <p class="ref-q">Antes la cotización dependía de una sola persona y de su archivo. Hoy cualquiera del equipo cotiza en minutos y con el mismo criterio, y sabemos con qué margen estamos cerrando cada viaje.</p>
+        <div class="ref-w">
+          <div class="ref-av"><svg viewBox="0 0 64 64" role="img" aria-label="Patricia Núñez"><defs><linearGradient id="av3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF6B35"/><stop offset="1" stop-color="#FBBF24"/></linearGradient></defs><rect width="64" height="64" fill="url(#av3)"/><text x="32" y="41" text-anchor="middle" font-family="Inter, sans-serif" font-size="23" font-weight="700" fill="#0A0A0A">PN</text></svg></div>
+          <div><div class="ref-n">Patricia Núñez</div><div class="ref-r">Jefa de Costos · Logística Serrano</div></div>
+        </div>
+      </div>
+
+      <div class="ref">
+        <span class="ref-tag">Qubo</span>
+        <p class="ref-q">El cambio se nota en la cantidad de unidades que despachamos. Mismo pedido, menos viajes, y el manifiesto de pesos sale impreso con la orden: dejamos de tener problemas en balanza.</p>
+        <div class="ref-w">
+          <div class="ref-av"><svg viewBox="0 0 64 64" role="img" aria-label="Ernesto Cabrera"><defs><linearGradient id="av4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B388FF"/><stop offset="1" stop-color="#00D4FF"/></linearGradient></defs><rect width="64" height="64" fill="url(#av4)"/><text x="32" y="41" text-anchor="middle" font-family="Inter, sans-serif" font-size="23" font-weight="700" fill="#0A0A0A">EC</text></svg></div>
+          <div><div class="ref-n">Ernesto Cabrera</div><div class="ref-r">Coordinador de Despacho · Corporación Mavil</div></div>
+        </div>
+      </div>
+
+      <div class="ref">
+        <span class="ref-tag">Efletexia BI</span>
+        <p class="ref-q">Lo que más valoro es que dejé de pedir reportes. Entro, filtro por mi compañía y ahí está todo: los viajes en ruta, las alertas abiertas y el cierre del mes.</p>
+        <div class="ref-w">
+          <div class="ref-av"><svg viewBox="0 0 64 64" role="img" aria-label="Sofía Herrera"><defs><linearGradient id="av5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBBF24"/><stop offset="1" stop-color="#F97316"/></linearGradient></defs><rect width="64" height="64" fill="url(#av5)"/><text x="32" y="41" text-anchor="middle" font-family="Inter, sans-serif" font-size="23" font-weight="700" fill="#0A0A0A">SH</text></svg></div>
+          <div><div class="ref-n">Sofía Herrera</div><div class="ref-r">Gerente de Supply Chain · Grupo Tarapoto</div></div>
+        </div>
+      </div>
+
+      <div class="ref">
+        <span class="ref-tag">Plataforma</span>
+        <p class="ref-q">Teníamos cuatro herramientas de cuatro proveedores distintos. Tener todo bajo una sola cuenta nos simplificó la vida, y la implementación fue mucho más rápida de lo que esperábamos.</p>
+        <div class="ref-w">
+          <div class="ref-av"><svg viewBox="0 0 64 64" role="img" aria-label="Diego Salazar"><defs><linearGradient id="av6" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F97316"/><stop offset="1" stop-color="#00FF94"/></linearGradient></defs><rect width="64" height="64" fill="url(#av6)"/><text x="32" y="41" text-anchor="middle" font-family="Inter, sans-serif" font-size="23" font-weight="700" fill="#0A0A0A">DS</text></svg></div>
+          <div><div class="ref-n">Diego Salazar</div><div class="ref-r">Director de Operaciones · Agroexport Nor</div></div>
+        </div>
+      </div>
+
+    </div>
+    <span class="note">Contenido de muestra — pendiente de reemplazar por referencias reales autorizadas por cada cliente</span>
+  </div>
+</section>
+
+<!-- FLUJO OPERATIVO -->
+<section class="blk" id="distribucion">
+  <div class="wrap">
+    <div class="head rv">
+      <div class="eyebrow">Flujo Operativo</div>
+      <h2>Logística <span class="gradient-text">de punta a punta</span></h2>
+      <p>Las tres etapas secuenciales del viaje físico de la mercancía, conectadas en una sola plataforma.</p>
+    </div>
+
+    <div class="step-head rv">
+      <div class="step-k"><b>Paso 01</b> — Distribución Primaria</div>
+      <h3>De la planta al<br><span class="gradient-text">punto de descarga</span></h3>
+      <p>Control completo del movimiento entre nodos con trazabilidad en tiempo real y alertas automáticas.</p>
+    </div>
+    <div class="caps4 rv">
+      <div class="cap"><div class="cap-n">01</div><h3>Rutas de Carga</h3><p>Asignación inteligente por peso, ventanas horarias y capacidad de flota.</p></div>
+      <div class="cap"><div class="cap-n">02</div><h3>Rastreo GPS en Tiempo Real</h3><p>Posición, velocidad, desvíos y ETA de cada unidad activa en la red.</p></div>
+      <div class="cap"><div class="cap-n">03</div><h3>Agentes de Llamada IA</h3><p>Confirmaciones y alertas automáticas sin intervención manual.</p></div>
+      <div class="cap"><div class="cap-n">04</div><h3>Visión Computacional</h3><p>Validación automática de fotos: descargue, sellos y documentos de entrega.</p></div>
+    </div>
+    <div class="hl rv">
+      <h4>7 Etapas con SLA y Escalamiento Automático</h4>
+      <p>Programación → Asignación → Cargue → En Tránsito → Llegada → Descargue → Cierre. Cada etapa con alertas configurables y escalamiento ante desviación.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TORRE DE CONTROL -->
+<section class="blk alt" id="torre">
+  <div class="wrap flow2">
+    <div class="rv">
+      <div class="step-k"><b>Paso 02</b> — Torre de Control</div>
+      <h3 style="font-size:clamp(24px,3.6vw,40px);font-weight:700;letter-spacing:-1.2px;line-height:1.12;margin-bottom:16px">Visibilidad total.<br><span class="gradient-text">Respuesta inmediata.</span></h3>
+      <p style="font-size:16px;color:var(--n400);font-weight:300;line-height:1.7;margin-bottom:26px">Centro neurálgico 24/7 con control especializado, 3 turnos y seguimiento por bloque de proceso.</p>
+      <ul class="nums">
+        <li><b>01</b><div><h4>4 Bloques de Proceso</h4><p>Salida · Tránsito · Llegada y Descargue · Cierre</p></div></li>
+        <li><b>02</b><div><h4>3 Turnos Continuos 24/7</h4><p>Sin brechas. Cobertura total del ciclo de distribución.</p></div></li>
+        <li><b>03</b><div><h4>Scoring 0–100 por Monitorista</h4><p>Contactabilidad, velocidad de respuesta y cierre de etapas.</p></div></li>
+        <li><b>04</b><div><h4>Dashboards en Tiempo Real</h4><p>Vista por turno, bloque y monitorista con alertas de SLA.</p></div></li>
+        <li><b>05</b><div><h4>Escalamiento Automático</h4><p>Viaje en riesgo → supervisor + agente de llamada activados.</p></div></li>
+      </ul>
+    </div>
+    <div class="live rv">
+      <div class="live-h">
+        <span class="live-t">Torre de Control — Turno Activo</span>
+        <span class="live-c">En Vivo</span>
+      </div>
+      <div class="live-b">
+        <div class="live-r"><span class="live-l">Viajes Activos</span><span class="live-v ct-n" data-to="312">0</span></div>
+        <div class="live-r"><span class="live-l">Avance Colocación</span><span class="live-v ct-n" data-to="94" data-suf="%">0</span></div>
+        <div class="live-r"><span class="live-l">Cumplimiento Llegada</span><span class="live-v ct-n" data-to="97" data-suf="%">0</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISTRIBUCION SECUNDARIA -->
+<section class="blk" id="secundaria">
+  <div class="wrap">
+    <div class="step-head rv">
+      <div class="step-k"><b>Paso 03</b> — Distribución Secundaria</div>
+      <h3>Del CEDI al<br><span class="gradient-text">punto de venta</span></h3>
+      <p>Ruteador, facturación móvil y seguimiento de entrega para la última milla comercial.</p>
+    </div>
+    <div class="g3 rv">
+      <div class="cap">
+        <div class="cap-n">01</div><h3>Ruteador Inteligente</h3>
+        <p>Optimización de rutas con reasignación dinámica ante cambios de último momento.</p>
+        <ul><li>Secuenciación automática por zona</li><li>Reasignación en tiempo real</li><li>Dashboard de cumplimiento</li></ul>
+      </div>
+      <div class="cap">
+        <div class="cap-n">02</div><h3>Facturación en Punto de Venta</h3>
+        <p>App del vendedor de ruta para facturar, cobrar y levantar pedidos en campo.</p>
+        <ul><li>Facturas y notas de remisión</li><li>Gestión de cobros y crédito</li><li>Historial y saldo de cliente</li></ul>
+      </div>
+      <div class="cap">
+        <div class="cap-n">03</div><h3>Seguimiento de Entrega</h3>
+        <p>Trazabilidad con firma digital, foto de evidencia y geolocalización.</p>
+        <ul><li>Registro de devoluciones y novedades</li><li>Alertas de visitas no realizadas</li><li>Liquidación diaria por vendedor</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DESARROLLO A MEDIDA -->
+<section class="blk alt" id="medida">
+  <div class="wrap">
+    <div class="head rv">
+      <div class="eyebrow">Desarrollo a Medida</div>
+      <h2>Tu operación es única. <span class="gradient-text">Tu software también.</span></h2>
+      <p>Diagnóstico, arquitectura e implementación de soluciones a medida.</p>
+    </div>
+    <div class="caps4 rv">
+      <div class="cap"><div class="cap-n">01</div><h3>Diagnóstico y Consultoría</h3><p>Mapeo de procesos, brechas y hoja de ruta tecnológica para tu operación.</p></div>
+      <div class="cap"><div class="cap-n">02</div><h3>Desarrollo a Medida</h3><p>Apps web, móviles y APIs para los retos de tu cadena de distribución.</p></div>
+      <div class="cap"><div class="cap-n">03</div><h3>Automatización con IA</h3><p>Agentes de llamada, análisis documental y optimización con modelos de lenguaje.</p></div>
+      <div class="cap"><div class="cap-n">04</div><h3>Integración de Sistemas</h3><p>Conectamos tu TMS, ERP o WMS con el ecosistema Efletexia sin fricción.</p></div>
+    </div>
+    <div class="statband rv">
+      <div>
+        <h4>Expertise Logístico + Desarrollo de Alto Rendimiento</h4>
+        <p>Desde integraciones puntuales hasta plataformas completas. Diagnóstico operativo, dashboards y KPIs, GPS e IoT, visión computacional.</p>
+      </div>
+      <div class="stnums">
+        <div><div class="stn">+50</div><div class="stl">Proyectos</div></div>
+        <div><div class="stn">8</div><div class="stl">Países</div></div>
+        <div><div class="stn">6 sem</div><div class="stl">Entrega prom.</div></div>
+      </div>
+    </div>
+    <div class="band rv">
+      <div>
+        <h4>¿Necesitas algo que no existe en el catálogo?</h4>
+        <p>Cuéntanos tu problemática logística y nuestro equipo de consultoría e ingeniería diseña la solución a la medida.</p>
+      </div>
+      <a href="#contacto" class="btn btn-p">Solicitar consultoría y desarrollo</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="final">
+  <div class="wrap">
+    <h2 class="rv">Tu operación merece<br><span class="gradient-text">control total.</span></h2>
+    <p class="rv">Conéctate con nuestro equipo y descubre cómo Efletexia transforma tu distribución.</p>
+    <div class="hbtns rv" style="margin-bottom:0">
+      <a href="#contacto" class="btn btn-p btn-lg">Solicitar información</a>
+      <a href="https://wa.me/+522223284900" class="btn btn-o btn-lg">Hablar con un especialista</a>
+    </div>
+    <p class="final-legal rv">Sin compromiso · Demostración personalizada · Respuesta en 24 h</p>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="blk alt" id="contacto">
+  <div class="wrap">
+    <div class="head rv">
+      <div class="eyebrow">Quiero más información</div>
+      <h2>Cuéntanos qué necesitas <span class="gradient-text">y te contactamos</span></h2>
+      <p>Nuestro equipo comercial te envía la información y agenda una demostración con tu operación.</p>
+    </div>
+    <form class="formbox rv" id="leadform" novalidate>
+      <div class="f2">
+        <div><label class="fl" for="lf-nom">Nombre y apellido</label><input class="inp" id="lf-nom" name="nombre" type="text" placeholder="Tu nombre" required></div>
+        <div><label class="fl" for="lf-emp">Empresa</label><input class="inp" id="lf-emp" name="empresa" type="text" placeholder="Nombre de tu empresa" required></div>
+      </div>
+      <div class="f2">
+        <div><label class="fl" for="lf-mail">Correo electrónico</label><input class="inp" id="lf-mail" name="email" type="email" placeholder="nombre@empresa.com" required></div>
+        <div><label class="fl" for="lf-tel">Teléfono</label><input class="inp" id="lf-tel" name="telefono" type="tel" placeholder="+51 999 999 999"></div>
+      </div>
+      <div class="f2">
+        <div><label class="fl" for="lf-pais">País</label>
+          <select class="inp" id="lf-pais" name="pais" required>
+            <option value="">Selecciona tu país</option>
+            <option>México</option><option>Guatemala</option><option>Honduras</option>
+            <option>El Salvador</option><option>Nicaragua</option><option>Costa Rica</option>
+            <option>Panamá</option><option>Colombia</option><option>Ecuador</option><option>Perú</option>
+          </select>
+        </div>
+        <div><label class="fl" for="lf-prod">Producto de interés</label>
+          <select class="inp" id="lf-prod" name="producto" required>
+            <option value="">Selecciona una solución</option>
+            <option>Eflexy — Robots de última milla</option>
+            <option>Viax — Navegación de carga</option>
+            <option>Fletex — Cotizador</option>
+            <option>Qubo — Cubicaje</option>
+            <option>Efletexia BI — Centro de control</option>
+            <option>Todavía no lo sé / quiero asesoría</option>
+          </select>
+        </div>
+      </div>
+      <div><label class="fl" for="lf-msg">¿Qué te gustaría resolver?</label><textarea class="inp" id="lf-msg" name="mensaje" placeholder="Cuéntanos brevemente tu operación y qué necesitas"></textarea></div>
+      <div class="ffoot">
+        <p class="fnote">No creas una cuenta aquí. El usuario y la contraseña se generan cuando contratas una solución.</p>
+        <button type="submit" class="btn btn-p btn-lg">Enviar solicitud</button>
+      </div>
+      <div class="fok" id="lf-ok">Solicitud registrada. Nuestro equipo comercial se pondrá en contacto contigo.</div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <a href="#top" class="brand">EFLETEX<i>IA</i></a>
+        <p>Plataforma integral de distribución para LatAm. Conectamos la logística primaria, la torre de control y la última milla en un solo ecosistema.</p>
+        <div class="socs">
+          <a class="soc" href="https://www.facebook.com/efletexia" target="_blank" rel="noopener noreferrer" aria-label="Efletexia en Facebook">f</a>
+          <a class="soc" href="https://www.linkedin.com/company/efletexia-oficial" target="_blank" rel="noopener noreferrer" aria-label="Efletexia en LinkedIn">in</a>
+          <a class="soc" href="https://wa.me/+522223284900" target="_blank" rel="noopener noreferrer" aria-label="Efletexia en WhatsApp">wa</a>
+        </div>
+      </div>
+      <div class="fcol">
+        <h5>Soluciones</h5>
+        <ul>
+          <li><a href="eflexy.html">Eflexy</a></li>
+          <li><a href="viax.html">Viax</a></li>
+          <li><a href="fletex.html">Fletex</a></li>
+          <li><a href="qubo.html">Qubo</a></li>
+          <li><a href="efletexia-bi.html">Efletexia BI</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h5>Distribución</h5>
+        <ul>
+          <li><a href="#distribucion">Primaria</a></li>
+          <li><a href="#secundaria">Secundaria</a></li>
+          <li><a href="#torre">Torre de Control</a></li>
+          <li><a href="#referencias">Referencias</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h5>Empresa</h5>
+        <ul>
+          <li><a href="#medida">Desarrollo a Medida</a></li>
+          <li><a href="#contacto">Contáctanos</a></li>
+          <li><a href="login.html">Log in</a></li>
+          <li><a href="#top">Privacidad</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 Efletexia · Plataforma de distribución y logística</span>
+      <span>Operaciones en 10 países de LatAm</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// barra de progreso de scroll
+const sp = document.getElementById('sp');
+addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - innerHeight;
+  sp.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
+}, {passive:true});
+
+// reveal
+const obs = new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); } });
+}, {threshold:.1, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+// contadores del hero
+const cObs = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target, to = +el.dataset.to, suf = el.dataset.suf || '';
+    let n = 0;
+    const step = () => {
+      n += to / 45;
+      if (n >= to) { el.textContent = to.toLocaleString('es') + suf; return; }
+      el.textContent = Math.floor(n).toLocaleString('es') + suf;
+      requestAnimationFrame(step);
+    };
+    step();
+    cObs.unobserve(el);
+  });
+}, {threshold:.5});
+document.querySelectorAll('.ct-n').forEach(el => cObs.observe(el));
+
+// formulario de solicitud (informativo: no crea usuario)
+const leadform = document.getElementById('leadform');
+if (leadform) {
+  leadform.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true;
+    leadform.querySelectorAll('[required]').forEach(f => {
+      if (!f.value.trim()) { f.style.borderColor = '#ef4444'; ok = false; }
+      else { f.style.borderColor = ''; }
+    });
+    if (!ok) return;
+    document.getElementById('lf-ok').style.display = 'block';
+    leadform.querySelector('button[type=submit]').textContent = 'Solicitud enviada';
+  });
+}
+</script>
+</body>
+</html>

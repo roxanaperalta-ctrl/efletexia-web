@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viax — Navegación y millas para conductores de carga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* paleta tomada de efletexia.dtdevops.com */
+  --bg:    #0A0A0A;   /* dark-900 */
+  --bg2:   #111111;   /* dark-800 */
+  --bg3:   #1A1A1A;   /* dark-700 */
+  --card:  #111111;
+  --card2: #1A1A1A;
+  --b1:    rgba(249,115,22,.20);
+  --b2:    rgba(249,115,22,.08);
+  --b3:    #262626;   /* neutral-800 */
+  --orange:#F97316;   /* brand-500 */
+  --amber: #FB923C;   /* brand-400 */
+  --deep:  #EA580C;   /* brand-600 */
+  --purple:#a855f7;
+  --blue:  #00D4FF;
+  --green: #00FF94;
+  --red:   #ef4444;
+  --grad:  linear-gradient(135deg,#F97316,#FB923C);
+  --text:  #FFFFFF;
+  --muted: #A3A3A3;   /* neutral-400 */
+  --muted2:#737373;   /* neutral-500 */
+  --mono:  'Inter', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;overflow-x:hidden}
+img{max-width:100%}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 56px}
+
+.rev{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.rev-l{opacity:0;transform:translateX(-28px);transition:opacity .7s ease,transform .7s ease}
+.rev-r{opacity:0;transform:translateX(28px);transition:opacity .7s ease,transform .7s ease}
+.rev.on,.rev-l.on,.rev-r.on{opacity:1;transform:none}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:16px 56px;background:rgba(10,10,10,.85);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--b1);flex-wrap:wrap}
+.logo{display:flex;align-items:baseline;gap:7px;font-family:var(--mono);font-weight:800;font-size:16px;letter-spacing:2px}
+.logo b{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo span{font-size:10px;letter-spacing:3px;color:var(--muted)}
+.nav-links{display:flex;gap:26px;list-style:none}
+.nav-links a{font-size:13px;font-weight:600;color:var(--muted);transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn-ghost{padding:8px 18px;border:1px solid var(--b1);border-radius:10px;color:var(--text);
+  font-size:12px;font-weight:700;transition:all .2s;display:inline-block}
+.btn-ghost:hover{border-color:var(--orange);box-shadow:0 0 18px rgba(249,115,22,.2)}
+.btn-primary{padding:9px 22px;border-radius:10px;background:var(--grad);color:#fff;font-size:12px;
+  font-weight:800;transition:all .2s;display:inline-block}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(249,115,22,.55)}
+.btn-lg{padding:14px 30px;font-size:13px}
+
+/* ── HERO ── */
+.hero{position:relative;padding:96px 0 80px;overflow:hidden;
+  background:radial-gradient(1100px 500px at 80% 6%,rgba(0,255,148,.09),transparent 60%),
+             radial-gradient(900px 480px at 6% 0%,rgba(249,115,22,.13),transparent 62%),var(--bg)}
+.hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(249,115,22,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(249,115,22,.05) 1px,transparent 1px);
+  background-size:52px 52px;mask-image:linear-gradient(180deg,#000,transparent 72%)}
+.hgrid{display:grid;grid-template-columns:1.06fr .94fr;gap:52px;align-items:center;position:relative;z-index:2}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;
+  letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:20px}
+.eyebrow i{display:block;width:34px;height:1px;background:var(--grad)}
+h1{font-size:clamp(34px,5.4vw,60px);font-weight:800;color:#fff;letter-spacing:-1.8px;line-height:1.02;margin-bottom:20px}
+h1 span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:16px;color:var(--muted);line-height:1.7;max-width:500px;margin-bottom:30px}
+.hbtns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.hstats{display:grid;grid-template-columns:repeat(3,auto);gap:34px;justify-content:start}
+.sn{font-family:var(--mono);font-size:26px;font-weight:800;line-height:1;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sl{font-family:var(--mono);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-top:7px}
+
+/* ── MOCK APP ── */
+.phone{max-width:340px;margin:0 auto;border-radius:24px;padding:10px;
+  border:1px solid var(--b1);background:linear-gradient(165deg,#1A1A1A,#0A0A0A);
+  box-shadow:0 28px 70px rgba(0,0,0,.65)}
+.screen{border-radius:16px;overflow:hidden;background:var(--bg);border:1px solid var(--b3)}
+.app-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
+  border-bottom:1px solid var(--b3);background:rgba(255,255,255,.02)}
+.app-logo{font-family:var(--mono);font-size:12px;font-weight:800;letter-spacing:2px;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tier{font-family:var(--mono);font-size:8.5px;letter-spacing:1.2px;padding:4px 9px;border-radius:999px;
+  background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.35);color:#fcd34d}
+.app-body{padding:14px;display:flex;flex-direction:column;gap:12px}
+.miles{text-align:center;padding:14px 10px;border-radius:16px;
+  background:rgba(249,115,22,.07);border:1px solid var(--b2)}
+.miles-n{font-family:var(--mono);font-size:34px;font-weight:800;color:#fff;line-height:1}
+.miles-l{font-family:var(--mono);font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.prog{margin-top:12px}
+.prog-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.prog-bar i{display:block;height:100%;width:57%;background:var(--grad)}
+.prog-t{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;
+  letter-spacing:.9px;color:var(--muted);margin-top:7px}
+.stepl{display:flex;flex-direction:column;gap:6px}
+.stp{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:12px;
+  background:rgba(255,255,255,.02);border:1px solid var(--b3);font-size:11.5px}
+.stp .ic{width:15px;height:15px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:8px;font-weight:800}
+.stp.done .ic{background:rgba(0,255,148,.15);border:1px solid rgba(0,255,148,.45);color:#66FFC0}
+.stp.now .ic{background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.5);color:var(--orange)}
+.stp.next .ic{border:1px solid var(--b3);color:var(--muted)}
+.stp.next{opacity:.55}
+.stp-m{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--muted)}
+.stp.done .stp-m{color:#66FFC0}
+.offline{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:12px;font-size:11px;
+  background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.28);color:#66E2FF}
+.offline::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0}
+
+/* ── SECCIONES ── */
+section.blk{padding:92px 0}
+.alt{background:var(--bg2);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.sec-head{margin-bottom:52px;max-width:700px}
+.slabel{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);
+  margin-bottom:14px}
+.stitle{font-size:clamp(26px,4vw,48px);font-weight:800;color:#fff;letter-spacing:-1px;line-height:1.06}
+.stitle span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ssub{font-size:15px;color:var(--muted);line-height:1.7;margin-top:16px}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.step{background:var(--card);border:1px solid var(--b1);border-radius:14px;padding:28px 24px;position:relative;overflow:hidden}
+.step::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);
+  transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.step:hover::after{transform:scaleX(1)}
+.step-n{font-family:var(--mono);font-size:30px;font-weight:800;color:rgba(249,115,22,.22);line-height:1;margin-bottom:13px}
+.step h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:9px}
+.step p{font-size:13px;color:var(--muted);line-height:1.7}
+
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1);
+  border:1px solid var(--b1);border-radius:14px;overflow:hidden}
+.mc{background:var(--card);padding:32px 28px;transition:background .25s,transform .25s}
+.mc:hover{background:var(--card2);transform:translateY(-3px)}
+.mc-num{font-family:var(--mono);font-size:9.5px;letter-spacing:2px;color:var(--orange);margin-bottom:16px}
+.mc h3{font-size:18px;font-weight:800;color:#fff;margin-bottom:10px}
+.mc p{font-size:13.5px;color:var(--muted);line-height:1.7}
+.mc-tag{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:8.5px;letter-spacing:1.3px;
+  text-transform:uppercase;padding:3px 9px;border-radius:999px;
+  background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:#66E2FF}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.bens{list-style:none;display:flex;flex-direction:column;gap:9px;margin:22px 0 26px}
+.bens li{display:flex;align-items:flex-start;gap:9px;font-size:14px;font-weight:500}
+.chk{width:17px;height:17px;border-radius:999px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;
+  justify-content:center;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.35);color:var(--orange)}
+
+/* categorias */
+.tiers{display:flex;flex-direction:column;gap:12px}
+.tr{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--b1);
+  border-radius:14px;padding:18px 20px;transition:transform .25s,border-color .25s}
+.tr:hover{transform:translateX(5px)}
+.tr-b{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:15px;font-weight:800;color:#0A0A0A}
+.b1{background:linear-gradient(135deg,#B87333,#D9A066)}
+.b2{background:linear-gradient(135deg,#9CA6B5,#D6DEE8)}
+.b3g{background:linear-gradient(135deg,#FB923C,#FFD277)}
+.b4{background:linear-gradient(135deg,#7DD3FC,#C4B5FD)}
+.tr-n{font-size:16px;font-weight:800;color:#fff}
+.tr-d{font-size:12.5px;color:var(--muted);margin-top:3px}
+.tr-m{margin-left:auto;text-align:right;flex-shrink:0}
+.tr-mn{font-family:var(--mono);font-size:17px;font-weight:800;color:var(--text);line-height:1}
+.tr-ml{font-family:var(--mono);font-size:8px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin-top:5px}
+
+.note{font-family:var(--mono);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);
+  border:1px dashed var(--b1);border-radius:10px;padding:9px 15px;display:inline-block;margin-top:26px}
+
+.cta{padding:100px 0;text-align:center;position:relative;overflow:hidden;
+  background:radial-gradient(760px 340px at 50% 0%,rgba(249,115,22,.13),transparent 66%),var(--bg)}
+.cta h2{font-size:clamp(28px,5vw,54px);font-weight:800;color:#fff;letter-spacing:-1.4px;line-height:1.05;margin-bottom:16px}
+.cta h2 span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cta p{font-size:15px;color:var(--muted);max-width:470px;margin:0 auto 32px;line-height:1.65}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+footer{border-top:1px solid var(--b1);padding:52px 0 30px;background:var(--bg2)}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:44px;margin-bottom:34px}
+.fgrid p{font-size:13px;color:var(--muted);line-height:1.7;margin-top:14px;max-width:330px}
+.fcol h5{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text);margin-bottom:16px}
+.fcol ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.fcol a{font-size:13px;color:var(--muted);transition:color .2s}
+.fcol a:hover{color:var(--orange)}
+.fbot{border-top:1px solid var(--b3);padding-top:22px;display:flex;justify-content:space-between;gap:14px;
+  flex-wrap:wrap;font-family:var(--mono);font-size:10px;letter-spacing:1.2px;color:var(--muted)}
+
+@media(max-width:1020px){
+  .wrap,nav{padding-left:28px;padding-right:28px}
+  .hgrid,.split{grid-template-columns:1fr;gap:38px}
+  .mgrid,.steps{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .hstats{gap:24px}
+}
+@media(max-width:560px){
+  .tr{flex-wrap:wrap}
+  .tr-m{margin-left:58px;text-align:left}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#top" class="logo"><b>VIAX</b><span>CONDUCTORES</span></a>
+  <ul class="nav-links">
+    <li><a href="#como">Cómo funciona</a></li>
+    <li><a href="#modulos">Qué incluye</a></li>
+    <li><a href="#categorias">Categorías</a></li>
+    <li><a href="#confianza">Confianza</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-ghost">Iniciar sesión</a>
+    <a href="#contacto" class="btn-primary">Solicitar información</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="wrap hgrid">
+    <div class="rev-l">
+      <div class="eyebrow"><i></i>Navegación y millas para conductores</div>
+      <h1>El conductor gana.<br><span>El viaje queda documentado.</span></h1>
+      <p class="hero-sub">Viax guía al conductor durante todo el viaje y convierte cada paso confirmado en millas que él canjea por beneficios reales. Tú recibes la trazabilidad completa de la operación, en tiempo real y con evidencia.</p>
+      <div class="hbtns">
+        <a href="#contacto" class="btn-primary btn-lg">SOLICITAR INFORMACIÓN</a>
+        <a href="#modulos" class="btn-ghost btn-lg">VER QUÉ INCLUYE</a>
+      </div>
+      <div class="hstats">
+        <div><div class="sn">13</div><div class="sl">Pasos del viaje</div></div>
+        <div><div class="sn">4</div><div class="sl">Categorías</div></div>
+        <div><div class="sn">100%</div><div class="sl">Funciona sin señal</div></div>
+      </div>
+    </div>
+
+    <div class="phone rev-r">
+      <div class="screen">
+        <div class="app-bar">
+          <span class="app-logo">VIAX</span>
+          <span class="tier">🥇 ORO</span>
+        </div>
+        <div class="app-body">
+          <div class="miles">
+            <div class="miles-n">2,840</div>
+            <div class="miles-l">Millas de este mes</div>
+            <div class="prog">
+              <div class="prog-bar"><i></i></div>
+              <div class="prog-t"><span>META ORO 2,400 ✓</span><span>PLATINO 5,000</span></div>
+            </div>
+          </div>
+          <div class="stepl">
+            <div class="stp done"><span class="ic">✓</span>Ingresé a planta<span class="stp-m">+10</span></div>
+            <div class="stp done"><span class="ic">✓</span>Inicio de carga<span class="stp-m">+20</span></div>
+            <div class="stp now"><span class="ic">●</span>Fin de carga<span class="stp-m">+10</span></div>
+            <div class="stp next"><span class="ic">4</span>Saliendo del lugar<span class="stp-m">+10</span></div>
+            <div class="stp next"><span class="ic">5</span>Subir evidencias<span class="stp-m">+20</span></div>
+          </div>
+          <div class="offline">Navegación activa sin conexión · mapas descargados</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="blk alt" id="como">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <p class="slabel">El reto de documentar</p>
+      <h2 class="stitle">La trazabilidad depende <span>de quien va al volante.</span></h2>
+      <p class="ssub">Cada hito que se registra a tiempo es un dato que después nadie tiene que perseguir. Viax le da al conductor una razón concreta para registrarlo: el trabajo bien documentado se convierte en millas suyas, canjeables por beneficios. El programa es del conductor, no del transportista, y por eso funciona.</p>
+    </div>
+    <div class="steps">
+      <div class="step rev">
+        <div class="step-n">01</div>
+        <h3>Entra con su viaje</h3>
+        <p>Número de viaje y placa. El sistema valida que ambos coincidan antes de dar acceso, así el viaje siempre queda ligado a la unidad correcta.</p>
+      </div>
+      <div class="step rev">
+        <div class="step-n">02</div>
+        <h3>Activa su membresía</h3>
+        <p>Con su número de celular. Las millas son suyas y lo acompañan, aunque cambie de unidad o de transportista.</p>
+      </div>
+      <div class="step rev">
+        <div class="step-n">03</div>
+        <h3>Opera el viaje</h3>
+        <p>Navegación giro a giro y los trece pasos del viaje, desde salir a cargar hasta terminar la descarga. Cada uno suma sus millas.</p>
+      </div>
+      <div class="step rev">
+        <div class="step-n">04</div>
+        <h3>Cierra con evidencia</h3>
+        <p>Las cuatro fotos del cierre habilitan la finalización. Ahí se acreditan las millas del viaje y se actualiza su categoría.</p>
+      </div>
+    </div>
+    <p class="note">150 millas base por viaje completo, más 1 milla por kilómetro recorrido</p>
+  </div>
+</section>
+
+<!-- MODULOS -->
+<section class="blk" id="modulos">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <p class="slabel">Qué incluye</p>
+      <h2 class="stitle">Una app que el conductor <span>sí quiere abrir.</span></h2>
+    </div>
+    <div class="mgrid rev">
+      <div class="mc">
+        <div class="mc-num">01</div>
+        <h3>Navegación offline</h3>
+        <p>Mapas descargados en el equipo: la guía giro a giro, los avisos de velocidad y el rastreo de posición siguen funcionando en zonas mineras, puertos o tramos rurales sin cobertura.</p>
+        <span class="mc-tag">Navegación</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">02</div>
+        <h3>Trece pasos del viaje</h3>
+        <p>De "en camino a carga" hasta "fin de descarga", pasando por ingreso a planta e hitos de ruta. Cada confirmación queda con su hora y su posición.</p>
+        <span class="mc-tag">Trazabilidad</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">03</div>
+        <h3>Programa de millas</h3>
+        <p>Millas por viaje documentado y por kilómetro recorrido, canjeables por beneficios reales: combustible, restaurantes, mercadería. El primer programa de lealtad pensado para conductores de carga.</p>
+        <span class="mc-tag">Incentivo</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">04</div>
+        <h3>Evidencias y eventos</h3>
+        <p>Fotos de cierre obligatorias y registro de lo que pasa en ruta: retenes, pausas, fallas. Todo queda trazado para la operación, no solo para el programa.</p>
+        <span class="mc-tag">Evidencia</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">05</div>
+        <h3>Acceso por placa</h3>
+        <p>El número de viaje y la placa se validan contra el sistema antes de abrir la app. Nadie ajeno al viaje entra, ni acumula millas que no le corresponden.</p>
+        <span class="mc-tag">Control</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">06</div>
+        <h3>Millas portátiles</h3>
+        <p>La membresía vive en el celular del conductor, no en la unidad ni en la empresa. Ese es el motivo por el que se cuida el programa y lo mantiene activo.</p>
+        <span class="mc-tag">Membresía</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIAS -->
+<section class="blk alt" id="categorias">
+  <div class="wrap split">
+    <div class="rev-l">
+      <p class="slabel">Categorías</p>
+      <h2 class="stitle">Cuatro niveles, <span>una meta cada mes.</span></h2>
+      <p class="ssub">Las millas del mes se reinician el día uno: son una moneda de actividad, no un puntaje de por vida. La categoría, en cambio, se conserva mientras el conductor cumpla su meta, y es la que define los beneficios que tiene activos.</p>
+      <ul class="bens">
+        <li><span class="chk">✓</span>Supera la meta del nivel siguiente y sube el mes entrante</li>
+        <li><span class="chk">✓</span>Tres meses sin alcanzar la meta antes de bajar un nivel, con dos avisos previos</li>
+        <li><span class="chk">✓</span>Bronce es piso: nadie queda fuera del programa</li>
+        <li><span class="chk">✓</span>Metas calibradas con la actividad real de la flota</li>
+      </ul>
+    </div>
+    <div class="tiers rev-r">
+      <div class="tr">
+        <div class="tr-b b1">B</div>
+        <div><div class="tr-n">Bronce</div><div class="tr-d">Todo conductor activo</div></div>
+        <div class="tr-m"><div class="tr-mn">200</div><div class="tr-ml">Millas / mes</div></div>
+      </div>
+      <div class="tr">
+        <div class="tr-b b2">P</div>
+        <div><div class="tr-n">Plata</div><div class="tr-d">Actividad sostenida</div></div>
+        <div class="tr-m"><div class="tr-mn">800</div><div class="tr-ml">Millas / mes</div></div>
+      </div>
+      <div class="tr">
+        <div class="tr-b b3g">O</div>
+        <div><div class="tr-n">Oro</div><div class="tr-d">Alto desempeño</div></div>
+        <div class="tr-m"><div class="tr-mn">2,400</div><div class="tr-ml">Millas / mes</div></div>
+      </div>
+      <div class="tr">
+        <div class="tr-b b4">◆</div>
+        <div><div class="tr-n">Platino</div><div class="tr-d">Conductores élite</div></div>
+        <div class="tr-m"><div class="tr-mn">5,000</div><div class="tr-ml">Millas / mes</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIANZA -->
+<section class="blk" id="confianza">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <p class="slabel">Confianza</p>
+      <h2 class="stitle">Millas que valen <span>porque se ganan.</span></h2>
+      <p class="ssub">Un programa de incentivos solo sirve si el dato que premia es cierto. Viax valida cada paso contra la posición, la hora y el recorrido antes de acreditar millas, de modo que lo que llega a tu operación es información confiable y lo que llega al conductor es un beneficio que se ganó.</p>
+    </div>
+    <div class="split">
+      <div class="rev-l">
+        <ul class="bens">
+          <li><span class="chk">✓</span>Confirmación en sitio: el paso se habilita cuando la unidad está en el punto</li>
+          <li><span class="chk">✓</span>Coherencia de tiempos y recorrido entre un hito y el siguiente</li>
+          <li><span class="chk">✓</span>Foto de cámara en vivo para los eventos críticos</li>
+          <li><span class="chk">✓</span>Revisión de los cierres que no cuadran, antes de acreditar</li>
+        </ul>
+        <p class="ssub" style="margin-top:0">Los controles son invisibles para quien opera bien: el conductor honesto simplemente está en el lugar correcto a la hora correcta. Y los eventos siempre se registran para la trazabilidad, aunque no generen millas.</p>
+      </div>
+      <div class="rev-r">
+        <div class="phone" style="max-width:320px">
+          <div class="screen">
+            <div class="app-bar">
+              <span class="app-logo">VERIFICACIÓN</span>
+              <span class="tier" style="background:rgba(0,255,148,.12);border-color:rgba(0,255,148,.35);color:#66FFC0">VÁLIDO</span>
+            </div>
+            <div class="app-body">
+              <div class="stepl">
+                <div class="stp done"><span class="ic">✓</span>Posición en el punto<span class="stp-m">GPS</span></div>
+                <div class="stp done"><span class="ic">✓</span>Tiempo coherente<span class="stp-m">OK</span></div>
+                <div class="stp done"><span class="ic">✓</span>Recorrido continuo<span class="stp-m">OK</span></div>
+                <div class="stp done"><span class="ic">✓</span>Evidencias completas<span class="stp-m">4/4</span></div>
+              </div>
+              <div class="miles" style="padding:12px">
+                <div class="miles-n" style="font-size:26px">+320</div>
+                <div class="miles-l">Millas acreditadas</div>
+              </div>
+              <div class="offline">Viaje cerrado y trazado de punta a punta</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">Los eventos de ruta se registran siempre, generen millas o no</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="contacto">
+  <div class="wrap">
+    <h2 class="rev">Documentar el viaje,<br><span>con algo a cambio.</span></h2>
+    <p class="rev">Cuéntanos cómo opera tu flota y te mostramos Viax con tus rutas y tus conductores. Sin compromiso.</p>
+    <div class="cta-btns rev">
+      <a href="index.html#solicitar" class="btn-primary btn-lg">SOLICITAR INFORMACIÓN</a>
+      <a href="https://wa.me/+522223284900" class="btn-ghost btn-lg">HABLAR CON UN ASESOR</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <a href="#top" class="logo"><b>VIAX</b><span>CONDUCTORES</span></a>
+        <p>App de navegación y programa de millas para conductores de carga: guía el viaje, documenta cada hito y convierte el trabajo bien hecho en beneficios reales.</p>
+      </div>
+      <div class="fcol">
+        <h5>PRODUCTO</h5>
+        <ul>
+          <li><a href="#como">Cómo funciona</a></li>
+          <li><a href="#modulos">Qué incluye</a></li>
+          <li><a href="#categorias">Categorías</a></li>
+          <li><a href="#confianza">Confianza</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h5>EFLETEXIA</h5>
+        <ul>
+          <li><a href="index.html">Todas las soluciones</a></li>
+          <li><a href="index.html#referencias">Referencias</a></li>
+          <li><a href="index.html#solicitar">Solicitar información</a></li>
+          <li><a href="login.html">Iniciar sesión</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 EFLETEXIA · VIAX</span>
+      <span>UNA SOLUCIÓN DE EFLETEXIA</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); } });
+}, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rev,.rev-l,.rev-r').forEach((el, i) => {
+  el.style.transitionDelay = (i % 4) * 80 + 'ms';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>

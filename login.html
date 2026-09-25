@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Efletexia — Acceso al Sistema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:    #040810;
+  --bg2:   #060C18;
+  --bg3:   #091220;
+  --card:  #0A1628;
+  --card2: #0E1E36;
+  --b1:    rgba(255,107,26,.18);
+  --b2:    rgba(255,107,26,.08);
+  --b3:    rgba(255,255,255,.06);
+  --orange:#FF6B1A;
+  --amber: #F5A82A;
+  --grad:  linear-gradient(135deg,#FF6B1A,#F5A82A);
+  --text:  #E2EDF8;
+  --muted: #4E6A8A;
+  --mono:  'Share Tech Mono', monospace;
+  --error: #FF4444;
+  --success: #22C55E;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+
+/* SCANLINE */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.03) 0,rgba(0,0,0,.03) 1px,transparent 1px,transparent 2px);
+  animation:scanShift 8s linear infinite}
+@keyframes scanShift{from{background-position:0 0}to{background-position:0 100px}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 56px;
+  background:rgba(4,8,16,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--b1)}
+nav::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--orange),var(--amber),transparent);opacity:.5}
+.nav-logo img{height:36px;width:auto;filter:brightness(0) invert(1)}
+
+/* PARTICLES */
+#particles-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* AUTH WRAPPER */
+.auth-page{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 24px 60px}
+
+/* HUD CORNERS */
+.hud-frame{position:fixed;inset:20px;z-index:3;pointer-events:none}
+.hud-corner{position:absolute;width:28px;height:28px;opacity:.4}
+.hud-tl{top:0;left:0;border-top:2px solid var(--orange);border-left:2px solid var(--orange)}
+.hud-tr{top:0;right:0;border-top:2px solid var(--orange);border-right:2px solid var(--orange)}
+.hud-bl{bottom:0;left:0;border-bottom:2px solid var(--orange);border-left:2px solid var(--orange)}
+.hud-br{bottom:0;right:0;border-bottom:2px solid var(--orange);border-right:2px solid var(--orange)}
+
+/* AUTH CARD */
+.auth-card{
+  background:rgba(10,22,40,.85);
+  backdrop-filter:blur(24px);
+  border:1px solid var(--b1);
+  border-radius:8px;
+  padding:0;
+  width:100%;
+  max-width:540px;
+  box-shadow:0 0 60px rgba(255,107,26,.08),0 40px 80px rgba(0,0,0,.5);
+  overflow:hidden;
+  animation:cardIn .5s ease both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+.auth-card-header{
+  padding:28px 40px 24px;
+  border-bottom:1px solid var(--b1);
+  background:linear-gradient(135deg,rgba(255,107,26,.06),rgba(245,168,42,.03));
+  position:relative;
+}
+.auth-card-header::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--grad);
+}
+.auth-eyebrow{
+  font-family:var(--mono);font-size:10px;color:var(--orange);
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--orange);animation:hpulse 1.5s infinite}
+@keyframes hpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,26,.6)}70%{box-shadow:0 0 0 6px rgba(255,107,26,0)}}
+.auth-title{font-size:24px;font-weight:900;color:#fff;letter-spacing:-0.5px}
+.auth-subtitle{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* TABS */
+.auth-tabs{display:flex;border-bottom:1px solid var(--b1);}
+.auth-tab{
+  flex:1;padding:16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;
+  border:none;background:transparent;color:var(--muted);
+  transition:all .2s;position:relative;
+}
+.auth-tab.active{color:var(--orange);background:rgba(255,107,26,.05)}
+.auth-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--grad)}
+.auth-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.03)}
+
+/* FORM BODY */
+.auth-body{padding:32px 40px 36px}
+.form-panel{display:none}
+.form-panel.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+
+/* FIELDS */
+.field-group{margin-bottom:18px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0}
+.field-row .field-group{margin-bottom:0}
+label{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.field-wrap{position:relative}
+input,select,textarea{
+  width:100%;padding:11px 14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:4px;
+  color:var(--text);
+  font-family:'Nunito',sans-serif;
+  font-size:14px;
+  outline:none;
+  transition:border-color .2s,background .2s,box-shadow .2s;
+}
+input::placeholder,select::placeholder,textarea::placeholder{color:rgba(78,106,138,.6)}
+input:focus,select:focus,textarea:focus{
+  border-color:rgba(255,107,26,.5);
+  background:rgba(255,107,26,.04);
+  box-shadow:0 0 0 3px rgba(255,107,26,.08);
+}
+select{cursor:pointer;appearance:none;-webkit-appearance:none}
+select option{background:#0A1628;color:var(--text)}
+.select-arrow{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  pointer-events:none;color:var(--muted);font-size:11px;
+}
+
+/* RADIO TOGGLE */
+.radio-group{display:flex;gap:10px}
+.radio-opt{
+  flex:1;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:4px;
+  cursor:pointer;display:flex;align-items:center;gap:8px;
+  transition:all .2s;font-size:13px;font-weight:600;color:var(--muted);
+}
+.radio-opt:hover{border-color:rgba(255,107,26,.4);color:var(--text)}
+.radio-opt.selected{border-color:var(--orange);background:rgba(255,107,26,.08);color:var(--orange)}
+.radio-opt input[type=radio]{display:none}
+.radio-dot{
+  width:14px;height:14px;border-radius:50%;border:2px solid currentColor;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.radio-opt.selected .radio-dot::after{
+  content:'';width:6px;height:6px;border-radius:50%;background:var(--orange);display:block;
+}
+
+/* PROJECT TEXTAREA */
+.project-field{
+  margin-bottom:18px;
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .3s ease,opacity .3s ease,margin .3s ease;
+  opacity:0;
+}
+.project-field.show{max-height:200px;opacity:1}
+.project-field textarea{min-height:90px;resize:vertical;line-height:1.5}
+
+/* DIVIDER */
+.field-divider{
+  font-family:var(--mono);font-size:9px;color:rgba(78,106,138,.5);
+  letter-spacing:2px;text-transform:uppercase;
+  text-align:center;margin:6px 0 18px;
+  display:flex;align-items:center;gap:10px;
+}
+.field-divider::before,.field-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+
+/* BTN */
+.btn-auth{
+  width:100%;padding:13px;
+  background:var(--grad);color:#fff;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  border:none;border-radius:4px;cursor:pointer;
+  transition:transform .15s,box-shadow .2s;
+  box-shadow:0 0 24px rgba(255,107,26,.35);
+  margin-top:8px;
+}
+.btn-auth:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(255,107,26,.55)}
+.btn-auth:active{transform:translateY(0)}
+.btn-ghost-full{
+  width:100%;padding:11px;
+  background:transparent;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  border:1px solid var(--b1);border-radius:4px;cursor:pointer;
+  transition:all .2s;margin-top:10px;
+}
+.btn-ghost-full:hover{border-color:var(--orange);color:var(--orange);background:rgba(255,107,26,.04)}
+
+/* ERROR / SUCCESS */
+.form-msg{
+  font-family:var(--mono);font-size:11px;
+  padding:10px 14px;border-radius:4px;
+  margin-bottom:16px;display:none;
+  letter-spacing:.5px;
+}
+.form-msg.error{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);color:var(--error)}
+.form-msg.success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);color:var(--success)}
+.form-msg.show{display:block}
+
+/* VERIFICATION OVERLAY */
+.verify-overlay{
+  display:none;
+  position:absolute;inset:0;z-index:50;
+  background:rgba(4,8,16,.96);
+  backdrop-filter:blur(10px);
+  border-radius:8px;
+  flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px;
+  text-align:center;
+}
+.verify-overlay.show{display:flex}
+.verify-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(255,107,26,.1);border:2px solid var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:24px;
+  animation:pulseIcon 2s ease-in-out infinite;
+}
+@keyframes pulseIcon{0%,100%{box-shadow:0 0 0 0 rgba(255,107,26,.4)}50%{box-shadow:0 0 0 16px rgba(255,107,26,0)}}
+.verify-icon svg{width:28px;height:28px;stroke:var(--orange);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.verify-title{font-size:20px;font-weight:900;color:#fff;margin-bottom:8px}
+.verify-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+.verify-phone{
+  font-family:var(--mono);font-size:16px;color:var(--orange);
+  background:rgba(255,107,26,.08);border:1px solid rgba(255,107,26,.2);
+  padding:8px 20px;border-radius:4px;margin-bottom:28px;
+  letter-spacing:2px;
+}
+.verify-inputs{display:flex;gap:10px;justify-content:center;margin-bottom:24px}
+.verify-input{
+  width:48px;height:56px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:4px;
+  color:var(--text);font-size:22px;font-weight:800;font-family:var(--mono);
+  text-align:center;outline:none;
+  transition:border-color .2s,background .2s;
+  -moz-appearance:textfield;
+}
+.verify-input::-webkit-outer-spin-button,.verify-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.verify-input:focus{border-color:var(--orange);background:rgba(255,107,26,.06);box-shadow:0 0 0 3px rgba(255,107,26,.1)}
+.verify-input.filled{border-color:rgba(255,107,26,.4)}
+.btn-verify{
+  width:100%;padding:13px;
+  background:var(--grad);color:#fff;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  border:none;border-radius:4px;cursor:pointer;
+  box-shadow:0 0 24px rgba(255,107,26,.35);
+  transition:transform .15s,box-shadow .2s;
+  margin-bottom:14px;
+}
+.btn-verify:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(255,107,26,.55)}
+.resend-link{
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  cursor:pointer;transition:color .2s;letter-spacing:.5px;
+  background:none;border:none;
+}
+.resend-link:hover{color:var(--orange)}
+.verify-countdown{color:var(--orange);font-family:var(--mono);font-size:11px;margin-top:4px}
+
+/* ROBOT POPUP */
+.robot-overlay{
+  display:none;position:fixed;inset:0;z-index:999;
+  background:rgba(4,8,16,.88);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;
+}
+.robot-overlay.show{display:flex}
+.robot-popup{
+  background:var(--card);
+  border:1px solid var(--b1);border-radius:8px;
+  padding:40px 48px;max-width:420px;width:90%;
+  text-align:center;
+  animation:popupIn .35s cubic-bezier(.175,.885,.32,1.275) both;
+  position:relative;
+}
+@keyframes popupIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.robot-popup::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--grad);border-radius:8px 8px 0 0;
+}
+.robot-emoji{font-size:48px;margin-bottom:16px;display:block}
+.robot-label{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+.robot-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:10px;letter-spacing:-0.5px}
+.robot-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:28px}
+.btn-demo{
+  width:100%;padding:14px;
+  background:var(--grad);color:#fff;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  border:none;border-radius:4px;cursor:pointer;
+  box-shadow:0 0 28px rgba(255,107,26,.4);
+  transition:transform .15s,box-shadow .2s;
+  margin-bottom:12px;
+}
+.btn-demo:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(255,107,26,.6)}
+.btn-close-robot{
+  width:100%;padding:11px;background:transparent;
+  color:var(--muted);font-family:'Nunito',sans-serif;
+  font-size:12px;font-weight:600;letter-spacing:1px;
+  border:1px solid rgba(255,255,255,.06);border-radius:4px;cursor:pointer;
+  transition:all .2s;
+}
+.btn-close-robot:hover{border-color:var(--b1);color:var(--text)}
+.robot-note{font-family:var(--mono);font-size:10px;color:rgba(78,106,138,.5);letter-spacing:.5px;margin-top:14px}
+
+/* FOOTER NAV */
+.auth-footer{text-align:center;margin-top:18px}
+.auth-footer a{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:.5px;transition:color .2s}
+.auth-footer a:hover{color:var(--orange)}
+.auth-footer span{color:rgba(255,255,255,.1);margin:0 10px}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  nav{padding:12px 16px}
+  .auth-card-header,.auth-body{padding-left:24px;padding-right:24px}
+  .field-row{grid-template-columns:1fr}
+  .auth-page{padding:80px 12px 40px}
+}
+</style>
+</head>
+<body>
+
+<!-- PARTICLES -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- HUD CORNERS -->
+<div class="hud-frame">
+  <div class="hud-corner hud-tl"></div>
+  <div class="hud-corner hud-tr"></div>
+  <div class="hud-corner hud-bl"></div>
+  <div class="hud-corner hud-br"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40'%3E%3Ctext x='0' y='30' font-family='Nunito,sans-serif' font-weight='900' font-size='28' fill='white'%3EEfletexia%3C/text%3E%3C/svg%3E" alt="Efletexia" style="height:30px;width:auto">
+  </a>
+</nav>
+
+<!-- AUTH PAGE -->
+<div class="auth-page">
+  <div style="width:100%;max-width:540px">
+
+    <!-- CARD -->
+    <div class="auth-card" style="position:relative">
+
+      <!-- VERIFY OVERLAY -->
+      <div class="verify-overlay" id="verifyOverlay">
+        <div class="verify-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.9 1.18 2 2 0 012.83 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.17 7.46a16 16 0 006.37 6.37l.86-.86a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <div class="verify-title">Verificación SMS</div>
+        <div class="verify-sub">Ingresa el código de 6 dígitos que enviamos al número</div>
+        <div class="verify-phone" id="verifyPhoneDisplay">+52 (55) ****-****</div>
+        <div class="verify-inputs">
+          <input class="verify-input" type="number" maxlength="1" id="v1">
+          <input class="verify-input" type="number" maxlength="1" id="v2">
+          <input class="verify-input" type="number" maxlength="1" id="v3">
+          <input class="verify-input" type="number" maxlength="1" id="v4">
+          <input class="verify-input" type="number" maxlength="1" id="v5">
+          <input class="verify-input" type="number" maxlength="1" id="v6">
+        </div>
+        <button class="btn-verify" onclick="doVerify()">// VERIFICAR Y CONTINUAR</button>
+        <button class="resend-link" onclick="resendCode()">¿No recibiste el código? Reenviar</button>
+        <div class="verify-countdown" id="verifyCountdown"></div>
+      </div>
+
+      <!-- HEADER -->
+      <div class="auth-card-header">
+        <div class="auth-eyebrow"><div class="eyebrow-dot"></div>EFLETEXIA — LOGISTICS OS</div>
+        <div class="auth-title">Acceso al Sistema</div>
+        <div class="auth-subtitle">Plataforma logística para Latinoamérica</div>
+      </div>
+
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login',this)">Iniciar Sesión</button>
+        <button class="auth-tab" onclick="switchTab('register',this)">Crear Cuenta</button>
+      </div>
+
+      <!-- BODY -->
+      <div class="auth-body">
+
+        <!-- LOGIN PANEL -->
+        <div class="form-panel active" id="panel-login">
+          <div class="form-msg" id="login-msg"></div>
+          <div class="field-group">
+            <label>Teléfono o Correo</label>
+            <input type="text" id="login-user" placeholder="usuario@empresa.com o +52 55 1234 5678">
+            <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(78,106,138,.6);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap">Cliente</span>
+                <code onclick="document.getElementById('login-user').value=this.textContent;this.animate([{background:'rgba(255,107,26,.25)'},{background:'rgba(255,107,26,.06)'}],{duration:500})" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,107,26,.75);background:rgba(255,107,26,.06);border:1px solid rgba(255,107,26,.15);border-radius:3px;padding:3px 9px;cursor:pointer;transition:all .2s;user-select:all" title="Clic para copiar al campo">carlos.lopez@gmail.com</code>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(78,106,138,.6);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap">Admin</span>
+                <code onclick="document.getElementById('login-user').value=this.textContent;this.animate([{background:'rgba(255,107,26,.25)'},{background:'rgba(255,107,26,.06)'}],{duration:500})" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,107,26,.75);background:rgba(255,107,26,.06);border:1px solid rgba(255,107,26,.15);border-radius:3px;padding:3px 9px;cursor:pointer;transition:all .2s;user-select:all" title="Clic para copiar al campo">juan.ramirez@gmail.com</code>
+              </div>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Contraseña</label>
+            <input type="password" id="login-pass" placeholder="••••••••••">
+            <div style="margin-top:8px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(78,106,138,.6);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap">Demo</span>
+                <code onclick="document.getElementById('login-pass').value=this.textContent;this.animate([{background:'rgba(255,107,26,.25)'},{background:'rgba(255,107,26,.06)'}],{duration:500})" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,107,26,.75);background:rgba(255,107,26,.06);border:1px solid rgba(255,107,26,.15);border-radius:3px;padding:3px 9px;cursor:pointer;transition:all .2s;user-select:all" title="Clic para copiar al campo">123456</code>
+              </div>
+            </div>
+          </div>
+          <button class="btn-auth" onclick="doLogin()">// INGRESAR AL SISTEMA</button>
+          <button class="btn-ghost-full" onclick="switchTab('register', document.querySelectorAll('.auth-tab')[1])">Crear cuenta nueva</button>
+          <div class="auth-footer" style="margin-top:14px">
+            <a href="#">Olvidé mi contraseña</a>
+          </div>
+        </div>
+
+        <!-- REGISTER PANEL -->
+        <div class="form-panel" id="panel-register">
+          <div class="form-msg" id="register-msg"></div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Nombre *</label>
+              <input type="text" id="reg-name" placeholder="Juan">
+            </div>
+            <div class="field-group">
+              <label>Apellido *</label>
+              <input type="text" id="reg-lastname" placeholder="García">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Empresa *</label>
+            <input type="text" id="reg-company" placeholder="Transportes del Norte S.A.">
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Teléfono *</label>
+              <input type="tel" id="reg-phone" placeholder="+52 55 1234 5678">
+            </div>
+            <div class="field-group">
+              <label>Industria *</label>
+              <div class="field-wrap">
+                <select id="reg-industry">
+                  <option value="" disabled selected>Seleccionar…</option>
+                  <option>Retail y Distribución</option>
+                  <option>Manufactura</option>
+                  <option>Alimentación y Bebidas</option>
+                  <option>Farmacéutica</option>
+                  <option>Automotriz</option>
+                  <option>Construcción</option>
+                  <option>Tecnología</option>
+                  <option>Textil y Moda</option>
+                  <option>Comercio Exterior</option>
+                  <option>Otra</option>
+                </select>
+                <span class="select-arrow">▼</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Correo electrónico *</label>
+            <input type="email" id="reg-email" placeholder="juan@empresa.com">
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Contraseña *</label>
+              <div class="field-wrap">
+                <input type="password" id="reg-pass" placeholder="Mín. 8 caracteres" oninput="checkPassStrength(this.value)">
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Confirmar contraseña *</label>
+              <input type="password" id="reg-pass2" placeholder="Repite tu contraseña">
+            </div>
+          </div>
+
+          <div class="pass-strength" id="passStrength" style="display:none;margin-top:-10px;margin-bottom:16px">
+            <div style="display:flex;gap:4px;margin-bottom:4px">
+              <div class="bar" id="bar1" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.08);transition:background .3s"></div>
+              <div class="bar" id="bar2" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.08);transition:background .3s"></div>
+              <div class="bar" id="bar3" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.08);transition:background .3s"></div>
+              <div class="bar" id="bar4" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.08);transition:background .3s"></div>
+            </div>
+            <div id="passLabel" style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.5px"></div>
+          </div>
+
+          <div class="field-divider">¿Tienes un proyecto en mente?</div>
+
+          <div class="field-group">
+            <label>¿Tienes un proyecto en mente?</label>
+            <div class="radio-group">
+              <label class="radio-opt" id="proj-si" onclick="selectProject('si')">
+                <input type="radio" name="proyecto" value="si">
+                <span class="radio-dot"></span>
+                Sí, tengo uno
+              </label>
+              <label class="radio-opt" id="proj-no" onclick="selectProject('no')">
+                <input type="radio" name="proyecto" value="no">
+                <span class="radio-dot"></span>
+                No por ahora
+              </label>
+            </div>
+          </div>
+
+          <div class="project-field" id="projectField">
+            <div class="field-group" style="margin-bottom:0">
+              <label>Cuéntanos sobre tu proyecto</label>
+              <textarea id="reg-project" placeholder="Describe brevemente tus necesidades logísticas, rutas, volúmenes estimados, tiempos de entrega…"></textarea>
+            </div>
+          </div>
+
+          <button class="btn-auth" onclick="doRegister()">// REGISTRARSE GRATIS</button>
+
+          <div class="auth-footer">
+            <a href="#">Términos de servicio</a>
+            <span>·</span>
+            <a href="#">Privacidad</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- /CARD -->
+
+    <div class="auth-footer">
+      <a href="#">← Volver al inicio</a>
+      <span>·</span>
+      <a href="#">Soporte</a>
+      <span>·</span>
+      <a href="#">WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<!-- ROBOT POPUP -->
+<div class="robot-overlay" id="robotOverlay">
+  <div class="robot-popup">
+    <span class="robot-emoji">🤖</span>
+    <div class="robot-label">// Detección de bot</div>
+    <div class="robot-title">¡Parece que eres un robot!</div>
+    <div class="robot-desc">
+      Hemos detectado actividad inusual en tu sesión. Si eres un profesional de logística interesado en nuestra plataforma, podemos mostrarte todo en una demo personalizada.
+    </div>
+    <button class="btn-demo" onclick="requestDemo()">📅 Solicitar Demo Personalizada</button>
+    <button class="btn-close-robot" onclick="closeRobot()">Volver al formulario</button>
+    <div class="robot-note">EFLETEXIA · SISTEMA DE SEGURIDAD ACTIVO</div>
+  </div>
+</div>
+
+<script>
+// ── PARTICLES
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+const N=60;
+const pts=Array.from({length:N},()=>({
+  x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+  vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
+  r:Math.random()*1.5+.5,
+  hue:Math.random()>.5?[255,107,26]:[245,168,42]
+}));
+function animParts(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=0;i<N;i++){
+    const p=pts[i];
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width)p.vx*=-1;
+    if(p.y<0||p.y>canvas.height)p.vy*=-1;
+    for(let j=i+1;j<N;j++){
+      const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<120){
+        const a=(1-d/120)*.15;
+        ctx.strokeStyle=`rgba(${p.hue[0]},${p.hue[1]},${p.hue[2]},${a})`;
+        ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
+      }
+    }
+    const a=.4+Math.sin(Date.now()*.001+i)*.2;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${p.hue[0]},${p.hue[1]},${p.hue[2]},${a})`;ctx.fill();
+  }
+  requestAnimationFrame(animParts);
+}
+animParts();
+
+// ── TABS
+function switchTab(tab, el){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.form-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+  hideMsg('login-msg');hideMsg('register-msg');
+}
+
+// ── PROJECT TOGGLE
+let projectSelected='';
+function selectProject(val){
+  projectSelected=val;
+  document.getElementById('proj-si').classList.toggle('selected',val==='si');
+  document.getElementById('proj-no').classList.toggle('selected',val==='no');
+  document.getElementById('projectField').classList.toggle('show',val==='si');
+}
+
+// ── MSGS
+function showMsg(id,type,text){
+  const el=document.getElementById(id);
+  el.className='form-msg '+type+' show';
+  el.textContent=text;
+}
+function hideMsg(id){
+  const el=document.getElementById(id);
+  el.className='form-msg';el.textContent='';
+}
+
+// ── LOGIN
+const VALID_USERS = {
+  'carlos.lopez@gmail.com': { pass:'123456', role:'Cliente', name:'Carlos López', dashboardUrl:'mi-cuenta.html' },
+  'juan.ramirez@gmail.com': { pass:'123456', role:'Administrador', name:'Juan Ramírez', dashboardUrl:'administrador.html' },
+};
+let loginAttempts=0;
+function doLogin(){
+  hideMsg('login-msg');
+  const user=document.getElementById('login-user').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  if(!user||!pass){showMsg('login-msg','error','⚠ Por favor completa todos los campos');return;}
+
+  const match = VALID_USERS[user.toLowerCase()];
+  if(match && pass===match.pass){
+    showMsg('login-msg','success','✔ Credenciales correctas. Accediendo al sistema…');
+    const btn=document.querySelector('#panel-login .btn-auth');
+    btn.textContent='// CARGANDO…';btn.disabled=true;btn.style.opacity='.7';
+    setTimeout(()=>showSuccessScreen(match),1200);
+    return;
+  }
+
+  loginAttempts++;
+  if(loginAttempts>=3){showRobot();loginAttempts=0;return;}
+  setTimeout(()=>{
+    showMsg('login-msg','error','⚠ Credenciales incorrectas. Por favor verifica tus datos.');
+  },800);
+}
+
+function showSuccessScreen(user){
+  const overlay=document.getElementById('verifyOverlay');
+  const roleColor = user.role==='Administrador' ? '#F5A82A' : '#FF6B1A';
+  const dashboardUrl = user.dashboardUrl || '#';
+  overlay.innerHTML=`
+    <div style="text-align:center;width:100%">
+      <div style="width:72px;height:72px;border-radius:50%;background:rgba(34,197,94,.12);border:2px solid #22C55E;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:pulseIcon 2s infinite">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#22C55E;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">// ACCESO CONCEDIDO</div>
+      <div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:6px">¡Bienvenido, ${user.name}!</div>
+      <div style="display:inline-block;background:rgba(255,107,26,.1);border:1px solid ${roleColor}33;border-radius:4px;padding:4px 16px;margin-bottom:20px">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${roleColor};letter-spacing:2px">${user.role}</span>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:28px">Has ingresado exitosamente a<br><strong style="color:var(--text)">Efletexia Logistics OS</strong></div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:16px 20px;margin-bottom:24px;text-align:left">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(78,106,138,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">// SESIÓN INICIADA</div>
+        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:6px">
+          <span>Usuario</span><span style="color:var(--text)">${user.name}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:6px">
+          <span>Rol</span><span style="color:${roleColor}">${user.role}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted)">
+          <span>Hora</span><span style="color:var(--text)">${new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'})}</span>
+        </div>
+      </div>
+      <button onclick="window.location.href='${dashboardUrl}'" style="width:100%;padding:13px;background:linear-gradient(135deg,#FF6B1A,#F5A82A);color:#fff;border:none;border-radius:4px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 0 28px rgba(255,107,26,.4)">IR AL DASHBOARD →</button>
+    </div>
+  `;
+  overlay.classList.add('show');
+}
+
+// ── PASSWORD STRENGTH
+function checkPassStrength(val){
+  const el=document.getElementById('passStrength');
+  if(!val){el.style.display='none';return;}
+  el.style.display='block';
+  let score=0;
+  if(val.length>=8)score++;
+  if(/[A-Z]/.test(val))score++;
+  if(/[0-9]/.test(val))score++;
+  if(/[^A-Za-z0-9]/.test(val))score++;
+  const colors=['#FF4444','#FF8C00','#F5A82A','#22C55E'];
+  const labels=['Débil','Regular','Buena','Fuerte'];
+  for(let i=1;i<=4;i++){
+    const b=document.getElementById('bar'+i);
+    b.style.background=i<=score?colors[score-1]:'rgba(255,255,255,.08)';
+  }
+  document.getElementById('passLabel').textContent=labels[score-1]||'';
+  document.getElementById('passLabel').style.color=colors[score-1]||'var(--muted)';
+}
+
+// ── REGISTER
+function doRegister(){
+  hideMsg('register-msg');
+  const name=document.getElementById('reg-name').value.trim();
+  const lastname=document.getElementById('reg-lastname').value.trim();
+  const company=document.getElementById('reg-company').value.trim();
+  const phone=document.getElementById('reg-phone').value.trim();
+  const industry=document.getElementById('reg-industry').value;
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  const pass2=document.getElementById('reg-pass2').value;
+
+  if(!name||!lastname||!company||!phone||!industry||!email||!pass||!pass2){
+    showMsg('register-msg','error','⚠ Por favor completa todos los campos obligatorios (*)');return;
+  }
+  if(phone.replace(/\D/g,'').length<8){
+    showMsg('register-msg','error','⚠ Ingresa un número de teléfono válido con código de país');return;
+  }
+  const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRx.test(email)){
+    showMsg('register-msg','error','⚠ Ingresa un correo electrónico válido');return;
+  }
+  if(pass.length<8){
+    showMsg('register-msg','error','⚠ La contraseña debe tener al menos 8 caracteres');return;
+  }
+  if(pass!==pass2){
+    showMsg('register-msg','error','⚠ Las contraseñas no coinciden');return;
+  }
+  const masked=phone.slice(0,4)+'****'+phone.slice(-4);
+  document.getElementById('verifyPhoneDisplay').textContent=masked;
+  document.getElementById('verifyOverlay').classList.add('show');
+  startCountdown();
+  clearVerifyInputs();
+  setTimeout(()=>document.getElementById('v1').focus(),300);
+}
+
+// ── VERIFY CODE
+let countdownTimer=null;
+function startCountdown(){
+  let secs=60;
+  const cd=document.getElementById('verifyCountdown');
+  clearInterval(countdownTimer);
+  const resendBtn=document.querySelector('.resend-link');
+  resendBtn.style.opacity='.4';resendBtn.style.pointerEvents='none';
+  countdownTimer=setInterval(()=>{
+    cd.textContent=`Puedes reenviar en ${secs}s`;
+    secs--;
+    if(secs<0){
+      clearInterval(countdownTimer);
+      cd.textContent='';
+      resendBtn.style.opacity='1';resendBtn.style.pointerEvents='auto';
+    }
+  },1000);
+}
+function resendCode(){
+  startCountdown();
+  clearVerifyInputs();
+  setTimeout(()=>document.getElementById('v1').focus(),100);
+}
+function clearVerifyInputs(){
+  ['v1','v2','v3','v4','v5','v6'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.value='';el.classList.remove('filled');
+  });
+}
+function doVerify(){
+  const code=['v1','v2','v3','v4','v5','v6'].map(id=>document.getElementById(id).value).join('');
+  if(code.length<6){alert('Por favor ingresa el código completo de 6 dígitos');return;}
+  // Simulate verification success
+  document.getElementById('verifyOverlay').innerHTML=`
+    <div style="text-align:center">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,.15);border:2px solid #22C55E;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:8px">¡Cuenta Verificada!</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px">Tu registro fue exitoso. Bienvenido a Efletexia Logistics OS</div>
+      <button onclick="window.location.reload()" style="padding:12px 32px;background:var(--grad);color:#fff;border:none;border-radius:4px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 0 24px rgba(255,107,26,.4)">ACCEDER AL SISTEMA</button>
+    </div>
+  `;
+  clearInterval(countdownTimer);
+}
+
+// OTP auto-advance
+['v1','v2','v3','v4','v5','v6'].forEach((id,i,arr)=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',()=>{
+    if(el.value.length>1)el.value=el.value.slice(-1);
+    if(el.value){
+      el.classList.add('filled');
+      if(i<arr.length-1)document.getElementById(arr[i+1]).focus();
+    }else{el.classList.remove('filled')}
+  });
+  el.addEventListener('keydown',e=>{
+    if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();
+  });
+});
+
+// ── ROBOT POPUP
+function showRobot(){document.getElementById('robotOverlay').classList.add('show')}
+function closeRobot(){document.getElementById('robotOverlay').classList.remove('show')}
+function requestDemo(){
+  alert('📅 Redirigiendo a la página de solicitud de demo personalizada…\n\nUn especialista de Efletexia se pondrá en contacto contigo en menos de 24 horas.');
+  closeRobot();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Efletexia — ER Plataforma & Servicios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<style>
+:root{
+  --bg:#040810;--bg2:#060C18;--card:#0A1628;--card2:#0E1E36;
+  --b1:rgba(255,107,26,.18);
+  --orange:#FF6B1A;--amber:#F5A82A;--grad:linear-gradient(135deg,#FF6B1A,#F5A82A);
+  --text:#E2EDF8;--muted:#4E6A8A;--mono:'Share Tech Mono',monospace;
+  --green:#22c55e;--purple:#a855f7;--blue:#3b82f6;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+
+.topbar{padding:18px 28px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.tb-logo{font-family:var(--mono);font-weight:900;letter-spacing:2px;font-size:15px;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tb-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+.tabs{display:flex;gap:8px;padding:16px 28px 0;flex-wrap:wrap}
+.tab-btn{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:9px 18px;border-radius:4px;border:1px solid var(--b1);background:var(--card);color:var(--muted);
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.tab-btn:hover{color:var(--text);border-color:rgba(255,107,26,.35)}
+.tab-btn.active{background:rgba(255,107,26,.12);color:var(--orange);border-color:rgba(255,107,26,.4)}
+.tab-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+.panel-wrap{flex:1;padding:16px 28px 28px;display:flex;flex-direction:column}
+.diagram-panel{display:none;flex:1;flex-direction:column;background:var(--card);border:1px solid var(--b1);border-radius:6px;overflow:hidden;min-height:0}
+.diagram-panel.active{display:flex}
+
+.panel-hdr{padding:12px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.panel-title{font-family:var(--mono);font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:8px}
+.panel-title::before{content:'//';color:var(--orange);font-weight:900}
+.panel-sub{font-size:11px;color:var(--muted);padding:0 18px 10px;margin-top:-4px}
+
+.zoom-controls{display:flex;align-items:center;gap:6px}
+.zoom-btn{width:30px;height:30px;border-radius:4px;border:1px solid var(--b1);background:transparent;color:var(--text);
+  font-family:var(--mono);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.zoom-btn:hover{border-color:var(--orange);color:var(--orange)}
+.zoom-pct{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:42px;text-align:center}
+.gloss-toggle{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  padding:7px 12px;border-radius:4px;border:1px solid var(--b1);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.gloss-toggle:hover{color:var(--orange);border-color:rgba(255,107,26,.35)}
+.gloss-toggle.on{color:var(--orange);border-color:rgba(255,107,26,.4);background:rgba(255,107,26,.1)}
+
+.panel-body{flex:1;display:flex;overflow:hidden;min-height:0}
+.viewport{flex:1;position:relative;overflow:hidden;cursor:grab;background:
+  radial-gradient(circle at 1px 1px, rgba(255,255,255,.04) 1px, transparent 0) 0 0/22px 22px;}
+.viewport.grabbing{cursor:grabbing}
+.canvas{position:absolute;top:0;left:0;transform-origin:0 0;padding:40px;display:inline-block}
+.canvas svg{display:block;max-width:none !important;height:auto !important}
+.loading{color:var(--muted);font-family:var(--mono);font-size:12px;padding:40px;text-align:center;width:100%}
+
+.info-sidebar{width:380px;flex-shrink:0;border-left:1px solid var(--b1);overflow-y:auto;
+  padding:18px 20px 28px;background:var(--bg2)}
+.info-sidebar.hidden{display:none}
+.gloss-section-title{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:2px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--b1)}
+.gloss-section-title:first-child{margin-top:0}
+.gloss-item{margin-bottom:13px}
+.gloss-name{font-family:var(--mono);color:var(--orange);font-size:11.5px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.gloss-desc{font-size:12px;color:var(--text);line-height:1.55;margin-top:3px}
+.gloss-note{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.gloss-note b{color:var(--text)}
+.badge{font-family:var(--mono);font-size:8.5px;letter-spacing:.5px;padding:2px 6px;border-radius:100px;text-transform:uppercase;font-weight:700}
+.b-admin{background:rgba(255,107,26,.15);color:var(--orange);border:1px solid rgba(255,107,26,.3)}
+.b-hija{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
+.b-free{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--b3, rgba(255,255,255,.1))}
+.b-pro{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.b-plat{background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.3)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="tb-logo">EFLETEXIA // ECOSISTEMA — ER</div>
+    <div class="tb-sub">De alto nivel (plataforma) hacia cada servicio y su detalle por perfil</div>
+  </div>
+  <div class="tb-sub" style="font-family:var(--mono);font-size:10px">SCROLL = ZOOM &nbsp;·&nbsp; ARRASTRAR = MOVER</div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchPanel('arq', this)"><span class="tab-dot" style="background:#3b82f6"></span>0 · Arquitectura (componentes)</button>
+  <button class="tab-btn" onclick="switchPanel('plataforma', this)"><span class="tab-dot" style="background:var(--orange)"></span>1 · Landing (modelo simple)</button>
+  <button class="tab-btn" onclick="switchPanel('eflexy', this)"><span class="tab-dot" style="background:#FF6B1A"></span>2 · Eflexy ↗</button>
+  <button class="tab-btn" onclick="switchPanel('viax', this)"><span class="tab-dot" style="background:#4CAF50"></span>3 · Viax ↗</button>
+  <button class="tab-btn" onclick="switchPanel('fletex', this)"><span class="tab-dot" style="background:#F5A82A"></span>4 · Fletex ↗</button>
+  <button class="tab-btn" onclick="switchPanel('qubo', this)"><span class="tab-dot" style="background:#a855f7"></span>5 · Qubo ↗</button>
+  <button class="tab-btn" onclick="switchPanel('bi', this)"><span class="tab-dot" style="background:#3b82f6"></span>6 · Efletexia BI ↗</button>
+  <button class="tab-btn" onclick="switchPanel('admin', this)"><span class="tab-dot" style="background:#F5A82A"></span>7 · Panel Administrador</button>
+</div>
+
+<div class="panel-wrap">
+
+  <!-- 0. ARQUITECTURA DE COMPONENTES -->
+  <div class="diagram-panel active" id="panel-arq">
+    <div class="panel-hdr">
+      <div class="panel-title">Arquitectura · Diagrama de componentes</div>
+      <div class="zoom-controls" data-target="arq">
+        <button class="gloss-toggle on" onclick="toggleGloss('arq', this)">Glosario</button>
+        <button class="zoom-btn" onclick="zoomBy('arq',-0.15)">−</button>
+        <div class="zoom-pct" id="pct-arq">100%</div>
+        <button class="zoom-btn" onclick="zoomBy('arq',0.15)">+</button>
+        <button class="zoom-btn" style="width:auto;padding:0 10px;font-size:10px" onclick="resetZoom('arq')">RESET</button>
+      </div>
+    </div>
+    <div class="panel-sub">Qué piezas componen la solución y cómo se hablan entre sí, incluida la <b style="color:var(--blue)">base de datos</b> y qué tabla toca cada componente. Las pestañas siguientes son los <b>modelos entidad-relación</b> de esas mismas tablas.</div>
+    <div class="panel-body">
+      <div class="viewport" id="viewport-arq">
+        <div class="canvas" id="canvas-arq"><div class="loading">Renderizando diagrama…</div></div>
+      </div>
+      <div class="info-sidebar" id="sidebar-arq">
+        <div class="gloss-section-title">Cómo leerlo</div>
+        <div class="gloss-note">Cada caja es un <b>componente</b>: una pieza de software con una responsabilidad. Las flechas son quién llama a quién. Los cilindros azules son <b>tablas de la base de datos</b> — las mismas que aparecen en la pestaña 1 como entidades del ER.</div>
+        <div class="gloss-section-title">Navegador</div>
+        <div class="gloss-item"><div class="gloss-name">Landing informativa</div><div class="gloss-desc">Lo público: el catálogo de los 5 productos. No pide login.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Formulario de solicitud</div><div class="gloss-desc">"Quiero más información". Lo único que el visitante puede enviar.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Referencias publicadas</div><div class="gloss-desc">Los testimonios que salen abajo en la web. Se leen de la base, no se escriben desde aquí.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Iniciar sesión</div><div class="gloss-desc">La esquina superior. Solo sirve para quien ya contrató.</div></div>
+        <div class="gloss-section-title">Aplicación web</div>
+        <div class="gloss-item"><div class="gloss-name">Sitio público</div><div class="gloss-desc">Sirve el contenido. Lee PRODUCTO y los COMENTARIO aprobados. Nunca escribe.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Gestor de solicitudes</div><div class="gloss-desc">Recibe el formulario, lo guarda en SOLICITUD_INFORMACION y avisa por correo al equipo comercial.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Autenticación</div><div class="gloss-desc">Valida usuario y contraseña contra CREDENCIAL y deja rastro en INTENTO_ACCESO. <b>Al tercer fallo bloquea</b>; el captcha frena a los robots.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Enrutador "Mi cuenta"</div><div class="gloss-desc">Después del login consulta ACCESO_PRODUCTO y manda al cliente al aplicativo que compró.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Panel administrador</div><div class="gloss-desc">Lo único que escribe sobre clientes: da de alta al que compró, genera y desbloquea contraseñas y aprueba comentarios. Cada una de esas acciones queda en la <b>bitácora</b>.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Administración de subcuentas</div><div class="gloss-desc">Vive <b>dentro de cada aplicativo</b>, no en la web pública. El cliente que contrató una solución crea ahí las cuentas de su equipo y decide qué módulo ve cada una.</div></div>
+        <div class="gloss-section-title">Base de datos</div>
+        <div class="gloss-note">Once tablas, las mismas del ER simple: <b>PRODUCTO</b>, <b>SOLICITUD_INFORMACION</b>, <b>CLIENTE</b>, <b>CREDENCIAL</b>, <b>INTENTO_ACCESO</b>, <b>ACCESO_PRODUCTO</b>, <b>COMENTARIO</b>, <b>SUBCUENTA</b>, <b>PERMISO_SUBCUENTA</b>, <b>BITACORA</b> y <b>CONFIGURACION_SITIO</b>. Es la única fuente de verdad; ningún componente guarda datos por su cuenta.</div>
+        <div class="gloss-section-title">Aplicativos</div>
+        <div class="gloss-note">Eflexy, Viax, Fletex, Qubo y Efletexia BI son <b>sistemas aparte</b>: cada uno corre en su propio servidor, con su propia base y su propio modelo de datos. La plataforma no los contiene — se <b>integra</b> con ellos para dar de alta a los usuarios y entregar el enlace de acceso. Las pestañas 2 a 6 muestran esa frontera, no el interior de cada solución.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 0. LANDING - MODELO SIMPLE -->
+  <div class="diagram-panel" id="panel-plataforma">
+    <div class="panel-hdr">
+      <div class="panel-title">Landing informativa · Modelo simple</div>
+      <div class="zoom-controls" data-target="plataforma">
+        <button class="gloss-toggle on" onclick="toggleGloss('plataforma', this)">Glosario</button>
+        <button class="zoom-btn" onclick="zoomBy('plataforma',-0.15)">−</button>
+        <div class="zoom-pct" id="pct-plataforma">100%</div>
+        <button class="zoom-btn" onclick="zoomBy('plataforma',0.15)">+</button>
+        <button class="zoom-btn" style="width:auto;padding:0 10px;font-size:10px" onclick="resetZoom('plataforma')">RESET</button>
+      </div>
+    </div>
+    <div class="panel-sub">La web es <b style="color:var(--orange)">solo informativa</b>: el visitante no tiene usuario, solo envía una solicitud de información. El usuario y la contraseña se crean <b>recién cuando contrata</b> una solución. Cuatro tablas de fondo: cliente, producto, contraseña y comentarios.</div>
+    <div class="panel-body">
+      <div class="viewport" id="viewport-plataforma">
+        <div class="canvas" id="canvas-plataforma"><div class="loading">Renderizando diagrama…</div></div>
+      </div>
+      <div class="info-sidebar" id="sidebar-plataforma">
+        <div class="gloss-section-title">El recorrido, en orden</div>
+        <div class="gloss-note"><b>1.</b> Alguien entra a la web y ve los 5 productos. No hay login ni cuenta.<br><b>2.</b> Le interesa uno y llena el formulario: <b>Solicitud_Informacion</b>. Nombre, correo, país, producto. Nada más.<br><b>3.</b> Ventas lo contacta con esa solicitud.<br><b>4.</b> Si compra, se vuelve <b>Cliente</b> y recién ahí se le genera su <b>Credencial</b> (usuario y contraseña).<br><b>5.</b> Entra por "Iniciar sesión" en la esquina de la misma web y desde ahí va a la solución que compró.<br><b>6.</b> Una vez implementada, puede dejar su <b>Comentario</b> (referencia) y ese texto sí aparece en la parte de abajo de la web.</div>
+        <div class="gloss-section-title">Entidades</div>
+        <div class="gloss-item"><div class="gloss-name">Producto</div><div class="gloss-desc">Las 5 soluciones que la web muestra: Eflexy, Viax, Fletex, Qubo y Efletexia BI. Es catálogo informativo, sin precios.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Solicitud_Informacion</div><div class="gloss-desc">El formulario de "quiero más información". Nombre, empresa, correo, teléfono, país, producto de interés y mensaje. <b>No crea usuario ni contraseña.</b></div></div>
+        <div class="gloss-item"><div class="gloss-name">Pais</div><div class="gloss-desc">País del interesado. Sirve para derivar la solicitud al equipo comercial correcto y, en Fletex, para saber qué árbol de cálculo aplica.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Cliente</div><div class="gloss-desc">La solicitud que sí compró. Aquí se guardan sus datos completos; es la tabla que el administrador consulta.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Credencial</div><div class="gloss-desc">Usuario y contraseña del cliente. Se genera al contratar, no antes. Guarda su estado: activa, bloqueada o pendiente de cambio.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Intento_Acceso</div><div class="gloss-desc">Cada intento de login con fecha, IP y si pasó el captcha. <b>Al tercer intento fallido la credencial se bloquea</b> — también si el captcha falla, por si es un robot.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Acceso_Producto</div><div class="gloss-desc">Qué solución compró cada cliente. Es lo que define a qué aplicativo lo manda "Mi cuenta" después del login, y cuántas subcuentas puede crear ahí (<b>hoy, 10</b>).</div></div>
+        <div class="gloss-item"><div class="gloss-name">Subcuenta</div><div class="gloss-desc">Los usuarios que el <b>cliente</b> crea dentro de una solución que ya contrató, para su propio equipo. Viven dentro de ese <b>Acceso_Producto</b>: una subcuenta de Qubo no entra a Fletex. Las administra el cliente, no Efletexia.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Modulo_Producto</div><div class="gloss-desc">Las partes en que se divide cada solución y que se pueden habilitar por separado (por ejemplo, en Efletexia BI: seguimiento, alertas, reportes, proyectos).</div></div>
+        <div class="gloss-item"><div class="gloss-name">Permiso_Subcuenta</div><div class="gloss-desc">Qué módulo ve cada subcuenta. Es la tabla que hace que dos personas del mismo cliente vean pantallas distintas.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Comentario</div><div class="gloss-desc">La referencia del cliente sobre un producto: su texto, su foto y su cargo. Solo existe si el cliente ya tiene el producto, y solo se publica cuando el administrador la aprueba.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Administrador</div><div class="gloss-desc">Personal de Efletexia. Ve todos los clientes registrados, resetea y desbloquea contraseñas, y aprueba qué comentarios salen publicados.</div></div>
+        <div class="gloss-section-title">Dos niveles de administración</div>
+        <div class="gloss-note"><b>Administrador</b> es de Efletexia: administra la página — clientes, contraseñas y comentarios. <b>Cliente</b> administra lo suyo: dentro de cada solución que compró crea <b>subcuentas</b> para su equipo y les habilita módulos. Efletexia no entra a repartir esos permisos; solo ve cuántas subcuentas tiene cada cliente.</div>
+        <div class="gloss-note">Una misma <b>Credencial</b> sirve para la cuenta del cliente y para cada subcuenta: todas pasan por el mismo login, los mismos tres intentos y el mismo captcha.</div>
+        <div class="gloss-section-title">Qué se eliminó del modelo anterior</div>
+        <div class="gloss-note">Ya no hay <b>Usuario</b> global, ni <b>Token_Verificación</b> (OTP), ni <b>Rol_Plataforma</b>, ni <b>Suscripción</b>, ni <b>Plan_Servicio</b>, ni <b>Cuenta_Servicio</b> con cuentas hijas. Esa estructura era un ERP y no corresponde a una web informativa. Si más adelante el cliente entra a los aplicativos con este mismo usuario, se retoma desde las pestañas 1–5.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. EFLEXY -->
+  <div class="diagram-panel" id="panel-eflexy">
+    <div class="panel-hdr">
+      <div class="panel-title">Eflexy · Integración</div>
+      <div class="zoom-controls" data-target="eflexy">
+        <button class="gloss-toggle on" onclick="toggleGloss('eflexy', this)">Glosario</button>
+        <button class="zoom-btn" onclick="zoomBy('eflexy',-0.15)">−</button>
+        <div class="zoom-pct" id="pct-eflexy">100%</div>
+        <button class="zoom-btn" onclick="zoomBy('eflexy',0.15)">+</button>
+        <button class="zoom-btn" style="width:auto;padding:0 10px;font-size:10px" onclick="resetZoom('eflexy')">RESET</button>
+      </div>
+    </div>
+    <div class="panel-sub"><b style="color:var(--orange)">Eflexy</b> es un sistema aparte: CMS y control de la flota de robots de última milla, con su propio servidor y su propia base de datos. Aquí <b>no se modela su interior</b> — solo el punto donde se conecta con la plataforma.</div>
+    <div class="panel-body">
+      <div class="viewport" id="viewport-eflexy">
+        <div class="canvas" id="canvas-eflexy"><div class="loading">Renderizando diagrama…</div></div>
+      </div>
+      <div class="info-sidebar" id="sidebar-eflexy">
+        <div class="gloss-section-title">Por qué no hay más detalle</div>
+        <div class="gloss-note">Eflexy <b>no vive en esta plataforma</b>. Corre en su propio servidor, con su propia base y su propio modelo de datos, mantenido por su equipo. Lo único que le corresponde a este ER es la <b>frontera</b>: qué se le envía, qué devuelve y qué queda registrado de esa conversación.</div>
+        <div class="gloss-section-title">Entidades de la frontera</div>
+        <div class="gloss-item"><div class="gloss-name">Sistema_EFLEXY</div><div class="gloss-desc">El sistema externo en sí. Se guarda dónde vive y qué versión atiende; nada de lo que tiene adentro.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Integracion</div><div class="gloss-desc">Cómo se conversa con Eflexy: tipo de conexión, credenciales del servicio y estado. Por aquí viaja el alta de cada persona del equipo y su acceso al panel de recorridos y publicaciones.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Usuario_Remoto</div><div class="gloss-desc">La correspondencia entre una <b>subcuenta</b> de esta plataforma y el usuario que le equivale dentro de Eflexy. Es la tabla que evita pedirle al cliente que dé de alta a su gente dos veces.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Evento_Integracion</div><div class="gloss-desc">El registro de cada intercambio: cuándo, qué se pidió y si salió bien. Sirve para saber dónde se rompió algo cuando un acceso no llega.</div></div>
+        <div class="gloss-section-title">De dónde viene</div>
+        <div class="gloss-note"><b>Acceso_Producto</b> y <b>Subcuenta</b> son de la pestaña 1: el contrato del cliente y las personas de su equipo. Aquí aparecen solo para mostrar qué se replica hacia Eflexy.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. VIAX -->
+  <div class="diagram-panel" id="panel-viax">
+    <div class="panel-hdr">
+      <div class="panel-title">Viax · Integración</div>
+      <div class="zoom-controls" data-target="viax">
+        <button class="gloss-toggle on" onclick="toggleGloss('viax', this)">Glosario</button>
+        <button class="zoom-btn" onclick="zoomBy('viax',-0.15)">−</button>
+        <div class="zoom-pct" id="pct-viax">100%</div>
+        <button class="zoom-btn" onclick="zoomBy('viax',0.15)">+</button>
+        <button class="zoom-btn" style="width:auto;padding:0 10px;font-size:10px" onclick="resetZoom('viax')">RESET</button>
+      </div>
+    </div>
+    <div class="panel-sub"><b style="color:var(--orange)">Viax</b> es un sistema aparte: app de navegación y programa de millas para conductores, con su propio servidor y su propia base de datos. Aquí <b>no se modela su interior</b> — solo el punto donde se conecta con la plataforma.</div>
+    <div class="panel-body">
+      <div class="viewport" id="viewport-viax">
+        <div class="canvas" id="canvas-viax"><div class="loading">Renderizando diagrama…</div></div>
+      </div>
+      <div class="info-sidebar" id="sidebar-viax">
+        <div class="gloss-section-title">Por qué no hay más detalle</div>
+        <div class="gloss-note">Viax <b>no vive en esta plataforma</b>. Corre en su propio servidor, con su propia base y su propio modelo de datos, mantenido por su equipo. Lo único que le corresponde a este ER es la <b>frontera</b>: qué se le envía, qué devuelve y qué queda registrado de esa conversación.</div>
+        <div class="gloss-section-title">Entidades de la frontera</div>
+        <div class="gloss-item"><div class="gloss-name">Sistema_VIAX</div><div class="gloss-desc">El sistema externo en sí. Se guarda dónde vive y qué versión atiende; nada de lo que tiene adentro.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Integracion</div><div class="gloss-desc">Cómo se conversa con Viax: tipo de conexión, credenciales del servicio y estado. Por aquí viaja la validación de viaje y placa contra el TMS, y el alta de los usuarios de la empresa.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Usuario_Remoto</div><div class="gloss-desc">La correspondencia entre una <b>subcuenta</b> de esta plataforma y el usuario que le equivale dentro de Viax. Es la tabla que evita pedirle al cliente que dé de alta a su gente dos veces.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Evento_Integracion</div><div class="gloss-desc">El registro de cada intercambio: cuándo, qué se pidió y si salió bien. Sirve para saber dónde se rompió algo cuando un acceso no llega.</div></div>
+        <div class="gloss-section-title">De dónde viene</div>
+        <div class="gloss-note"><b>Acceso_Producto</b> y <b>Subcuenta</b> son de la pestaña 1: el contrato del cliente y las personas de su equipo. Aquí aparecen solo para mostrar qué se replica hacia Viax.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. FLETEX -->
+  <div class="diagram-panel" id="panel-fletex">
+    <div class="panel-hdr">
+      <div class="panel-title">Fletex · Integración</div>
+      <div class="zoom-controls" data-target="fletex">
+        <button class="gloss-toggle on" onclick="toggleGloss('fletex', this)">Glosario</button>
+        <button class="zoom-btn" onclick="zoomBy('fletex',-0.15)">−</button>
+        <div class="zoom-pct" id="pct-fletex">100%</div>
+        <button class="zoom-btn" onclick="zoomBy('fletex',0.15)">+</button>
+        <button class="zoom-btn" style="width:auto;padding:0 10px;font-size:10px" onclick="resetZoom('fletex')">RESET</button>
+      </div>
+    </div>
+    <div class="panel-sub"><b style="color:var(--orange)">Fletex</b> es un sistema aparte: simulador de tarifas de transporte, con su propio servidor y su propia base de datos. Aquí <b>no se modela su interior</b> — solo el punto donde se conecta con la plataforma.</div>
+    <div class="panel-body">
+      <div class="viewport" id="viewport-fletex">
+        <div class="canvas" id="canvas-fletex"><div class="loading">Renderizando diagrama…</div></div>
+      </div>
+      <div class="info-sidebar" id="sidebar-fletex">
+        <div class="gloss-section-title">Por qué no hay más detalle</div>
+        <div class="gloss-note">Fletex <b>no vive en esta plataforma</b>. Corre en su propio servidor, con su propia base y su propio modelo de datos, mantenido por su equipo. Lo único que le corresponde a este ER es la <b>frontera</b>: qué se le envía, qué devuelve y qué queda registrado de esa conversación.</div>
+        <div class="gloss-section-title">Entidades de la frontera</div>
+        <div class="gloss-item"><div class="gloss-name">Sistema_FLETEX</div><div class="gloss-desc">El sistema externo en sí. Se guarda dónde vive y qué versión atiende; nada de lo que tiene adentro.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Integracion</div><div class="gloss-desc">Cómo se conversa con Fletex: tipo de conexión, credenciales del servicio y estado. Por aquí viaja el alta de los usuarios que cotizan y el árbol de cálculo que le toca a cada país.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Usuario_Remoto</div><div class="gloss-desc">La correspondencia entre una <b>subcuenta</b> de esta plataforma y el usuario que le equivale dentro de Fletex. Es la tabla que evita pedirle al cliente que dé de alta a su gente dos veces.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Evento_Integracion</div><div class="gloss-desc">El registro de cada intercambio: cuándo, qué se pidió y si salió bien. Sirve para saber dónde se rompió algo cuando un acceso no llega.</div></div>
+        <div class="gloss-section-title">De dónde viene</div>
+        <div class="gloss-note"><b>Acceso_Producto</b> y <b>Subcuenta</b> son de la pestaña 1: el contrato del cliente y las personas de su equipo. Aquí aparecen solo para mostrar qué se replica hacia Fletex.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. QUBO -->
+  <div class="diagram-panel" id="panel-qubo">
+    <div class="panel-hdr">
+      <div class="panel-title">Qubo · Integración</div>
+      <div class="zoom-controls" data-target="qubo">
+        <button class="gloss-toggle on" onclick="toggleGloss('qubo', this)">Glosario</button>
+        <button class="zoom-btn" onclick="zoomBy('qubo',-0.15)">−</button>
+        <div class="zoom-pct" id="pct-qubo">100%</div>
+        <button class="zoom-btn" onclick="zoomBy('qubo',0.15)">+</button>
+        <button class="zoom-btn" style="width:auto;padding:0 10px;font-size:10px" onclick="resetZoom('qubo')">RESET</button>
+      </div>
+    </div>
+    <div class="panel-sub"><b style="color:var(--orange)">Qubo</b> es un sistema aparte: simulador de cubicaje y planificador de despacho, con su propio servidor y su propia base de datos. Aquí <b>no se modela su interior</b> — solo el punto donde se conecta con la plataforma.</div>
+    <div class="panel-body">
+      <div class="viewport" id="viewport-qubo">
+        <div class="canvas" id="canvas-qubo"><div class="loading">Renderizando diagrama…</div></div>
+      </div>
+      <div class="info-sidebar" id="sidebar-qubo">
+        <div class="gloss-section-title">Por qué no hay más detalle</div>
+        <div class="gloss-note">Qubo <b>no vive en esta plataforma</b>. Corre en su propio servidor, con su propia base y su propio modelo de datos, mantenido por su equipo. Lo único que le corresponde a este ER es la <b>frontera</b>: qué se le envía, qué devuelve y qué queda registrado de esa conversación.</div>
+        <div class="gloss-section-title">Entidades de la frontera</div>
+        <div class="gloss-item"><div class="gloss-name">Sistema_QUBO</div><div class="gloss-desc">El sistema externo en sí. Se guarda dónde vive y qué versión atiende; nada de lo que tiene adentro.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Integracion</div><div class="gloss-desc">Cómo se conversa con Qubo: tipo de conexión, credenciales del servicio y estado. Por aquí viaja el alta de los usuarios de patio y qué módulos ve cada uno.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Usuario_Remoto</div><div class="gloss-desc">La correspondencia entre una <b>subcuenta</b> de esta plataforma y el usuario que le equivale dentro de Qubo. Es la tabla que evita pedirle al cliente que dé de alta a su gente dos veces.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Evento_Integracion</div><div class="gloss-desc">El registro de cada intercambio: cuándo, qué se pidió y si salió bien. Sirve para saber dónde se rompió algo cuando un acceso no llega.</div></div>
+        <div class="gloss-section-title">De dónde viene</div>
+        <div class="gloss-note"><b>Acceso_Producto</b> y <b>Subcuenta</b> son de la pestaña 1: el contrato del cliente y las personas de su equipo. Aquí aparecen solo para mostrar qué se replica hacia Qubo.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. EFLETEXIA BI -->
+  <div class="diagram-panel" id="panel-bi">
+    <div class="panel-hdr">
+      <div class="panel-title">Efletexia BI · Integración</div>
+      <div class="zoom-controls" data-target="bi">
+        <button class="gloss-toggle on" onclick="toggleGloss('bi', this)">Glosario</button>
+        <button class="zoom-btn" onclick="zoomBy('bi',-0.15)">−</button>
+        <div class="zoom-pct" id="pct-bi">100%</div>
+        <button class="zoom-btn" onclick="zoomBy('bi',0.15)">+</button>
+        <button class="zoom-btn" style="width:auto;padding:0 10px;font-size:10px" onclick="resetZoom('bi')">RESET</button>
+      </div>
+    </div>
+    <div class="panel-sub"><b style="color:var(--orange)">Efletexia BI</b> es un sistema aparte: centro de control: seguimiento, alertas, reportes y proyectos, con su propio servidor y su propia base de datos. Aquí <b>no se modela su interior</b> — solo el punto donde se conecta con la plataforma.</div>
+    <div class="panel-body">
+      <div class="viewport" id="viewport-bi">
+        <div class="canvas" id="canvas-bi"><div class="loading">Renderizando diagrama…</div></div>
+      </div>
+      <div class="info-sidebar" id="sidebar-bi">
+        <div class="gloss-section-title">Por qué no hay más detalle</div>
+        <div class="gloss-note">Efletexia BI <b>no vive en esta plataforma</b>. Corre en su propio servidor, con su propia base y su propio modelo de datos, mantenido por su equipo. Lo único que le corresponde a este ER es la <b>frontera</b>: qué se le envía, qué devuelve y qué queda registrado de esa conversación.</div>
+        <div class="gloss-section-title">Entidades de la frontera</div>
+        <div class="gloss-item"><div class="gloss-name">Sistema_EFLETEXIA_BI</div><div class="gloss-desc">El sistema externo en sí. Se guarda dónde vive y qué versión atiende; nada de lo que tiene adentro.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Integracion</div><div class="gloss-desc">Cómo se conversa con Efletexia BI: tipo de conexión, credenciales del servicio y estado. Por aquí viaja el alta de usuarios y el alcance de cada uno por país y compañía.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Usuario_Remoto</div><div class="gloss-desc">La correspondencia entre una <b>subcuenta</b> de esta plataforma y el usuario que le equivale dentro de Efletexia BI. Es la tabla que evita pedirle al cliente que dé de alta a su gente dos veces.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Evento_Integracion</div><div class="gloss-desc">El registro de cada intercambio: cuándo, qué se pidió y si salió bien. Sirve para saber dónde se rompió algo cuando un acceso no llega.</div></div>
+        <div class="gloss-section-title">De dónde viene</div>
+        <div class="gloss-note"><b>Acceso_Producto</b> y <b>Subcuenta</b> son de la pestaña 1: el contrato del cliente y las personas de su equipo. Aquí aparecen solo para mostrar qué se replica hacia Efletexia BI.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. PANEL ADMINISTRADOR -->
+  <div class="diagram-panel" id="panel-admin">
+    <div class="panel-hdr">
+      <div class="panel-title">Panel Administrador · Administración del sitio</div>
+      <div class="zoom-controls" data-target="admin">
+        <button class="gloss-toggle on" onclick="toggleGloss('admin', this)">Glosario</button>
+        <button class="zoom-btn" onclick="zoomBy('admin',-0.15)">−</button>
+        <div class="zoom-pct" id="pct-admin">100%</div>
+        <button class="zoom-btn" onclick="zoomBy('admin',0.15)">+</button>
+        <button class="zoom-btn" style="width:auto;padding:0 10px;font-size:10px" onclick="resetZoom('admin')">RESET</button>
+      </div>
+    </div>
+    <div class="panel-sub">Lo que administra <b style="color:var(--orange)">Efletexia</b> sobre la página: clientes, contraseñas, comentarios, el catálogo de productos y la configuración del sitio. Lo que cada cliente administra dentro de su solución — las <b>subcuentas</b> — aquí solo se consulta.</div>
+    <div class="panel-body">
+      <div class="viewport" id="viewport-admin">
+        <div class="canvas" id="canvas-admin"><div class="loading">Renderizando diagrama…</div></div>
+      </div>
+      <div class="info-sidebar" id="sidebar-admin">
+        <div class="gloss-section-title">Qué hace el administrador</div>
+        <div class="gloss-note">Ve todos los clientes registrados, resetea y desbloquea contraseñas, aprueba o rechaza los comentarios que salen publicados, mantiene el catálogo de las cinco soluciones y ajusta la configuración de la web. <b>No reparte los permisos internos de cada cliente</b>: eso lo hace el propio cliente en su solución.</div>
+        <div class="gloss-section-title">Entidades propias del panel</div>
+        <div class="gloss-item"><div class="gloss-name">Administrador</div><div class="gloss-desc">Personal de Efletexia con acceso al panel. Puede haber más de uno.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Bitacora</div><div class="gloss-desc">El registro de cada acción: quién reseteo qué clave, quién publicó qué comentario y cuándo. También guarda lo que hace el sistema solo, como el bloqueo al tercer intento.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Configuracion_Sitio</div><div class="gloss-desc">Los ajustes de la web guardados como clave y valor: a qué correo llegan las solicitudes, el WhatsApp de contacto, los países del formulario y cuántas referencias se muestran.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Modulo_Producto</div><div class="gloss-desc">Las partes en que se divide cada solución. El administrador las mantiene; el cliente las reparte entre sus subcuentas.</div></div>
+        <div class="gloss-section-title">Lo que consulta, pero no administra</div>
+        <div class="gloss-item"><div class="gloss-name">Subcuenta</div><div class="gloss-desc">Los accesos que el cliente creó para su equipo. El panel solo muestra <b>cuántos lleva de su tope</b>; no entra a cambiarlos.</div></div>
+        <div class="gloss-item"><div class="gloss-name">Acceso_Producto</div><div class="gloss-desc">La solución contratada por un cliente. Guarda el enlace al aplicativo y el límite de subcuentas.</div></div>
+        <div class="gloss-section-title">Qué se eliminó</div>
+        <div class="gloss-note">Ya no hay <b>CRM</b> con etapas de pipeline, ni <b>Factura</b> e <b>Item_Factura</b>, ni <b>Plan</b> y <b>Suscripción</b>, ni el módulo de contenido (<b>Página</b>, <b>SEO</b>, <b>Banner</b>, <b>Media</b>, <b>Flujo_Aprobación</b>), ni <b>Rol</b> y <b>Permiso</b> del panel. Esa estructura era un ERP completo y no corresponde a la administración de una web informativa.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+mermaid.initialize({
+  startOnLoad:false,
+  theme:'dark',
+  themeVariables:{
+    background:'#0A1628', primaryColor:'#0E1E36', primaryTextColor:'#E2EDF8',
+    primaryBorderColor:'#FF6B1A', lineColor:'#F5A82A', secondaryColor:'#0A1628',
+    tertiaryColor:'#060C18', fontFamily:'Nunito, sans-serif',
+    nodeBorder:'#FF6B1A', mainBkg:'#0E1E36', textColor:'#E2EDF8',
+    edgeLabelBackground:'#0A1628', clusterBkg:'#060C18'
+  },
+  er:{useMaxWidth:false},
+  flowchart:{useMaxWidth:false, htmlLabels:true, curve:'basis'}
+});
+
+const DIAGRAMS = {
+
+arq:`flowchart LR
+    subgraph NAV["NAVEGADOR · visitante"]
+        direction TB
+        LP["Landing informativa<br/>catálogo de 5 productos"]
+        FRM["Formulario<br/>solicitar información"]
+        REF["Referencias publicadas"]
+        LOG["Iniciar sesión"]
+    end
+
+    subgraph SRV["APLICACIÓN WEB"]
+        direction TB
+        PUB["Sitio público<br/>contenido y catálogo"]
+        LEAD["Gestor de solicitudes<br/>valida y notifica"]
+        AUTH["Autenticación<br/>máx. 3 intentos + captcha"]
+        RUT["Enrutador Mi cuenta"]
+        ADM["Panel administrador<br/>clientes, contraseñas, comentarios"]
+    end
+
+    subgraph DB["BASE DE DATOS"]
+        direction TB
+        D1[("PRODUCTO")]
+        D2[("SOLICITUD_INFORMACION")]
+        D3[("CLIENTE")]
+        D4[("CREDENCIAL")]
+        D5[("INTENTO_ACCESO")]
+        D6[("ACCESO_PRODUCTO")]
+        D7[("COMENTARIO")]
+        D8[("SUBCUENTA")]
+        D9[("PERMISO_SUBCUENTA")]
+        D10[("BITACORA")]
+        D11[("CONFIGURACION_SITIO")]
+    end
+
+    subgraph APPS["SISTEMAS EXTERNOS · cada uno en su propio servidor"]
+        direction TB
+        A1["Eflexy"]
+        A2["Viax"]
+        A3["Fletex"]
+        A4["Qubo"]
+        A5["Efletexia BI"]
+        SUB["Administración de subcuentas<br/>la hace el propio cliente"]
+        INT["Integración<br/>alta de usuarios y enlace de acceso"]
+    end
+
+    VEN["Equipo comercial"]
+
+    LP --> PUB
+    FRM --> LEAD
+    LOG --> AUTH
+    REF --> PUB
+
+    PUB -->|lee| D1
+    PUB -->|lee aprobados| D7
+    LEAD -->|escribe| D2
+    LEAD -->|correo| VEN
+    VEN -.->|si contrata| ADM
+
+    AUTH -->|valida| D4
+    AUTH -->|registra| D5
+    AUTH --> RUT
+    RUT -->|consulta| D6
+    RUT -.->|enlace| INT
+    INT -.-> A1
+    INT -.-> A2
+    INT -.-> A3
+    INT -.-> A4
+    INT -.-> A5
+    SUB -.->|replica usuarios| INT
+
+    RUT --> SUB
+    SUB -->|crea y bloquea| D8
+    SUB -->|habilita módulos| D9
+
+    ADM -->|alta| D3
+    ADM -->|genera y desbloquea| D4
+    ADM -->|aprueba| D7
+    ADM -->|deja rastro| D10
+    ADM -->|ajusta| D11
+    PUB -->|lee| D11
+
+    classDef db fill:#0B1A33,stroke:#3b82f6,stroke-width:1.5px,color:#E2EDF8
+    classDef svc fill:#0E1E36,stroke:#FF6B1A,stroke-width:1.5px,color:#E2EDF8
+    classDef ui fill:#0A1628,stroke:#F5A82A,stroke-width:1.5px,color:#E2EDF8
+    classDef app fill:#0A1628,stroke:#a855f7,stroke-width:1.5px,color:#E2EDF8
+    classDef ext fill:#060C18,stroke:#4E6A8A,stroke-width:1.5px,color:#E2EDF8
+    class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11 db
+    class PUB,LEAD,AUTH,RUT,ADM svc
+    class LP,FRM,REF,LOG ui
+    class A1,A2,A3,A4,A5,SUB,INT app
+    class VEN ext`,
+
+plataforma:`erDiagram
+    PRODUCTO ||--o{ SOLICITUD_INFORMACION : se_consulta_en
+    PAIS ||--o{ SOLICITUD_INFORMACION : origen
+    SOLICITUD_INFORMACION ||--o| CLIENTE : se_convierte_en
+    CLIENTE ||--|| CREDENCIAL : recibe_al_contratar
+    CREDENCIAL ||--o{ INTENTO_ACCESO : registra
+    CLIENTE ||--o{ ACCESO_PRODUCTO : tiene
+    PRODUCTO ||--o{ ACCESO_PRODUCTO : habilita
+    CLIENTE ||--o{ COMENTARIO : escribe
+    PRODUCTO ||--o{ COMENTARIO : recibe
+    ADMINISTRADOR ||--o{ CREDENCIAL : gestiona
+    ADMINISTRADOR ||--o{ COMENTARIO : aprueba
+
+    ACCESO_PRODUCTO ||--o{ SUBCUENTA : contiene
+    CLIENTE ||--o{ SUBCUENTA : administra
+    SUBCUENTA ||--|| CREDENCIAL : accede_con
+    PRODUCTO ||--o{ MODULO_PRODUCTO : tiene
+    SUBCUENTA ||--o{ PERMISO_SUBCUENTA : recibe
+    MODULO_PRODUCTO ||--o{ PERMISO_SUBCUENTA : se_habilita_en
+
+    PRODUCTO {
+        string nombre
+        boolean visible_web
+    }
+    PAIS {
+        string nombre
+    }
+    SOLICITUD_INFORMACION {
+        string correo
+    }
+    CLIENTE {
+        string empresa
+    }
+    CREDENCIAL {
+        string estado
+    }
+    INTENTO_ACCESO {
+        boolean captcha_ok
+    }
+    ACCESO_PRODUCTO {
+        string url_app
+        int limite_subcuentas
+    }
+    COMENTARIO {
+        string estado
+    }
+    ADMINISTRADOR {
+        string nombre
+    }
+    SUBCUENTA {
+        string estado
+    }
+    MODULO_PRODUCTO {
+        string nombre
+    }
+    PERMISO_SUBCUENTA {
+        boolean habilitado
+    }`,
+
+eflexy:`erDiagram
+    ACCESO_PRODUCTO ||--|| INTEGRACION : se_conecta_por
+    SISTEMA_EFLEXY ||--|| INTEGRACION : expone
+    SUBCUENTA ||--o| USUARIO_REMOTO : se_replica_como
+    INTEGRACION ||--o{ USUARIO_REMOTO : da_de_alta
+    INTEGRACION ||--o{ EVENTO_INTEGRACION : registra
+
+    ACCESO_PRODUCTO {
+        string url_app
+    }
+    SUBCUENTA {
+        string estado
+    }
+    SISTEMA_EFLEXY {
+        string servidor
+    }
+    INTEGRACION {
+        string tipo
+    }
+    USUARIO_REMOTO {
+        string id_externo
+    }
+    EVENTO_INTEGRACION {
+        string resultado
+    }`,
+
+viax:`erDiagram
+    ACCESO_PRODUCTO ||--|| INTEGRACION : se_conecta_por
+    SISTEMA_VIAX ||--|| INTEGRACION : expone
+    SUBCUENTA ||--o| USUARIO_REMOTO : se_replica_como
+    INTEGRACION ||--o{ USUARIO_REMOTO : da_de_alta
+    INTEGRACION ||--o{ EVENTO_INTEGRACION : registra
+
+    ACCESO_PRODUCTO {
+        string url_app
+    }
+    SUBCUENTA {
+        string estado
+    }
+    SISTEMA_VIAX {
+        string servidor
+    }
+    INTEGRACION {
+        string tipo
+    }
+    USUARIO_REMOTO {
+        string id_externo
+    }
+    EVENTO_INTEGRACION {
+        string resultado
+    }`,
+
+fletex:`erDiagram
+    ACCESO_PRODUCTO ||--|| INTEGRACION : se_conecta_por
+    SISTEMA_FLETEX ||--|| INTEGRACION : expone
+    SUBCUENTA ||--o| USUARIO_REMOTO : se_replica_como
+    INTEGRACION ||--o{ USUARIO_REMOTO : da_de_alta
+    INTEGRACION ||--o{ EVENTO_INTEGRACION : registra
+
+    ACCESO_PRODUCTO {
+        string url_app
+    }
+    SUBCUENTA {
+        string estado
+    }
+    SISTEMA_FLETEX {
+        string servidor
+    }
+    INTEGRACION {
+        string tipo
+    }
+    USUARIO_REMOTO {
+        string id_externo
+    }
+    EVENTO_INTEGRACION {
+        string resultado
+    }`,
+
+qubo:`erDiagram
+    ACCESO_PRODUCTO ||--|| INTEGRACION : se_conecta_por
+    SISTEMA_QUBO ||--|| INTEGRACION : expone
+    SUBCUENTA ||--o| USUARIO_REMOTO : se_replica_como
+    INTEGRACION ||--o{ USUARIO_REMOTO : da_de_alta
+    INTEGRACION ||--o{ EVENTO_INTEGRACION : registra
+
+    ACCESO_PRODUCTO {
+        string url_app
+    }
+    SUBCUENTA {
+        string estado
+    }
+    SISTEMA_QUBO {
+        string servidor
+    }
+    INTEGRACION {
+        string tipo
+    }
+    USUARIO_REMOTO {
+        string id_externo
+    }
+    EVENTO_INTEGRACION {
+        string resultado
+    }`,
+
+bi:`erDiagram
+    ACCESO_PRODUCTO ||--|| INTEGRACION : se_conecta_por
+    SISTEMA_EFLETEXIA_BI ||--|| INTEGRACION : expone
+    SUBCUENTA ||--o| USUARIO_REMOTO : se_replica_como
+    INTEGRACION ||--o{ USUARIO_REMOTO : da_de_alta
+    INTEGRACION ||--o{ EVENTO_INTEGRACION : registra
+
+    ACCESO_PRODUCTO {
+        string url_app
+    }
+    SUBCUENTA {
+        string estado
+    }
+    SISTEMA_EFLETEXIA_BI {
+        string servidor
+    }
+    INTEGRACION {
+        string tipo
+    }
+    USUARIO_REMOTO {
+        string id_externo
+    }
+    EVENTO_INTEGRACION {
+        string resultado
+    }`,
+
+admin:`erDiagram
+    ADMINISTRADOR ||--o{ BITACORA : deja_rastro_en
+    ADMINISTRADOR ||--o{ CREDENCIAL : gestiona
+    ADMINISTRADOR ||--o{ COMENTARIO : modera
+    ADMINISTRADOR ||--o{ PRODUCTO : mantiene
+    ADMINISTRADOR ||--o{ CONFIGURACION_SITIO : ajusta
+
+    SOLICITUD_INFORMACION ||--o| CLIENTE : se_convierte_en
+    CLIENTE ||--|| CREDENCIAL : tiene
+    CREDENCIAL ||--o{ INTENTO_ACCESO : registra
+    CLIENTE ||--o{ ACCESO_PRODUCTO : contrata
+    PRODUCTO ||--o{ ACCESO_PRODUCTO : habilita
+    ACCESO_PRODUCTO ||--o{ SUBCUENTA : contiene
+    PRODUCTO ||--o{ MODULO_PRODUCTO : tiene
+    CLIENTE ||--o{ COMENTARIO : escribe
+    PRODUCTO ||--o{ COMENTARIO : recibe
+
+    ADMINISTRADOR {
+        string nombre
+    }
+    BITACORA {
+        string accion
+    }
+    CONFIGURACION_SITIO {
+        string clave
+    }
+    SOLICITUD_INFORMACION {
+        string correo
+    }
+    CLIENTE {
+        string empresa
+    }
+    CREDENCIAL {
+        string estado
+    }
+    INTENTO_ACCESO {
+        boolean captcha_ok
+    }
+    PRODUCTO {
+        boolean visible_web
+    }
+    MODULO_PRODUCTO {
+        string nombre
+    }
+    ACCESO_PRODUCTO {
+        int limite_subcuentas
+    }
+    SUBCUENTA {
+        string estado
+    }
+    COMENTARIO {
+        string estado
+    }`
+
+};
+
+const state = {
+  arq:{zoom:1,x:0,y:0}, plataforma:{zoom:1,x:0,y:0}, eflexy:{zoom:1,x:0,y:0}, viax:{zoom:1,x:0,y:0},
+  fletex:{zoom:1,x:0,y:0}, qubo:{zoom:1,x:0,y:0}, bi:{zoom:1,x:0,y:0}, admin:{zoom:1,x:0,y:0}
+};
+
+async function renderAll(){
+  for(const key of Object.keys(DIAGRAMS)){
+    try{
+      const {svg} = await mermaid.render('svg-'+key, DIAGRAMS[key]);
+      document.getElementById('canvas-'+key).innerHTML = svg;
+      applyTransform(key);
+      setupInteractions(key);
+    }catch(err){
+      document.getElementById('canvas-'+key).innerHTML =
+        '<div class="loading">Error renderizando: '+err.message+'</div>';
+    }
+  }
+}
+
+function applyTransform(key){
+  const s = state[key];
+  const canvas = document.getElementById('canvas-'+key);
+  canvas.style.transform = `translate(${s.x}px, ${s.y}px) scale(${s.zoom})`;
+  document.getElementById('pct-'+key).textContent = Math.round(s.zoom*100)+'%';
+}
+
+function zoomBy(key, delta){
+  const s = state[key];
+  s.zoom = Math.min(3, Math.max(0.2, s.zoom + delta));
+  applyTransform(key);
+}
+
+function resetZoom(key){
+  state[key] = {zoom:1, x:0, y:0};
+  applyTransform(key);
+}
+
+function setupInteractions(key){
+  const viewport = document.getElementById('viewport-'+key);
+  const s = state[key];
+  let dragging=false, lastX=0, lastY=0;
+
+  viewport.addEventListener('wheel', (e)=>{
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.1 : -0.1;
+    s.zoom = Math.min(3, Math.max(0.2, s.zoom + delta));
+    applyTransform(key);
+  }, {passive:false});
+
+  viewport.addEventListener('mousedown', (e)=>{
+    dragging=true; lastX=e.clientX; lastY=e.clientY;
+    viewport.classList.add('grabbing');
+  });
+  window.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    s.x += (e.clientX - lastX);
+    s.y += (e.clientY - lastY);
+    lastX = e.clientX; lastY = e.clientY;
+    applyTransform(key);
+  });
+  window.addEventListener('mouseup', ()=>{
+    dragging=false;
+    viewport.classList.remove('grabbing');
+  });
+}
+
+function toggleGloss(key, btn){
+  const sidebar = document.getElementById('sidebar-'+key);
+  sidebar.classList.toggle('hidden');
+  btn.classList.toggle('on');
+}
+
+function switchPanel(key, btn){
+  document.querySelectorAll('.diagram-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+key).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+renderAll();
+</script>
+</body>
+</html>

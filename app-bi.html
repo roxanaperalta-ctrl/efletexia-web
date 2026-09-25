@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fletexia BI — Maqueta de app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080A;--panel:#121217;--panel2:#17171D;--linea:#25252E;
+  --naranja:#FF6B1A;--naranja-2:#FF9147;--texto:#F2F2F4;--gris:#8A8A96;--gris2:#5B5B67;
+  --verde:#25C08B;--rojo:#FF4D42;--ambar:#FFB020;--azul:#4A8CF7;--lila:#9B7BF0;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#040405;color:var(--texto);
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:18px;padding:26px 16px 40px;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(900px 520px at 50% -8%,rgba(255,107,26,.16),transparent 70%),
+             radial-gradient(700px 500px at 90% 100%,rgba(255,107,26,.08),transparent 70%)}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+button{font:inherit;border:none;background:none;color:inherit;cursor:pointer}
+input,select{font:inherit}
+:focus-visible{outline:2px solid var(--naranja);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.phone{position:relative;z-index:1;width:390px;height:844px;max-width:100%;background:var(--bg);
+  border:9px solid #1A1A20;border-radius:44px;
+  box-shadow:0 40px 90px rgba(0,0,0,.7),0 0 0 1px #2A2A33,0 0 70px rgba(255,107,26,.10);
+  overflow:hidden;display:flex;flex-direction:column}
+.phone::after{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:112px;height:26px;background:#1A1A20;border-radius:0 0 16px 16px;z-index:40}
+.status{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 4px;font-size:11px;color:var(--gris);font-family:'IBM Plex Mono',monospace;flex:none}
+.mapbg{position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background-image:linear-gradient(rgba(255,107,26,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,26,.055) 1px,transparent 1px);
+  background-size:52px 52px;
+  mask-image:radial-gradient(120% 60% at 50% 0%,#000 20%,transparent 78%);
+  -webkit-mask-image:radial-gradient(120% 60% at 50% 0%,#000 20%,transparent 78%)}
+.screen{flex:1;overflow-y:auto;position:relative;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.pad{padding:0 18px calc(30px + env(safe-area-inset-bottom,6px));position:relative;z-index:2}
+
+.login-wrap{height:100%;display:flex;flex-direction:column;justify-content:center;padding:0 26px;position:relative;z-index:2}
+.logo{display:flex;align-items:center;gap:7px;justify-content:center}
+.logo .e{width:26px;height:26px;border-radius:50%;border:2.5px solid var(--naranja);position:relative;box-shadow:0 0 18px rgba(255,107,26,.55);flex:none}
+.logo .e::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--naranja)}
+.logo .word{font-family:'Sora',sans-serif;font-weight:700;font-size:23px;letter-spacing:-.02em}
+.logo .word i{font-style:normal;color:var(--naranja)}
+.badge{display:block;text-align:center;margin:10px auto 0;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;color:var(--naranja);border:1px solid rgba(255,107,26,.4);border-radius:20px;padding:4px 12px;width:fit-content;background:rgba(255,107,26,.07)}
+.login-wrap h1{font-family:'Sora',sans-serif;font-weight:800;font-size:30px;line-height:1.12;letter-spacing:-.03em;margin-top:34px}
+.login-wrap h1 em{font-style:normal;color:var(--naranja)}
+.login-wrap>p{color:var(--gris);font-size:13.5px;margin:10px 0 24px}
+label{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gris2);margin-bottom:7px}
+.field{width:100%;padding:14px 15px;background:var(--panel);border:1px solid var(--linea);border-radius:13px;color:var(--texto);margin-bottom:15px}
+.field:focus{border-color:var(--naranja);outline:none}
+.btn{width:100%;padding:15px;border-radius:13px;font-weight:600;font-size:15px;background:linear-gradient(180deg,var(--naranja),#E85200);color:#fff;box-shadow:0 10px 26px rgba(255,107,26,.3)}
+.perfiles{margin-top:24px;border-top:1px solid var(--linea);padding-top:16px}
+.perfiles>span{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gris2)}
+.perfiles button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--panel);border:1px solid var(--linea);border-radius:13px;margin-top:9px;text-align:left}
+.perfiles b{font-size:13.5px;font-weight:600}
+.perfiles small{color:var(--gris);font-size:11px}
+.perfiles .arrow{color:var(--naranja)}
+
+.app{display:none;flex-direction:column;height:100%}
+.app.on{display:flex}
+.appbar{display:flex;align-items:center;gap:10px;padding:6px 18px 12px;flex:none;position:relative;z-index:3}
+.appbar .logo .word{font-size:17px}
+.appbar .logo .e{width:19px;height:19px;border-width:2px}
+.appbar .logo .e::after{width:6px;height:6px}
+.wa{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--verde);border:1px solid rgba(37,192,139,.3);background:rgba(37,192,139,.08);border-radius:20px;padding:4px 9px}
+.wa i{width:6px;height:6px;border-radius:50%;background:var(--verde);display:block}
+.back{display:none;font-size:26px;line-height:1;color:var(--naranja);padding:0 8px 3px 0;margin-left:-4px}
+.back.on{display:block}
+.user{margin-left:auto;display:flex;align-items:center;gap:8px}
+.user .un{font-size:12px;font-weight:500}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--panel2);border:1px solid var(--linea);display:grid;place-items:center;font-size:11px;font-weight:600}
+.scopebar{display:flex;gap:7px;padding:0 18px 12px;overflow-x:auto;flex:none;position:relative;z-index:3;scrollbar-width:none;align-items:center}
+.scopebar::-webkit-scrollbar{display:none}
+.scope{flex:none;display:flex;align-items:center;gap:5px;padding:5px 10px 5px 12px;border-radius:20px;background:var(--panel);border:1px solid var(--linea);font-size:12px;color:var(--gris);white-space:nowrap}
+.scope.act{border-color:rgba(255,107,26,.5);background:rgba(255,107,26,.08)}
+.scope select{background:none;border:none;color:var(--texto);font-size:12px;font-weight:500;max-width:130px}
+.scope select:disabled{color:var(--gris)}
+.scope select option{background:#15151B;color:#fff}
+.scope.info{color:var(--gris2)}
+.scope.info b{color:var(--gris);font-weight:500}
+.reset{flex:none;font-size:11.5px;color:var(--naranja);padding:5px 4px}
+
+.tab{display:none}
+.tab.on{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--naranja);text-transform:uppercase}
+.h-title{font-family:'Sora',sans-serif;font-weight:700;font-size:23px;letter-spacing:-.02em;margin-top:3px}
+.h-sub{color:var(--gris);font-size:12.5px;margin-top:4px;margin-bottom:16px}
+
+
+.search{display:flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--linea);border-radius:15px;padding:5px 5px 5px 15px;box-shadow:0 0 32px rgba(255,107,26,.07)}
+.search input{flex:1;min-width:0;background:none;border:none;color:var(--texto);font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;font-size:15px;padding:11px 0}
+.search input:focus{outline:none}
+.search input::placeholder{color:var(--gris2)}
+.search button{background:linear-gradient(180deg,var(--naranja),#E85200);border-radius:11px;padding:11px 15px;font-weight:600;font-size:13px}
+.chips{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--gris);border:1px solid var(--linea);background:var(--panel);border-radius:20px;padding:5px 11px}
+.chip.on{color:var(--naranja);border-color:rgba(255,107,26,.5);background:rgba(255,107,26,.08);font-family:'Inter',sans-serif}
+.chip.plain{font-family:'Inter',sans-serif}
+
+.card{background:var(--panel);border:1px solid var(--linea);border-radius:18px;padding:16px;margin-top:14px}
+.card-t{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.card-t h3{font-family:'Sora',sans-serif;font-size:14.5px;font-weight:600}
+.card-t .note{margin-left:auto;font-size:10.5px;color:var(--gris2);text-align:right}
+.pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.pill.curso{background:rgba(74,140,247,.14);color:var(--azul)}
+.pill.ok{background:rgba(37,192,139,.14);color:var(--verde)}
+.pill.tarde{background:rgba(255,77,66,.14);color:var(--rojo)}
+.pill.espera{background:rgba(255,176,32,.14);color:var(--ambar)}
+.pill.sinm{background:rgba(155,123,240,.16);color:var(--lila)}
+
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.kpi{background:var(--panel);border:1px solid var(--linea);border-radius:18px;padding:14px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--gris2)}
+.kpi.alert::before{background:var(--rojo)}
+.kpi.warn::before{background:var(--naranja)}
+.kpi.good::before{background:var(--verde)}
+.kpi.info::before{background:var(--azul)}
+.kpi.lila::before{background:var(--lila)}
+.kpi dt{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--gris2)}
+.kpi dd{font-family:'Sora',sans-serif;font-weight:700;font-size:26px;margin-top:7px;letter-spacing:-.03em}
+.kpi small{display:block;color:var(--gris);font-size:10.5px;margin-top:4px}
+
+.donut-wrap{display:flex;gap:14px;align-items:center}
+.donut{flex:none}
+.leg{flex:1;min-width:0}
+.leg div{display:flex;align-items:center;gap:7px;font-size:11.5px;padding:3px 0}
+.leg i{width:8px;height:8px;border-radius:2px;flex:none}
+.leg b{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:11.5px}
+.leg span.pc{color:var(--gris2);font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:44px;text-align:right}
+
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--linea)}
+.row:last-child{border-bottom:none;padding-bottom:0}
+.row:first-child{padding-top:0}
+.row .grow{flex:1;min-width:0}
+.row .t{font-size:13px;font-weight:500;display:block}
+.row .s{font-size:11px;color:var(--gris);margin-top:2px;display:block}
+.row .r{text-align:right;flex:none}
+.bar{height:6px;background:#1E1E25;border-radius:4px;overflow:hidden;margin-top:7px}
+.bar i{display:block;height:100%;background:var(--naranja);border-radius:4px}
+.bar i.v{background:var(--verde)}
+.bar i.r{background:var(--rojo)}
+.bar i.a{background:var(--azul)}
+.av{width:30px;height:30px;border-radius:50%;background:#1E1E25;border:1px solid var(--linea);display:grid;place-items:center;font-size:10.5px;font-weight:600;flex:none}
+.flag{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:var(--gris2);border:1px solid var(--linea);border-radius:5px;padding:1px 5px}
+.nota{background:rgba(255,107,26,.07);border:1px solid rgba(255,107,26,.25);border-radius:14px;padding:12px 14px;font-size:12px;color:var(--naranja-2);margin-top:14px}
+.link{color:var(--naranja);font-size:12.5px;font-weight:500}
+.more{display:block;width:100%;text-align:center;color:var(--naranja);font-size:12.5px;padding-top:12px;margin-top:4px;border-top:1px solid var(--linea)}
+.gauge{text-align:center}
+.gauge .val{font-family:'Sora',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.03em}
+.gauge .lb{color:var(--gris);font-size:11.5px;margin-top:2px}
+
+.res-head{display:flex;align-items:flex-start;gap:12px}
+.res-id{font-family:'Sora',sans-serif;font-weight:700;font-size:21px;letter-spacing:-.02em}
+.res-route{color:var(--gris);font-size:12.5px;margin-top:2px}
+.res-head .pill{margin-left:auto;flex:none}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px;padding-top:14px;border-top:1px solid var(--linea)}
+.meta dt{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gris2)}
+.meta dd{font-family:'IBM Plex Mono',monospace;font-size:12.5px;margin-top:3px;word-break:break-word}
+.tl{margin-top:6px}
+.hito{position:relative;padding:0 0 22px 30px}
+.hito::before{content:"";position:absolute;left:6px;top:14px;bottom:-2px;width:2px;background:var(--linea)}
+.hito.done::before{background:var(--naranja)}
+.hito.now::before{background:linear-gradient(180deg,var(--naranja),var(--linea))}
+.hito:last-child{padding-bottom:0}
+.hito:last-child::before{display:none}
+.hito .node{position:absolute;left:0;top:5px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--linea)}
+.hito.done .node{background:var(--naranja);border-color:var(--naranja);box-shadow:0 0 12px rgba(255,107,26,.6)}
+.hito.now .node{border-color:var(--naranja);box-shadow:0 0 0 5px rgba(255,107,26,.14)}
+.hito.now .node::after{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--naranja);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.hito .hn{font-size:14px;font-weight:600;line-height:1.25}
+.hito .hg{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gris2);margin-top:3px}
+.hito .ht{display:flex;align-items:center;gap:9px;margin-top:8px;flex-wrap:wrap}
+.hito .real{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600}
+.delta{font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:2px 7px;border-radius:6px}
+.delta.pos{background:rgba(37,192,139,.13);color:var(--verde)}
+.delta.neg{background:rgba(255,77,66,.13);color:var(--rojo)}
+.delta.pend{background:#1E1E25;color:var(--gris)}
+.empty{text-align:center;padding:36px 16px;border:1px dashed var(--linea);border-radius:18px;margin-top:14px}
+.empty b{font-family:'Sora',sans-serif;font-size:15px}
+.empty p{color:var(--gris);font-size:12.5px;margin-top:6px}
+
+/* alertas estilo Torre de Control */
+.fase{display:inline-block;background:rgba(255,77,66,.13);border:1px solid rgba(255,77,66,.35);color:var(--rojo);
+  font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:8px;letter-spacing:.02em}
+.titulo{font-size:11.5px;color:var(--gris);margin-top:10px;line-height:1.4}
+.tramo{margin-top:14px;padding:12px;background:var(--panel2);border:1px solid var(--linea);border-radius:12px;border-left:3px solid var(--azul)}
+.tramo.dest{border-left-color:var(--gris2)}
+.tr-h{font-size:12.5px;font-weight:600}
+.tr-cli{font-size:11.5px;color:var(--gris);margin-top:2px}
+.tr-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.tr-g span{font-family:'IBM Plex Mono',monospace;font-size:11px}
+.tr-g b{display:block;font-family:'Inter',sans-serif;font-weight:500;font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--gris2);margin-bottom:2px}
+.leyenda{display:flex;gap:14px;margin-bottom:12px;font-size:10.5px;color:var(--gris)}
+.leyenda i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.leyenda i.v{background:var(--verde)}.leyenda i.f{background:var(--azul)}.leyenda i.o{background:var(--gris2)}
+.mes{margin-bottom:11px}
+.mes-h{display:flex;justify-content:space-between;font-size:11.5px;color:var(--gris);margin-bottom:4px}
+.mes-h .mono{color:var(--texto);font-size:11px}
+.dual{height:5px;background:#1E1E25;border-radius:3px;overflow:hidden;margin-bottom:2px}
+.dual i{display:block;height:100%;border-radius:3px}
+.dual i.v{background:var(--verde)}.dual i.f{background:var(--azul)}
+.mm{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.mm .ml{font-size:11px;color:var(--gris);width:26px;flex:none}
+.mm .mb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.mm .mb i{display:block;height:5px;border-radius:3px}
+.mm .mb i.v{background:var(--verde)}.mm .mb i.o{background:var(--gris2)}
+.mm .mv{font-size:10.5px;color:var(--gris);flex:none;text-align:right;min-width:66px}
+  padding:9px 4px calc(14px + env(safe-area-inset-bottom,6px));position:relative;z-index:5}
+  line-height:1.1;position:relative;padding:4px 0}
+@media(max-width:520px),(pointer:coarse){
+  body{padding:0}
+  .phone{width:100%;height:100vh;height:100dvh;border:none;border-radius:0;box-shadow:none}
+  .phone::after{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="mapbg"></div>
+  <div class="status"><span>9:41</span><span>Fletexia BI</span><span>100%</span></div>
+
+  <!-- LOGIN -->
+  <div class="screen" id="login">
+    <div class="login-wrap">
+      <div class="logo"><span class="e"></span><span class="word">fletex<i>ia</i></span></div>
+      <span class="badge">BI</span>
+      <h1>Toda la operación,<br><em>en un solo lugar.</em></h1>
+      <p>Seguimiento, alertas, reportes y proyectos, sin pedirle el dato a nadie.</p>
+      <label for="usr">Usuario</label>
+      <input class="field mono" id="usr" value="mfidel" autocomplete="username">
+      <label for="pwd">Contraseña</label>
+      <input class="field" id="pwd" type="password" value="••••••••" autocomplete="current-password">
+      <button class="btn" onclick="entrar('total')">Entrar</button>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div class="app" id="app">
+    <div class="appbar">
+      <button class="back" id="btnBack" onclick="ir('inicio')" aria-label="Volver al inicio">‹</button>
+      <div class="logo"><span class="e"></span><span class="word">fletex<i>ia</i></span></div>
+      <button class="user" onclick="ir('perfil')"><span class="un">Marcos Fidel</span><span class="avatar" id="avatar">MF</span></button>
+    </div>
+
+    <div class="scopebar">
+      <span class="scope" id="chipPais">País <select id="selPais" onchange="cambioPais()"></select></span>
+      <span class="scope" id="chipCia">Compañía <select id="selCia" onchange="render()"></select></span>
+      <button class="reset" id="btnReset" onclick="limpiar()">Quitar filtros</button>
+      <span class="scope info">Corte <b>2026-08-19 12:55</b></span>
+    </div>
+
+    <div class="screen" id="scroller">
+      <div class="pad">
+
+        <!-- INICIO -->
+        <section class="tab on" id="t-inicio">
+          <div class="eyebrow" id="ctxInicio">Resumen de hoy</div>
+          <div class="h-title" id="saludo">Hola, Marco</div>
+          <div class="h-sub">Así va la operación en este momento.</div>
+          <div class="card">
+            <div class="card-t"><h3>Reportes y consultas</h3></div>
+            <div id="listaAccesos"></div>
+          </div>
+        </section>
+
+        <!-- RASTREO -->
+        <section class="tab" id="t-rastreo">
+          <div class="eyebrow">Seguimiento por referencia</div>
+          <div class="h-title">¿Dónde va este viaje?</div>
+          <div class="h-sub">Lo mismo que responde el bot de WhatsApp, sin depender de que WhatsApp te deje entrar.</div>
+          <div class="search">
+            <input id="ref" placeholder="1100947 o F2K919" aria-label="Referencia o placa" onkeydown="if(event.key==='Enter')buscar()">
+            <button onclick="buscar()">Buscar</button>
+          </div>
+          <div class="chips" id="chipsRastreo"></div>
+          <div id="salida"></div>
+        </section>
+
+        <!-- ALERTAS -->
+        <section class="tab" id="t-alertas">
+          <div class="eyebrow" id="ctxAlertas">Gestión por excepción</div>
+          <div class="h-title">Alertas</div>
+          <div class="h-sub">Las referencias con alerta activa en Torre de Control. Solo consulta: el evento se registra en TC.</div>
+          <div id="alertasBox"></div>
+        </section>
+
+        <!-- REPORTE: TORRE DE CONTROL -->
+        <section class="tab" id="t-torre">
+          <div class="eyebrow" id="ctxTorre">Reportería</div>
+          <div class="h-title">Reporte de Torre de Control</div>
+          <div class="h-sub">Estados, orígenes y coordinadores del corte de hoy.</div>
+          <div id="repTorre"></div>
+        </section>
+
+        <!-- REPORTE: FACTURACIÓN -->
+        <section class="tab" id="t-fact">
+          <div class="eyebrow" id="ctxFact">Reportería</div>
+          <div class="h-title">Facturación OPL</div>
+          <div class="h-sub">Utilidad por operación, cliente y transportista.</div>
+          <div id="repFact"></div>
+        </section>
+
+        <!-- REPORTE: COBERTURA -->
+        <section class="tab" id="t-cob">
+          <div class="eyebrow" id="ctxCob">Reportería</div>
+          <div class="h-title">Cobertura de flota</div>
+          <div class="h-sub">Flota propia contra terceros, mes a mes.</div>
+          <div id="repCob"></div>
+        </section>
+
+        <!-- EFLETEXIA TOTAL -->
+        <section class="tab" id="t-total">
+          <div class="eyebrow">Acceso total</div>
+          <div class="h-title">eFletexia Total</div>
+          <div class="h-sub">Todos los proyectos con su estado, su responsable y su enlace, en un solo lugar.</div>
+          <dl class="kpis" id="kpisTotal"></dl>
+          <div class="card">
+            <div class="card-t"><h3>Proyectos</h3><span class="note" id="notaProy"></span></div>
+            <div id="listaProy"></div>
+          </div>
+          <div class="card">
+            <div class="card-t"><h3>Pendientes de actualizar</h3><span class="note">Más de 3 días</span></div>
+            <div id="listaPend"></div>
+          </div>
+        </section>
+
+        <!-- PERFIL -->
+        <section class="tab" id="t-perfil">
+          <div class="eyebrow">Tu cuenta</div>
+          <div class="h-title" id="perfilNombre">Marcos Fidel</div>
+          <div class="h-sub" id="perfilRol">Acceso total · todos los países</div>
+          <div class="card">
+            <div class="card-t"><h3>Qué ves con este perfil</h3></div>
+            <div class="row"><span class="grow"><span class="t">País</span></span><span class="r mono" id="pfPais" style="font-size:12.5px">Todos</span></div>
+            <div class="row"><span class="grow"><span class="t">Compañía</span></span><span class="r mono" id="pfCia" style="font-size:12.5px">Todas</span></div>
+            <div class="row"><span class="grow"><span class="t">Módulos</span></span><span class="r mono" id="pfMod" style="font-size:12.5px">Todos</span></div>
+          </div>
+          <div class="card" style="text-align:center" onclick="salir()"><span class="link">Cerrar sesión</span></div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ===== datos reales del Tablero de Monitoreo (Perú) ===== */
+const MON = [{"ref":"1100947","ori":"HUARAL","des":"TOCACHE","trt":"GRUPO CRUZ DE MAYO LOGISTICO INTEGRAL S.A.C.","placa":"F2K919","st":"Falla Mecánica","fh":"2026-08-19 12:24:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.52,"rg":"OK","gr":"En ruta"},{"ref":"1101190","ori":"LIMA","des":"SAN MARTÍN","trt":"LOGISTICA INVERSIONES CAMPOS","placa":"C3T892","st":"En ruta","fh":"2026-08-19 11:15:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.67,"rg":"OK","gr":"En ruta"},{"ref":"1101775","ori":"HUARAL","des":"MOYOBAMBA","trt":"Empresa de Transporte Vigsan EIRL","placa":"TDU938","st":"En ruta","fh":"2026-08-19 12:00:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.92,"rg":"OK","gr":"En ruta"},{"ref":"1101816","ori":"HUARAL","des":"AREQUIPA","trt":"INVERSIONES MARITIMAS DEL PACIFICO SUR S.A.C.","placa":"VFD889","st":"Confirmado","fh":"2026-08-19 15:50:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-2.91,"rg":"OK","gr":"No ruta"},{"ref":"1101177","ori":"SAN MARTÍN","des":"MAYNAS","trt":"GRUPO ARIAS OPERADOR LOGISTICO S.A.C","placa":"C4I770","st":"En ruta","fh":"2026-08-19 12:11:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.74,"rg":"OK","gr":"En ruta"},{"ref":"1102910","ori":"HUARAL","des":"TACNA","trt":"EMPRESA DE TRANSPORTES CUENTAS PACO E.I.R.L.","placa":"C1M821","st":"En Resguardo","fh":"2026-08-19 12:27:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.47,"rg":"OK","gr":"En ruta"},{"ref":"1102919","ori":"HUARAL","des":"SAN ROMÁN","trt":"INVERSIONES MARITIMAS DEL PACIFICO SUR S.A.C.","placa":"V9X735","st":"En Resguardo","fh":"2026-08-19 12:27:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.47,"rg":"OK","gr":"En ruta"},{"ref":"1101889","ori":"HUARAL","des":"CHANCHAMAYO","trt":"CORPORACION YU & LI E.I.R.L.","placa":"BAL865","st":"En espera de descargue","fh":"2026-08-19 11:58:00","coord":"Celina Andia","zona":"PROVINCIA","h":0.95,"rg":"OK","gr":"En ruta"},{"ref":"1102909","ori":"HUARAL","des":"TACNA","trt":"EMPRESA DE TRANSPORTES PATY SCRL","placa":"VEP779","st":"En Resguardo","fh":"2026-08-19 12:25:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.51,"rg":"OK","gr":"En ruta"},{"ref":"1103642","ori":"CHICLAYO","des":"MARISCAL CÁCERES","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"ASL783","st":"En ruta","fh":"2026-08-19 11:48:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.12,"rg":"OK","gr":"En ruta"},{"ref":"1103662","ori":"LIMA","des":"AREQUIPA","trt":"Empresa de Transportes Vam Kimper E.I.R.L.","placa":"T6V948","st":"En Resguardo","fh":"2026-08-19 11:21:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.57,"rg":"OK","gr":"En ruta"},{"ref":"1103677","ori":"LIMA","des":"AREQUIPA","trt":"transportes y maquinarias wislin eirl","placa":"V6Y888","st":"En Resguardo","fh":"2026-08-19 12:29:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.44,"rg":"OK","gr":"En ruta"},{"ref":"1103680","ori":"LIMA","des":"AREQUIPA","trt":"transportes y maquinarias wislin eirl","placa":"ANT788","st":"En Resguardo","fh":"2026-08-19 12:29:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.44,"rg":"OK","gr":"En ruta"},{"ref":"1103881","ori":"HUARAL","des":"PIURA","trt":"Inversiones y transportes Marisa EIRL","placa":"T4Q922","st":"En ruta","fh":"2026-08-19 11:24:00","coord":"Walter Romero","zona":"PROVINCIA","h":1.52,"rg":"OK","gr":"En ruta"},{"ref":"1103948","ori":"HUARAL","des":"ICA","trt":"GRUPO FAMIZA SAC","placa":"T3P946","st":"Confirmado","fh":"2026-08-19 16:50:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-3.91,"rg":"OK","gr":"No ruta"},{"ref":"1103953","ori":"HUARAL","des":"HUANCAYO","trt":"CORPORACION TRANS FANY S.R.L.","placa":"BHM711","st":"Inicio Ruta","fh":"2026-08-19 12:29:09","coord":"Celina Andia","zona":"PROVINCIA","h":0.43,"rg":"OK","gr":"En ruta"},{"ref":"1103961","ori":"HUARAL","des":"AREQUIPA","trt":"Empresa de Transportes Vam Kimper E.I.R.L.","placa":"CHI881","st":"En Resguardo","fh":"2026-08-19 12:27:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.47,"rg":"OK","gr":"En ruta"},{"ref":"1103973","ori":"HUARAL","des":"HUARAZ","trt":"CRISAR LOGISTICA - TRT","placa":"AKH864","st":"Confirmado","fh":"2026-08-19 13:50:00","coord":"Walter Romero","zona":"PROVINCIA","h":-0.91,"rg":"OK","gr":"No ruta"},{"ref":"1103970","ori":"HUARAL","des":"AREQUIPA","trt":"EMPRESA DE TRANSPORTES CUENTAS PACO E.I.R.L.","placa":"T2Y814","st":"En Resguardo","fh":"2026-08-19 12:28:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.46,"rg":"OK","gr":"En ruta"},{"ref":"1103967","ori":"HUARAL","des":"AREQUIPA","trt":"HERNANI SRLtda","placa":"VFJ940","st":"En Resguardo","fh":"2026-08-19 12:28:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.46,"rg":"OK","gr":"En ruta"},{"ref":"1103976","ori":"HUARAL","des":"CAYLLOMA","trt":"TRANSPORTE LEGON SRL","placa":"Z4Z849","st":"En Resguardo","fh":"2026-08-19 12:27:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.47,"rg":"OK","gr":"En ruta"},{"ref":"1103985","ori":"HUARAL","des":"TAMBOPATA","trt":"TRANSPORTES SAN BORJA S.A.C.","placa":"B1L833","st":"En ruta","fh":"2026-08-19 11:27:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.47,"rg":"OK","gr":"En ruta"},{"ref":"1104029","ori":"SAN MARTÍN","des":"ALTO AMAZONAS","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"A0S847","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":52.08,"rg":"ALTA","gr":"No ruta"},{"ref":"1104193","ori":"HUARAL","des":"ATALAYA","trt":"juber vega morales","placa":"C6B712","st":"Confirmado","fh":"2026-08-18 18:30:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":18.42,"rg":"ALTA","gr":"No ruta"},{"ref":"1104198","ori":"HUARAL","des":"OXAPAMPA","trt":"TRANSPORTE LEDESMA GROUP S.A.C.","placa":"AEJ766","st":"En ruta","fh":"2026-08-19 12:04:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.85,"rg":"OK","gr":"En ruta"},{"ref":"1104207","ori":"HUARAL","des":"LA CONVENCIÓN","trt":"TRANSPORTES JHENSS E.I.R.L.","placa":"CLD812","st":"En ruta","fh":"2026-08-19 11:50:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.09,"rg":"OK","gr":"En ruta"},{"ref":"1104882","ori":"CHICLAYO","des":"MARISCAL CÁCERES","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"F1K809","st":"En ruta","fh":"2026-08-19 11:22:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.55,"rg":"OK","gr":"En ruta"},{"ref":"1104903","ori":"CHICLAYO","des":"TRUJILLO","trt":"Empresa de servicios generales Sansajul sac","placa":"ALI837","st":"Confirmado","fh":"2026-08-19 15:50:00","coord":"Walter Romero","zona":"PROVINCIA","h":-2.91,"rg":"OK","gr":"No ruta"},{"ref":"1104993","ori":"HUARAL","des":"PROV. CONST. DEL CALLAO","trt":"CORPORATION LOGISTIC MALVINA SA","placa":"BNM780","st":"Confirmado","fh":"2026-08-19 20:40:00","coord":"Silvana Romani","zona":"LIMA","h":-7.75,"rg":"OK","gr":"No ruta"},{"ref":"1105084","ori":"HUARAL","des":"LAMBAYEQUE","trt":"Empresa de servicios generales Sansajul sac","placa":"CLI942","st":"En espera de descargue","fh":"2026-08-19 11:15:00","coord":"Walter Romero","zona":"PROVINCIA","h":1.67,"rg":"OK","gr":"En ruta"},{"ref":"1105134","ori":"HUARAL","des":"AREQUIPA","trt":"ZEBALLOS TUBILLAS PABLO","placa":"V2Y893","st":"En Resguardo","fh":"2026-08-19 12:29:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.44,"rg":"OK","gr":"En ruta"},{"ref":"1105130","ori":"HUARAL","des":"LIMA","trt":"Empresa de servicios generales Sansajul sac","placa":"BEQ848","st":"En espera de descargue","fh":"2026-08-19 11:00:00","coord":"Walter Romero","zona":"LIMA","h":1.92,"rg":"OK","gr":"En ruta"},{"ref":"1105148","ori":"HUARAL","des":"AREQUIPA","trt":"EMPRESA DE TRANSPORTES PATY SCRL","placa":"VBP861","st":"En Resguardo","fh":"2026-08-19 12:25:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.51,"rg":"OK","gr":"En ruta"},{"ref":"1105162","ori":"HUARAL","des":"CUSCO","trt":"CORPORACION YU & LI E.I.R.L.","placa":"CKI826","st":"En ruta","fh":"2026-08-19 11:10:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.75,"rg":"OK","gr":"En ruta"},{"ref":"1105161","ori":"HUARAL","des":"CUSCO","trt":"CORPORACION YU & LI E.I.R.L.","placa":"CNK889","st":"En ruta","fh":"2026-08-19 11:09:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.77,"rg":"OK","gr":"En ruta"},{"ref":"1105174","ori":"HUARAL","des":"SAN ROMÁN","trt":"EMPRESA DE TRANSPORTES PATY SCRL","placa":"VBH902","st":"En ruta","fh":"2026-08-19 12:25:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.51,"rg":"OK","gr":"En ruta"},{"ref":"1105173","ori":"HUARAL","des":"ABANCAY","trt":"GRUPO DANNA TRUCKS EMPRESA INDIVIDUAL DE  RESPONSABILIDAD LIMITADA","placa":"D3B772","st":"En ruta","fh":"2026-08-19 11:17:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.64,"rg":"OK","gr":"En ruta"},{"ref":"1105183","ori":"HUARAL","des":"HUANCAYO","trt":"CORPORACION TRANS FANY S.R.L.","placa":"CEX814","st":"Confirmado","fh":"2026-08-19 16:30:00","coord":"Celina Andia","zona":"PROVINCIA","h":-3.58,"rg":"OK","gr":"No ruta"},{"ref":"1102879","ori":"HUARAL","des":"MARISCAL CÁCERES","trt":"ZW TRANSPORTES SOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA","placa":"T9S937","st":"Confirmado","fh":"2026-08-19 14:50:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-1.91,"rg":"OK","gr":"No ruta"},{"ref":"1102968","ori":"HUARAL","des":"CHANCHAMAYO","trt":"Inversiones Huanay s.r.l.","placa":"V7Y946","st":"Confirmado","fh":"2026-08-19 12:30:00","coord":"Celina Andia","zona":"PROVINCIA","h":0.42,"rg":"OK","gr":"No ruta"},{"ref":"1103863","ori":"HUARAL","des":"LEONCIO PRADO","trt":"CORPORACION DISTRIBUIDORA R & A E.I.R.L.","placa":"CHT917","st":"En ruta","fh":"2026-08-19 11:16:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.66,"rg":"OK","gr":"En ruta"},{"ref":"1103865","ori":"HUARAL","des":"CORONEL PORTILLO","trt":"transcargo panduro s.a.c","placa":"BYE901","st":"En ruta","fh":"2026-08-19 11:19:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.6,"rg":"OK","gr":"En ruta"},{"ref":"1104680","ori":"LIMA","des":"AREQUIPA","trt":"TRANSPORTES INTERNACIONAL CANDELARIA S.A.C","placa":"BVL948","st":"En Resguardo","fh":"2026-08-19 12:28:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.46,"rg":"OK","gr":"En ruta"},{"ref":"1104686","ori":"SAN MARTÍN","des":"SAN MARTÍN","trt":"GRUPO SANTO TORIBIO LOGISTICA PERU SAC - GRUSTOLP SAC","placa":"AYW780","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":50.75,"rg":"ALTA","gr":"No ruta"},{"ref":"1104685","ori":"LIMA","des":"SAN MARTÍN","trt":"LOGISTICA INVERSIONES CAMPOS","placa":"A7C910","st":"En ruta","fh":"2026-08-19 11:25:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.5,"rg":"OK","gr":"En ruta"},{"ref":"1104694","ori":"LIMA","des":"MAYNAS","trt":"LOGISTICA INVERSIONES CAMPOS","placa":"D0J743","st":"En ruta","fh":"2026-08-19 12:23:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.54,"rg":"OK","gr":"En ruta"},{"ref":"1104879","ori":"CHICLAYO","des":"MAYNAS","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"B7Z829","st":"En ruta","fh":"2026-08-19 11:20:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.59,"rg":"OK","gr":"En ruta"},{"ref":"1104881","ori":"CHICLAYO","des":"SAN MARTÍN","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"D5E793","st":"En ruta","fh":"2026-08-19 11:47:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.14,"rg":"OK","gr":"En ruta"},{"ref":"1104907","ori":"CHICLAYO","des":"SULLANA","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"B2J914","st":"Confirmado","fh":"2026-08-19 12:50:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.09,"rg":"OK","gr":"No ruta"},{"ref":"1104930","ori":"CHICLAYO","des":"CAJAMARCA","trt":"SERVICIOS GENERALES V&R SRL","placa":"BVD832","st":"Inicio Descargue","fh":"2026-08-19 11:29:00","coord":"Walter Romero","zona":"PROVINCIA","h":1.44,"rg":"OK","gr":"En ruta"},{"ref":"1105076","ori":"HUARAL","des":"HUÁNUCO","trt":"CORPORACION DISTRIBUIDORA R & A E.I.R.L.","placa":"ABY937","st":"Inicio Ruta","fh":"2026-08-19 10:50:19","coord":"Faviola Apolinario","zona":"PROVINCIA","h":2.08,"rg":"MEDIA","gr":"En ruta"},{"ref":"1105085","ori":"HUARAL","des":"PIURA","trt":"TRANSPORTES Y SERVICIOS BERMING E.I.R.L.","placa":"AYA718","st":"Llegada a Destino","fh":"2026-08-19 11:12:38","coord":"Walter Romero","zona":"PROVINCIA","h":1.71,"rg":"OK","gr":"En ruta"},{"ref":"1105082","ori":"HUARAL","des":"CORONEL PORTILLO","trt":"transcargo panduro s.a.c","placa":"C9G781","st":"En Resguardo","fh":"2026-08-19 11:19:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.6,"rg":"OK","gr":"En ruta"},{"ref":"1105105","ori":"SAN MARTÍN","des":"ALTO AMAZONAS","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"A0S847","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":50.98,"rg":"ALTA","gr":"No ruta"},{"ref":"1105163","ori":"HUARAL","des":"CUSCO","trt":"CORPORACION YU & LI E.I.R.L.","placa":"CMF843","st":"En ruta","fh":"2026-08-19 11:18:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.62,"rg":"OK","gr":"En ruta"},{"ref":"1105200","ori":"HUARAL","des":"HUAMANGA","trt":"CORPORACIÓN JAICO CARGO E.I.R.L","placa":"BWF700","st":"Confirmado","fh":"2026-08-19 20:30:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-7.58,"rg":"OK","gr":"No ruta"},{"ref":"1105225","ori":"HUARAL","des":"CUSCO","trt":"INVERSIONES GENERALES ANDRADA E.I.R.L","placa":"CJD705","st":"En ruta","fh":"2026-08-19 11:16:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.66,"rg":"OK","gr":"En ruta"},{"ref":"1105226","ori":"HUARAL","des":"HUANCAVELICA","trt":"TRANSPORTES SERVICIOS OSPINA E.I.R.L","placa":"AWC733","st":"Llegada a Destino","fh":"2026-08-19 11:28:25","coord":"Celina Andia","zona":"PROVINCIA","h":1.45,"rg":"OK","gr":"En ruta"},{"ref":"1105235","ori":"HUARAL","des":"SAN ROMÁN","trt":"EMPRESA DE TRANSPORTES PATY SCRL","placa":"BUK717","st":"En Resguardo","fh":"2026-08-19 12:26:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.49,"rg":"OK","gr":"En ruta"},{"ref":"1105236","ori":"HUARAL","des":"ILO","trt":"EMPRESA DE TRANSPORTES PATY SCRL","placa":"BYM898","st":"En Resguardo","fh":"2026-08-19 12:26:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.49,"rg":"OK","gr":"En ruta"},{"ref":"1105245","ori":"LIMA","des":"LIMA","trt":"Inversiones y transportes Marisa EIRL","placa":"T1J800","st":"Llegada a Destino","fh":"2026-08-19 11:29:02","coord":"Walter Romero","zona":"LIMA","h":1.44,"rg":"OK","gr":"En ruta"},{"ref":"1105262","ori":"CHICLAYO","des":"ALTO AMAZONAS","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"D8R725","st":"En Resguardo","fh":"2026-08-19 11:49:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.1,"rg":"OK","gr":"En ruta"},{"ref":"1105374","ori":"LIMA","des":"HUAMANGA","trt":"COMERCIALIZADORA EMIA E.I.R.L.","placa":"AUY918","st":"Confirmado","fh":"2026-08-20 09:50:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-20.91,"rg":"OK","gr":"No ruta"},{"ref":"1105375","ori":"LIMA","des":"HUAMANGA","trt":"COMERCIALIZADORA EMIA E.I.R.L.","placa":"AUY918","st":"Confirmado","fh":"2026-08-20 09:50:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-20.91,"rg":"OK","gr":"No ruta"},{"ref":"1105380","ori":"CHICLAYO","des":"LIMA","trt":"Transportes Gitano","placa":"AHW948","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"LIMA","h":44.02,"rg":"ALTA","gr":"No ruta"},{"ref":"1105391","ori":"SAN MARTÍN","des":"MAYNAS","trt":"G&F Transport S.A.C","placa":"B8R850","st":"Confirmado","fh":"2026-08-19 15:30:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-2.58,"rg":"OK","gr":"No ruta"},{"ref":"1105393","ori":"LIMA","des":"CORONEL PORTILLO","trt":"hermes gevencio atahuaman guillermo","placa":"C8H866","st":"Inicio de Toldeo","fh":"2026-08-19 11:57:26","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.96,"rg":"OK","gr":"En ruta"},{"ref":"1105452","ori":"LIMA","des":"HUARAL","trt":"ETAGPERU S.A.C.","placa":"C2F753","st":"Confirmado","fh":"2026-08-19 14:30:00","coord":"Silvana Romani","zona":"LIMA","h":-1.58,"rg":"OK","gr":"No ruta"},{"ref":"1105554","ori":"CUSCO","des":"HUARAL","trt":"CORPORACION T & T ANYELA E.I.R.L.","placa":"BCJ800","st":"Confirmado","fh":"2026-08-19 16:40:00","coord":"Katheryn Quispe","zona":"LIMA","h":-3.75,"rg":"OK","gr":"No ruta"},{"ref":"1105899","ori":"CHICLAYO","des":"MAYNAS","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"AJW797","st":"En Resguardo","fh":"2026-08-19 12:03:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.87,"rg":"OK","gr":"En ruta"},{"ref":"1105078","ori":"HUARAL","des":"CHANCHAMAYO","trt":"juan carlos peramas sanchez","placa":"CAX784","st":"En ruta","fh":"2026-08-19 11:37:00","coord":"Celina Andia","zona":"PROVINCIA","h":1.3,"rg":"OK","gr":"En ruta"},{"ref":"1105132","ori":"LIMA","des":"CHICLAYO","trt":"CORPORACIÓN & TRANSPORTES RUTTA SAC","placa":"BDB803","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":28.8,"rg":"ALTA","gr":"No ruta"},{"ref":"1105131","ori":"LIMA","des":"CHICLAYO","trt":"CORPORACIÓN & TRANSPORTES RUTTA SAC","placa":"APJ738","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":28.8,"rg":"ALTA","gr":"No ruta"},{"ref":"1105199","ori":"CHANCHAMAYO","des":"HUARAL","trt":"Inversiones Huanay s.r.l.","placa":"BUD886","st":"Confirmado","fh":"2026-08-19 15:30:00","coord":"Celina Andia","zona":"LIMA","h":-2.58,"rg":"OK","gr":"No ruta"},{"ref":"1105204","ori":"CHANCHAMAYO","des":"HUARAL","trt":"CORPORACION LIDER H & M S.A.C.","placa":"BPN705","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Celina Andia","zona":"LIMA","h":27.32,"rg":"ALTA","gr":"No ruta"},{"ref":"1105231","ori":"HUARAL","des":"SÁNCHEZ CARRION","trt":"ESTACION DE SERVICIOS LA ARENA E.I.R.L","placa":"TEO912","st":"En ruta","fh":"2026-08-19 11:08:00","coord":"Walter Romero","zona":"PROVINCIA","h":1.79,"rg":"OK","gr":"En ruta"},{"ref":"1105580","ori":"LIMA","des":"HUARAL","trt":"SOLUCIONES LOGÍSTICAS CHEN SAC","placa":"A7H888","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Celina Andia","zona":"LIMA","h":28.8,"rg":"ALTA","gr":"No ruta"},{"ref":"1105610","ori":"LIMA","des":"HUARAL","trt":"E&D CARDENAS CONTRATISTAS SAC","placa":"C7B804","st":"Confirmado","fh":"2026-08-19 17:30:00","coord":"Silvana Romani","zona":"LIMA","h":-4.58,"rg":"OK","gr":"No ruta"},{"ref":"1105608","ori":"LIMA","des":"HUARAL","trt":"ETAGPERU S.A.C.","placa":"F1E712","st":"Confirmado","fh":"2026-08-19 13:30:00","coord":"Silvana Romani","zona":"LIMA","h":-0.58,"rg":"OK","gr":"No ruta"},{"ref":"1105605","ori":"LIMA","des":"HUARAL","trt":"JP Logística","placa":"CBD822","st":"Confirmado","fh":"2026-08-19 18:30:00","coord":"Silvana Romani","zona":"LIMA","h":-5.58,"rg":"OK","gr":"No ruta"},{"ref":"1105901","ori":"CHICLAYO","des":"HUARAL","trt":"Levent express I.R L","placa":"T3P873","st":"En ruta","fh":"2026-08-19 11:46:00","coord":"Walter Romero","zona":"LIMA","h":1.16,"rg":"OK","gr":"En ruta"},{"ref":"1105903","ori":"CHICLAYO","des":"HUARAL","trt":"Levent express I.R L","placa":"C9B827","st":"En ruta","fh":"2026-08-19 11:46:00","coord":"Walter Romero","zona":"LIMA","h":1.16,"rg":"OK","gr":"En ruta"},{"ref":"1105904","ori":"CHICLAYO","des":"HUARAL","trt":"TRANSAMO S.A.C.","placa":"T3D899","st":"En ruta","fh":"2026-08-19 11:45:00","coord":"Walter Romero","zona":"LIMA","h":1.17,"rg":"OK","gr":"En ruta"},{"ref":"1105912","ori":"CHICLAYO","des":"HUARAL","trt":"Inversiones y transportes Marisa EIRL","placa":"AXZ910","st":"En ruta","fh":"2026-08-19 11:44:00","coord":"Walter Romero","zona":"LIMA","h":1.19,"rg":"OK","gr":"En ruta"},{"ref":"1105949","ori":"HUARAL","des":"LIMA","trt":"FONPELL TRANSPORTE S.A.C.","placa":"CCF883","st":"En ruta","fh":"2026-08-19 12:27:00","coord":"Silvana Romani","zona":"LIMA","h":0.47,"rg":"OK","gr":"En ruta"},{"ref":"1105950","ori":"CHICLAYO","des":"LIMA","trt":"CORPORACIÓN & TRANSPORTES RUTTA SAC","placa":"ABM814","st":"En ruta","fh":"2026-08-19 11:53:00","coord":"Walter Romero","zona":"LIMA","h":1.04,"rg":"OK","gr":"En ruta"},{"ref":"1105966","ori":"HUARAL","des":"LIMA","trt":"ZÚÑIGA EXPRESS CARGO S.A.C","placa":"F4S880","st":"PARADA POR DESCANSO","fh":"2026-08-19 11:47:00","coord":"Silvana Romani","zona":"LIMA","h":1.14,"rg":"OK","gr":"En ruta"},{"ref":"1106035","ori":"HUARAL","des":"LIMA","trt":"HERNANI SRLtda","placa":"V0M711","st":"En espera de descargue","fh":"2026-08-19 11:00:00","coord":"Walter Romero","zona":"LIMA","h":1.92,"rg":"OK","gr":"En ruta"},{"ref":"1106040","ori":"HUARAL","des":"PIURA","trt":"Inversiones y transportes Marisa EIRL","placa":"T3I925","st":"En ruta","fh":"2026-08-19 11:47:00","coord":"Walter Romero","zona":"PROVINCIA","h":1.14,"rg":"OK","gr":"En ruta"},{"ref":"1106047","ori":"HUARAL","des":"CAJAMARCA","trt":"TORETO SAC","placa":"B4E756","st":"En ruta","fh":"2026-08-19 11:44:00","coord":"Walter Romero","zona":"PROVINCIA","h":1.19,"rg":"OK","gr":"En ruta"},{"ref":"1106076","ori":"LIMA","des":"LIMA","trt":"SOLUCIONES LOGÍSTICAS CHEN SAC","placa":"F10893","st":"En ruta","fh":"2026-08-19 12:34:00","coord":"Celina Andia","zona":"LIMA","h":0.35,"rg":"OK","gr":"En ruta"},{"ref":"1106108","ori":"HUARAL","des":"CUSCO","trt":"TRANSPORTES INTERNACIONAL CANDELARIA S.A.C","placa":"BZG922","st":"Confirmado","fh":"2026-08-19 16:00:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-3.08,"rg":"OK","gr":"No ruta"},{"ref":"1106109","ori":"HUARAL","des":"CUSCO","trt":"CRISAR LOGISTICA - TRT","placa":"CFN889","st":"Confirmado","fh":"2026-08-19 16:00:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-3.08,"rg":"OK","gr":"No ruta"},{"ref":"1106107","ori":"HUARAL","des":"CUSCO","trt":"EMPRESA DE TRANSPORTES PATY SCRL","placa":"BUK886","st":"En ruta","fh":"2026-08-19 12:26:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.49,"rg":"OK","gr":"En ruta"},{"ref":"1106121","ori":"HUARAL","des":"ANDAHUAYLAS","trt":"CONDORI MAMANI JAIME TOMAS","placa":"BUN866","st":"En ruta","fh":"2026-08-19 11:26:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.49,"rg":"OK","gr":"En ruta"},{"ref":"1106137","ori":"HUARAL","des":"ABANCAY","trt":"CORPORACION YU & LI E.I.R.L.","placa":"CEV884","st":"Confirmado","fh":"2026-08-20 00:00:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-11.08,"rg":"OK","gr":"No ruta"},{"ref":"1106222","ori":"AREQUIPA","des":"SAN ROMÁN","trt":"EMPRESA DE TRANSPORTES CUENTAS PACO E.I.R.L.","placa":"V1P889","st":"En ruta","fh":"2026-08-19 11:57:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.97,"rg":"OK","gr":"En ruta"},{"ref":"1106223","ori":"AREQUIPA","des":"SAN ROMÁN","trt":"EMPRESA DE TRANSPORTES CUENTAS PACO E.I.R.L.","placa":"F1H932","st":"Llegada a Destino","fh":"2026-08-19 11:58:20","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.95,"rg":"OK","gr":"En ruta"},{"ref":"1106224","ori":"AREQUIPA","des":"AREQUIPA","trt":"EMPRESA DE TRANSPORTES CUENTAS PACO E.I.R.L.","placa":"V1P889","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Katheryn Quispe","zona":"PROVINCIA","h":40.32,"rg":"ALTA","gr":"No ruta"},{"ref":"1105093","ori":"HUARAL","des":"TRUJILLO","trt":"Empresa de servicios generales Sansajul sac","placa":"BEQ926","st":"Confirmado","fh":"2026-08-19 15:40:00","coord":"Walter Romero","zona":"PROVINCIA","h":-2.75,"rg":"OK","gr":"No ruta"},{"ref":"1105689","ori":"PAITA","des":"LIMA","trt":"TRANSPORTES Y SERVICIOS BERMING E.I.R.L.","placa":"ACK815","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"LIMA","h":26.59,"rg":"ALTA","gr":"No ruta"},{"ref":"1105917","ori":"CHICLAYO","des":"PIURA","trt":"VASQUEZ PEREZ HERMELINDA","placa":"BAL930","st":"En ruta","fh":"2026-08-19 12:16:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.66,"rg":"OK","gr":"En ruta"},{"ref":"1105914","ori":"CHICLAYO","des":"SULLANA","trt":"VASQUEZ PEREZ HERMELINDA","placa":"BFZ715","st":"Inicio Ruta","fh":"2026-08-19 09:53:59","coord":"Walter Romero","zona":"PROVINCIA","h":3.02,"rg":"MEDIA","gr":"En ruta"},{"ref":"1105918","ori":"CHICLAYO","des":"PIURA","trt":"Empresa de Transporte Vigsan EIRL","placa":"T8X817","st":"Inicio Ruta","fh":"2026-08-19 09:50:04","coord":"Walter Romero","zona":"PROVINCIA","h":3.09,"rg":"MEDIA","gr":"En ruta"},{"ref":"1105923","ori":"CHICLAYO","des":"TUMBES","trt":"HERNANI SRLtda","placa":"V0M711","st":"Confirmado","fh":"2026-08-19 13:50:00","coord":"Walter Romero","zona":"PROVINCIA","h":-0.91,"rg":"OK","gr":"No ruta"},{"ref":"1105934","ori":"CHICLAYO","des":"TRUJILLO","trt":"Transportes Pakatnamu Sac","placa":"TFF911","st":"En ruta","fh":"2026-08-19 12:15:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.67,"rg":"OK","gr":"En ruta"},{"ref":"1105942","ori":"CHICLAYO","des":"HUARAZ","trt":"TRANSP. CESITAR CARGO S.R.L.","placa":"AKH867","st":"Llegada a Destino","fh":"2026-08-19 11:43:21","coord":"Walter Romero","zona":"PROVINCIA","h":1.2,"rg":"OK","gr":"En ruta"},{"ref":"1105969","ori":"TRUJILLO","des":"TRUJILLO","trt":"ETI COLLANTES E.I.R.L.","placa":"T5C893","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":26.59,"rg":"ALTA","gr":"No ruta"},{"ref":"1105995","ori":"LIMA","des":"CHICLAYO","trt":"CORPORACIÓN & TRANSPORTES RUTTA SAC","placa":"ADC809","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":23.09,"rg":"ALTA","gr":"No ruta"},{"ref":"1106036","ori":"HUARAL","des":"LAMBAYEQUE","trt":"Levent express I.R L","placa":"APU865","st":"Confirmado","fh":"2026-08-19 12:00:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.92,"rg":"OK","gr":"No ruta"},{"ref":"1106080","ori":"LIMA","des":"LIMA","trt":"Transportes poma","placa":"F1Y733","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"LIMA","h":21.19,"rg":"ALTA","gr":"No ruta"},{"ref":"1106128","ori":"HUARAL","des":"BARRANCA","trt":"TRANSPORTIME S.A.C","placa":"B8W786","st":"Confirmado","fh":"2026-08-19 14:50:00","coord":"Celina Andia","zona":"PROVINCIA","h":-1.91,"rg":"OK","gr":"No ruta"},{"ref":"1106126","ori":"HUARAL","des":"BARRANCA","trt":"TRANSPORTIME S.A.C","placa":"C1O770","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Celina Andia","zona":"PROVINCIA","h":23.09,"rg":"ALTA","gr":"No ruta"},{"ref":"1106138","ori":"HUARAL","des":"HUANCAYO","trt":"HAYABUSA EXPRESS E.I.R.L.","placa":"BEV800","st":"En ruta","fh":"2026-08-19 11:40:00","coord":"Celina Andia","zona":"PROVINCIA","h":1.25,"rg":"OK","gr":"En ruta"},{"ref":"1106143","ori":"HUARAL","des":"HUANCAYO","trt":"TRANSPORTES SERVICIOS OSPINA E.I.R.L","placa":"AZD757","st":"Confirmado","fh":"2026-08-20 00:30:00","coord":"Celina Andia","zona":"PROVINCIA","h":-11.58,"rg":"OK","gr":"No ruta"},{"ref":"1106144","ori":"HUARAL","des":"HUANCAYO","trt":"TRANSPORTES SERVICIOS OSPINA E.I.R.L","placa":"AJF857","st":"En ruta","fh":"2026-08-19 11:28:00","coord":"Celina Andia","zona":"PROVINCIA","h":1.46,"rg":"OK","gr":"En ruta"},{"ref":"1106164","ori":"HUARAL","des":"CHANCHAMAYO","trt":"CORPORACION LIDER H & M S.A.C.","placa":"BPN705","st":"Confirmación Inicio Descargue","fh":"2026-08-19 12:17:47","coord":"Celina Andia","zona":"PROVINCIA","h":0.62,"rg":"OK","gr":"En ruta"},{"ref":"1106179","ori":"HUARAL","des":"MAYNAS","trt":"CORPORACION T & T ANYELA E.I.R.L.","placa":"BCJ800","st":"En ruta","fh":"2026-08-19 12:08:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.79,"rg":"OK","gr":"En ruta"},{"ref":"1106198","ori":"CHICLAYO","des":"SAN MARTÍN","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"B7D741","st":"En Resguardo","fh":"2026-08-19 11:49:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.1,"rg":"OK","gr":"En ruta"},{"ref":"1106449","ori":"LIMA","des":"HUARAL","trt":"Grupo de Inversiones y Transportes Mendoza","placa":"T5T925","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Silvana Romani","zona":"LIMA","h":25.55,"rg":"ALTA","gr":"No ruta"},{"ref":"1100105","ori":"PAITA","des":"LIMA","trt":"Inversiones y transportes Marisa EIRL","placa":"AXZ910","st":"Confirmado","fh":"2026-08-19 07:00:00","coord":"Walter Romero","zona":"LIMA","h":5.92,"rg":"ALTA","gr":"No ruta"},{"ref":"1100106","ori":"PAITA","des":"LIMA","trt":"Inversiones y transportes Marisa EIRL","placa":"T3I925","st":"Confirmado","fh":"2026-08-19 07:00:00","coord":"Walter Romero","zona":"LIMA","h":5.92,"rg":"ALTA","gr":"No ruta"},{"ref":"1100115","ori":"PAITA","des":"CHICLAYO","trt":"Inversiones y transportes Marisa EIRL","placa":"V1P801","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":2.52,"rg":"MEDIA","gr":"No ruta"},{"ref":"1101215","ori":"PAITA","des":"LIMA","trt":"Inversiones y transportes Marisa EIRL","placa":"V1P801","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"LIMA","h":15.4,"rg":"ALTA","gr":"No ruta"},{"ref":"1102141","ori":"YURIMAGUAS","des":"IQUITOS","trt":"TRANSPORTE FLUVIAL HENRY SAC","placa":"Y1T772","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":1.25,"rg":"OK","gr":"No ruta"},{"ref":"1102142","ori":"YURIMAGUAS","des":"IQUITOS","trt":"TRANSPORTE FLUVIAL HENRY SAC","placa":"Y1T772","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":1.25,"rg":"OK","gr":"No ruta"},{"ref":"1103083","ori":"PROV. CONST. DEL CALLAO","des":"LIMA","trt":"TRANSPORTE FLASH & RAPIDASH S.A.C.","placa":"ABN751","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Silvana Romani","zona":"LIMA","h":16.97,"rg":"ALTA","gr":"No ruta"},{"ref":"1103089","ori":"PROV. CONST. DEL CALLAO","des":"LIMA","trt":"TRANSPORTE FLASH & RAPIDASH S.A.C.","placa":"ABN751","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Silvana Romani","zona":"LIMA","h":17.39,"rg":"ALTA","gr":"No ruta"},{"ref":"1103090","ori":"PROV. CONST. DEL CALLAO","des":"LIMA","trt":"TRANSPORTE FLASH & RAPIDASH S.A.C.","placa":"ABN751","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Silvana Romani","zona":"LIMA","h":17.39,"rg":"ALTA","gr":"No ruta"},{"ref":"1104342","ori":"CORONEL PORTILLO","des":"CORONEL PORTILLO","trt":"CRISAR ORIENTE SAC","placa":"BAX735","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":4.78,"rg":"ALTA","gr":"No ruta"},{"ref":"1104643","ori":"CORONEL PORTILLO","des":"CORONEL PORTILLO","trt":"CRISAR ORIENTE SAC","placa":"BAX735","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":4.78,"rg":"ALTA","gr":"No ruta"},{"ref":"1104742","ori":"PAITA","des":"LIMA","trt":"Inversiones y transportes Marisa EIRL","placa":"AXZ910","st":"Confirmado","fh":"2026-08-19 07:00:00","coord":"Walter Romero","zona":"LIMA","h":5.92,"rg":"ALTA","gr":"No ruta"},{"ref":"1104738","ori":"PAITA","des":"HUARAL","trt":"Inversiones y transportes Marisa EIRL","placa":"T4U947","st":"Confirmado","fh":"2026-08-19 16:30:00","coord":"Walter Romero","zona":"LIMA","h":-3.58,"rg":"OK","gr":"No ruta"},{"ref":"1104880","ori":"CHICLAYO","des":"MOYOBAMBA","trt":"EDSA SERVICIOS LOGÍSTICOS SAC","placa":"F1J833","st":"Confirmado","fh":"2026-08-19 14:32:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-1.61,"rg":"OK","gr":"No ruta"},{"ref":"1104927","ori":"CHICLAYO","des":"TUMBES","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"B9L796","st":"En espera de descargue","fh":"2026-08-19 12:35:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.34,"rg":"OK","gr":"En ruta"},{"ref":"1104924","ori":"CHICLAYO","des":"TUMBES","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"V5Q822","st":"Inicio de Toldeo","fh":"2026-08-19 12:17:09","coord":"Walter Romero","zona":"PROVINCIA","h":0.64,"rg":"OK","gr":"En ruta"},{"ref":"1105126","ori":"CORONEL PORTILLO","des":"LEONCIO PRADO","trt":"ATAHUAMAN MOSQUERA RICHARD SAVIER","placa":"ATS948","st":"Inicio Ruta","fh":"2026-08-19 12:03:33","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.86,"rg":"OK","gr":"En ruta"},{"ref":"1105127","ori":"CORONEL PORTILLO","des":"HUÁNUCO","trt":"CORPORACION DISTRIBUIDORA R & A E.I.R.L.","placa":"AXF901","st":"Confirmado","fh":"2026-08-20 16:50:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-27.91,"rg":"OK","gr":"No ruta"},{"ref":"1105358","ori":"YURIMAGUAS","des":"IQUITOS","trt":"TRANSPORTE FLUVIAL HENRY SAC","placa":"Y1T772","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":1.29,"rg":"OK","gr":"No ruta"},{"ref":"1105365","ori":"YURIMAGUAS","des":"IQUITOS","trt":"TRANSPORTE FLUVIAL HENRY SAC","placa":"Y1T772","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":1.29,"rg":"OK","gr":"No ruta"},{"ref":"1105366","ori":"YURIMAGUAS","des":"IQUITOS","trt":"TRANSPORTE FLUVIAL HENRY SAC","placa":"Y1T772","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":1.29,"rg":"OK","gr":"No ruta"},{"ref":"1105368","ori":"YURIMAGUAS","des":"IQUITOS","trt":"TRANSPORTE FLUVIAL HENRY SAC","placa":"M1T874","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":1.29,"rg":"OK","gr":"No ruta"},{"ref":"1105367","ori":"YURIMAGUAS","des":"IQUITOS","trt":"TRANSPORTE FLUVIAL HENRY SAC","placa":"Y1T772","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"PROVINCIA","h":1.29,"rg":"OK","gr":"No ruta"},{"ref":"1105397","ori":"LIMA","des":"MAYNAS","trt":"TRANSPORTES SAN BORJA S.A.C.","placa":"A8F805","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.35,"rg":"OK","gr":"No ruta"},{"ref":"1105457","ori":"LIMA","des":"HUAMANGA","trt":"LOGISTICA DE TRANSPORTES CAMILA E.I.R.L.","placa":"BCY728","st":"Llegada a Origen","fh":"2026-08-19 09:49:29","coord":"Katheryn Quispe","zona":"PROVINCIA","h":3.1,"rg":"MEDIA","gr":"En ruta"},{"ref":"1105898","ori":"LIMA","des":"CHICLAYO","trt":"Levent express I.R L","placa":"C9B827","st":"Confirmado","fh":"2026-08-20 16:50:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-27.91,"rg":"OK","gr":"No ruta"},{"ref":"1105929","ori":"CHICLAYO","des":"CAJAMARCA","trt":"SERVICIOS GENERALES V&R SRL","placa":"BVD832","st":"En ruta","fh":"2026-08-19 12:35:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.34,"rg":"OK","gr":"En ruta"},{"ref":"1105936","ori":"CHICLAYO","des":"PROV. CONST. DEL CALLAO","trt":"Empresa de servicios generales Sansajul sac","placa":"ALI805","st":"Parada por Otros","fh":"2026-08-19 11:50:00","coord":"Walter Romero","zona":"LIMA","h":1.09,"rg":"OK","gr":"En ruta"},{"ref":"1105996","ori":"LIMA","des":"CHICLAYO","trt":"CORPORACIÓN & TRANSPORTES RUTTA SAC","placa":"D7W706","st":"En ruta","fh":"2026-08-19 12:07:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.81,"rg":"OK","gr":"En ruta"},{"ref":"1106001","ori":"LIMA","des":"CHICLAYO","trt":"Empresa de Transporte Vigsan EIRL","placa":"T8X818","st":"En ruta","fh":"2026-08-19 12:01:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.91,"rg":"OK","gr":"En ruta"},{"ref":"1106038","ori":"HUARAL","des":"TRUJILLO","trt":"CORPORACION TRANS FANY S.R.L.","placa":"CFQ809","st":"En ruta","fh":"2026-08-19 12:17:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.64,"rg":"OK","gr":"En ruta"},{"ref":"1106054","ori":"LIMA","des":"LIMA","trt":"Transportes poma","placa":"P2M891","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"LIMA","h":20.35,"rg":"ALTA","gr":"No ruta"},{"ref":"1106058","ori":"LIMA","des":"LIMA","trt":"Transportes poma","placa":"P2M891","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"LIMA","h":2.12,"rg":"MEDIA","gr":"No ruta"},{"ref":"1106060","ori":"LIMA","des":"LIMA","trt":"ARANDA PANDO DAVID ARTURO","placa":"B1T847","st":"Confirmado","fh":"2026-08-19 04:00:00","coord":"Dayanna Espinoza","zona":"LIMA","h":8.92,"rg":"ALTA","gr":"No ruta"},{"ref":"1106139","ori":"HUARAL","des":"HUANCAYO","trt":"CORPORACION LIDER H & M S.A.C.","placa":"CHB905","st":"Inicio Ruta","fh":"2026-08-19 11:01:24","coord":"Celina Andia","zona":"PROVINCIA","h":1.9,"rg":"OK","gr":"En ruta"},{"ref":"1106141","ori":"HUARAL","des":"HUANCAYO","trt":"CORPORACION LIDER H & M S.A.C.","placa":"CHH902","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Celina Andia","zona":"PROVINCIA","h":16.82,"rg":"ALTA","gr":"No ruta"},{"ref":"1106140","ori":"HUARAL","des":"HUAMANGA","trt":"CORPORACIÓN JAICO CARGO E.I.R.L","placa":"BZX871","st":"Confirmado","fh":"2026-08-19 23:30:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-10.58,"rg":"OK","gr":"No ruta"},{"ref":"1106145","ori":"HUARAL","des":"HUANCAYO","trt":"GRUPO LOGISTICO JUSMAR S.R.L.","placa":"AXU890","st":"Confirmado","fh":"2026-08-19 15:00:00","coord":"Celina Andia","zona":"PROVINCIA","h":-2.08,"rg":"OK","gr":"No ruta"},{"ref":"1106158","ori":"HUARAL","des":"HUANCAYO","trt":"Transportes Vibal JPH SCRL","placa":"W6U875","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Celina Andia","zona":"PROVINCIA","h":16.82,"rg":"ALTA","gr":"No ruta"},{"ref":"1106161","ori":"HUARAL","des":"TARMA","trt":"CORPORACION TRANS FANY S.R.L.","placa":"BSG882","st":"Inicio Ruta","fh":"2026-08-19 12:28:01","coord":"Celina Andia","zona":"PROVINCIA","h":0.45,"rg":"OK","gr":"En ruta"},{"ref":"1106165","ori":"HUARAL","des":"CORONEL PORTILLO","trt":"transcargo panduro s.a.c","placa":"APB872","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.35,"rg":"OK","gr":"No ruta"},{"ref":"1106172","ori":"HUARAL","des":"EL DORADO","trt":"Empresa de Transporte Vigsan EIRL","placa":"T9Y886","st":"Confirmado","fh":"2026-08-19 14:30:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-1.58,"rg":"OK","gr":"No ruta"},{"ref":"1106182","ori":"HUARAL","des":"HUÁNUCO","trt":"CORPORACION DISTRIBUIDORA R & A E.I.R.L.","placa":"CDV938","st":"Confirmado","fh":"2026-08-19 15:30:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-2.58,"rg":"OK","gr":"No ruta"},{"ref":"1106367","ori":"LIMA","des":"LIMA","trt":"ARANDA PANDO DAVID ARTURO","placa":"B1T847","st":"Confirmado","fh":"2026-08-19 15:00:00","coord":"Dayanna Espinoza","zona":"LIMA","h":-2.08,"rg":"OK","gr":"No ruta"},{"ref":"1106369","ori":"LIMA","des":"LIMA","trt":"TRANSPORTE & COMERCIO AYF SAC","placa":"D9D873","st":"Confirmado","fh":"2026-08-19 16:00:00","coord":"Dayanna Espinoza","zona":"LIMA","h":-3.08,"rg":"OK","gr":"No ruta"},{"ref":"1106370","ori":"LIMA","des":"LIMA","trt":"TRANSPORTE & COMERCIO AYF SAC","placa":"Z3Q822","st":"Confirmado","fh":"2026-08-19 17:30:00","coord":"Dayanna Espinoza","zona":"LIMA","h":-4.58,"rg":"OK","gr":"No ruta"},{"ref":"1106371","ori":"LIMA","des":"LIMA","trt":"VELASQUEZ AYALA ABELARDO VICTOR","placa":"A3W913","st":"Confirmado","fh":"2026-08-19 15:30:00","coord":"Dayanna Espinoza","zona":"LIMA","h":-2.58,"rg":"OK","gr":"No ruta"},{"ref":"1106424","ori":"LIMA","des":"SAN MARTÍN","trt":"LOGISTICA INVERSIONES CAMPOS","placa":"F6F890","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.35,"rg":"OK","gr":"No ruta"},{"ref":"1106425","ori":"SAN MARTÍN","des":"SAN MARTÍN","trt":"GRUPO SANTO TORIBIO LOGISTICA PERU SAC - GRUSTOLP SAC","placa":"AYW780","st":"Confirmado","fh":"2026-08-20 09:00:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-20.08,"rg":"OK","gr":"No ruta"},{"ref":"1106426","ori":"LIMA","des":"SAN MARTÍN","trt":"LOGISTICA INVERSIONES CAMPOS","placa":"C2B710","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.35,"rg":"OK","gr":"No ruta"},{"ref":"1106428","ori":"LIMA","des":"HUARAL","trt":"Transportes Transfer E.I.R.L","placa":"B5N742","st":"¡ALERTA DE RETRASO DE CARGA!","fh":"2026-08-19 11:54:00","coord":"Celina Andia","zona":"LIMA","h":1.02,"rg":"OK","gr":"En ruta"},{"ref":"1106439","ori":"LIMA","des":"HUARAL","trt":"CAJAHUANCA URETA CARLOS FERNANDO","placa":"A0E928","st":"¡ALERTA DE RETRASO DE CARGA!","fh":"2026-08-19 11:45:00","coord":"Celina Andia","zona":"LIMA","h":1.17,"rg":"OK","gr":"En ruta"},{"ref":"1106440","ori":"LIMA","des":"HUARAL","trt":"GRUPO SANTO TORIBIO LOGISTICA PERU SAC - GRUSTOLP SAC","placa":"F4O909","st":"¡ALERTA DE RETRASO DE CARGA!","fh":"2026-08-19 11:42:00","coord":"Celina Andia","zona":"LIMA","h":1.22,"rg":"OK","gr":"En ruta"},{"ref":"1106508","ori":"HUARAL","des":"LIMA","trt":"GRUPO SANTO TORIBIO LOGISTICA PERU SAC - GRUSTOLP SAC","placa":"ATE864","st":"Confirmado","fh":"2026-08-19 16:50:00","coord":"Silvana Romani","zona":"LIMA","h":-3.91,"rg":"OK","gr":"No ruta"},{"ref":"1106509","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTE AGUERO EIRL","placa":"F4W866","st":"En ruta","fh":"2026-08-19 12:33:00","coord":"Silvana Romani","zona":"LIMA","h":0.37,"rg":"OK","gr":"En ruta"},{"ref":"1106516","ori":"HUARAL","des":"LIMA","trt":"NETZAH E.I.R.L.","placa":"D4L732","st":"En ruta","fh":"2026-08-19 12:30:00","coord":"Silvana Romani","zona":"LIMA","h":0.42,"rg":"OK","gr":"En ruta"},{"ref":"1106517","ori":"HUARAL","des":"LIMA","trt":"ETAGPERU S.A.C.","placa":"F1E712","st":"Confirmado","fh":"2026-08-19 14:50:00","coord":"Silvana Romani","zona":"LIMA","h":-1.91,"rg":"OK","gr":"No ruta"},{"ref":"1106520","ori":"HUARAL","des":"LIMA","trt":"CORPORACION LOGISTICA HAV SAC","placa":"BKK741","st":"Confirmado","fh":"2026-08-19 16:50:00","coord":"Silvana Romani","zona":"LIMA","h":-3.91,"rg":"OK","gr":"No ruta"},{"ref":"1106519","ori":"HUARAL","des":"LIMA","trt":"Worldpetrol sac","placa":"D5L721","st":"En ruta","fh":"2026-08-19 11:59:00","coord":"Silvana Romani","zona":"LIMA","h":0.94,"rg":"OK","gr":"En ruta"},{"ref":"1106521","ori":"HUARAL","des":"LIMA","trt":"ETAGPERU S.A.C.","placa":"C2F753","st":"Confirmado","fh":"2026-08-19 15:40:00","coord":"Silvana Romani","zona":"LIMA","h":-2.75,"rg":"OK","gr":"No ruta"},{"ref":"1106531","ori":"HUARAL","des":"LIMA","trt":"GRUPO SANTO TORIBIO LOGISTICA PERU SAC - GRUSTOLP SAC","placa":"CJB851","st":"Confirmado","fh":"2026-08-19 13:50:00","coord":"Silvana Romani","zona":"LIMA","h":-0.91,"rg":"OK","gr":"No ruta"},{"ref":"1106533","ori":"HUARAL","des":"LIMA","trt":"OPERADOR LOGISTICO MAREMOL SCRL","placa":"B4N882","st":"En ruta","fh":"2026-08-19 12:27:00","coord":"Silvana Romani","zona":"LIMA","h":0.47,"rg":"OK","gr":"En ruta"},{"ref":"1106534","ori":"HUARAL","des":"LIMA","trt":"OPERADOR LOGISTICO MAREMOL SCRL","placa":"B4N882","st":"Confirmado","fh":"2026-08-19 16:30:00","coord":"Silvana Romani","zona":"LIMA","h":-3.58,"rg":"OK","gr":"No ruta"},{"ref":"1106591","ori":"HUARAL","des":"LIMA","trt":"FONPELL TRANSPORTE S.A.C.","placa":"CMH719","st":"Confirmado","fh":"2026-08-19 15:00:00","coord":"Silvana Romani","zona":"LIMA","h":-2.08,"rg":"OK","gr":"No ruta"},{"ref":"1106593","ori":"HUARAL","des":"LIMA","trt":"FONPELL TRANSPORTE S.A.C.","placa":"CCF883","st":"Confirmado","fh":"2026-08-19 19:50:00","coord":"Silvana Romani","zona":"LIMA","h":-6.91,"rg":"OK","gr":"No ruta"},{"ref":"1106626","ori":"LIMA","des":"HUARAL","trt":"Grupo de Inversiones y Transportes Mendoza","placa":"T5T925","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Celina Andia","zona":"LIMA","h":3.33,"rg":"MEDIA","gr":"No ruta"},{"ref":"1106633","ori":"LIMA","des":"HUARAL","trt":"ALITRANSP SAC","placa":"T2J881","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Celina Andia","zona":"LIMA","h":3.33,"rg":"MEDIA","gr":"No ruta"},{"ref":"1106632","ori":"LIMA","des":"HUARAL","trt":"nexan sac","placa":"D2K941","st":"Inicio Ruta","fh":"2026-08-19 12:04:00","coord":"Celina Andia","zona":"LIMA","h":0.85,"rg":"OK","gr":"En ruta"},{"ref":"1106701","ori":"AREQUIPA","des":"SAN ROMÁN","trt":"EMPRESA DE TRANSPORTES CUENTAS PACO E.I.R.L.","placa":"V5U888","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Katheryn Quispe","zona":"PROVINCIA","h":17.45,"rg":"ALTA","gr":"No ruta"},{"ref":"1106747","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTE AGUERO EIRL","placa":"CEU922","st":"En ruta","fh":"2026-08-19 12:28:00","coord":"Silvana Romani","zona":"LIMA","h":0.46,"rg":"OK","gr":"En ruta"},{"ref":"1106748","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTE AGUERO EIRL","placa":"CEU922","st":"Confirmado","fh":"2026-08-19 15:30:00","coord":"Silvana Romani","zona":"LIMA","h":-2.58,"rg":"OK","gr":"No ruta"},{"ref":"1106758","ori":"HUARAL","des":"LIMA","trt":"OPERADOR LOGISTICO MAREMOL SCRL","placa":"CFA922","st":"En ruta","fh":"2026-08-19 12:33:00","coord":"Silvana Romani","zona":"LIMA","h":0.37,"rg":"OK","gr":"En ruta"},{"ref":"1106767","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTE AGUERO EIRL","placa":"CEV703","st":"En ruta","fh":"2026-08-19 12:31:00","coord":"Silvana Romani","zona":"LIMA","h":0.41,"rg":"OK","gr":"En ruta"},{"ref":"1106780","ori":"HUARAL","des":"LIMA","trt":"distribuidora logistica y transportes johan sac","placa":"B1D938","st":"Confirmado","fh":"2026-08-19 14:30:00","coord":"Silvana Romani","zona":"LIMA","h":-1.58,"rg":"OK","gr":"No ruta"},{"ref":"1106778","ori":"HUARAL","des":"LIMA","trt":"GRUPO SANTO TORIBIO LOGISTICA PERU SAC - GRUSTOLP SAC","placa":"ATE864","st":"En ruta","fh":"2026-08-19 12:33:00","coord":"Silvana Romani","zona":"LIMA","h":0.37,"rg":"OK","gr":"En ruta"},{"ref":"1106789","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTES SAN PEDRO DE MARAÑON S.A.C.","placa":"F1E858","st":"En ruta","fh":"2026-08-19 11:52:00","coord":"Silvana Romani","zona":"LIMA","h":1.05,"rg":"OK","gr":"En ruta"},{"ref":"1106803","ori":"HUARAL","des":"LIMA","trt":"CORPORATION LOGISTIC MALVINA SA","placa":"D3Y742","st":"Confirmado","fh":"2026-08-19 15:30:00","coord":"Silvana Romani","zona":"LIMA","h":-2.58,"rg":"OK","gr":"No ruta"},{"ref":"1106819","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTES SAN PEDRO DE MARAÑON S.A.C.","placa":"BKA738","st":"Confirmado","fh":"2026-08-19 16:40:00","coord":"Silvana Romani","zona":"LIMA","h":-3.75,"rg":"OK","gr":"No ruta"},{"ref":"1106822","ori":"HUARAL","des":"LIMA","trt":"NEGOCIACIONES YANCE SAC","placa":"CFG915","st":"Confirmado","fh":"2026-08-19 12:59:00","coord":"Silvana Romani","zona":"LIMA","h":-0.06,"rg":"OK","gr":"No ruta"},{"ref":"1106824","ori":"HUARAL","des":"LIMA","trt":"NEGOCIACIONES YANCE SAC","placa":"BUD930","st":"Confirmado","fh":"2026-08-19 12:59:00","coord":"Silvana Romani","zona":"LIMA","h":-0.06,"rg":"OK","gr":"No ruta"},{"ref":"1106838","ori":"HUARAL","des":"LIMA","trt":"CORPORATION LOGISTIC MALVINA SA","placa":"BWG878","st":"Confirmado","fh":"2026-08-19 15:40:00","coord":"Silvana Romani","zona":"LIMA","h":-2.75,"rg":"OK","gr":"No ruta"},{"ref":"1106839","ori":"HUARAL","des":"LIMA","trt":"ETAGPERU S.A.C.","placa":"C2F753","st":"En Proceso de Descargue","fh":"2026-08-19 12:00:00","coord":"Silvana Romani","zona":"LIMA","h":0.92,"rg":"OK","gr":"En ruta"},{"ref":"1106835","ori":"HUARAL","des":"LIMA","trt":"CORPORATION LOGISTIC MALVINA SA","placa":"BWG878","st":"En ruta","fh":"2026-08-19 12:25:00","coord":"Silvana Romani","zona":"LIMA","h":0.51,"rg":"OK","gr":"En ruta"},{"ref":"1106840","ori":"HUARAL","des":"LIMA","trt":"distribuidora logistica y transportes johan sac","placa":"F5R839","st":"En ruta","fh":"2026-08-19 11:57:00","coord":"Silvana Romani","zona":"LIMA","h":0.97,"rg":"OK","gr":"En ruta"},{"ref":"1106845","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTES SAN PEDRO DE MARAÑON S.A.C.","placa":"BRJ721","st":"En ruta","fh":"2026-08-19 11:43:00","coord":"Silvana Romani","zona":"LIMA","h":1.21,"rg":"OK","gr":"En ruta"},{"ref":"1106843","ori":"HUARAL","des":"LIMA","trt":"ALITRANSP SAC","placa":"T2J881","st":"Confirmado","fh":"2026-08-19 12:59:00","coord":"Silvana Romani","zona":"LIMA","h":-0.06,"rg":"OK","gr":"No ruta"},{"ref":"1106853","ori":"HUARAL","des":"LIMA","trt":"CORPORATION LOGISTIC MALVINA SA","placa":"BRE826","st":"Confirmado","fh":"2026-08-19 13:40:00","coord":"Silvana Romani","zona":"LIMA","h":-0.74,"rg":"OK","gr":"No ruta"},{"ref":"1106865","ori":"HUARAL","des":"LIMA","trt":"SOLUCIONES LOGÍSTICAS CHEN SAC","placa":"T1L851","st":"Confirmado","fh":"2026-08-19 12:59:00","coord":"Silvana Romani","zona":"LIMA","h":-0.06,"rg":"OK","gr":"No ruta"},{"ref":"1106866","ori":"HUARAL","des":"LIMA","trt":"CORPORATION LOGISTIC MALVINA SA","placa":"BRE826","st":"Confirmado","fh":"2026-08-19 13:30:00","coord":"Silvana Romani","zona":"LIMA","h":-0.58,"rg":"OK","gr":"No ruta"},{"ref":"1106868","ori":"HUARAL","des":"LIMA","trt":"JP Logística","placa":"CBE782","st":"En Proceso de Descargue","fh":"2026-08-19 12:00:00","coord":"Silvana Romani","zona":"LIMA","h":0.92,"rg":"OK","gr":"En ruta"},{"ref":"1106869","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTE AGUERO EIRL","placa":"F9T858","st":"Inicio Descargue","fh":"2026-08-19 12:21:00","coord":"Silvana Romani","zona":"LIMA","h":0.57,"rg":"OK","gr":"En ruta"},{"ref":"1106871","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTE AGUERO EIRL","placa":"F4W866","st":"Confirmado","fh":"2026-08-19 16:50:00","coord":"Silvana Romani","zona":"LIMA","h":-3.91,"rg":"OK","gr":"No ruta"},{"ref":"1106878","ori":"HUARAL","des":"LIMA","trt":"TRANSPORTE AGUERO EIRL","placa":"D1F770","st":"En ruta","fh":"2026-08-19 11:53:00","coord":"Silvana Romani","zona":"LIMA","h":1.04,"rg":"OK","gr":"En ruta"},{"ref":"1106880","ori":"HUARAL","des":"LIMA","trt":"CORPORATION LOGISTIC MALVINA SA","placa":"BNM780","st":"Confirmado","fh":"2026-08-19 20:50:00","coord":"Silvana Romani","zona":"LIMA","h":-7.91,"rg":"OK","gr":"No ruta"},{"ref":"1106881","ori":"HUARAL","des":"LIMA","trt":"distribuidora logistica y transportes johan sac","placa":"CNJ933","st":"En ruta","fh":"2026-08-19 11:38:00","coord":"Silvana Romani","zona":"LIMA","h":1.29,"rg":"OK","gr":"En ruta"},{"ref":"1106882","ori":"HUARAL","des":"LIMA","trt":"negocios seis srl","placa":"C6H817","st":"Confirmado","fh":"2026-08-19 13:00:00","coord":"Silvana Romani","zona":"LIMA","h":-0.08,"rg":"OK","gr":"No ruta"},{"ref":"1106879","ori":"HUARAL","des":"LIMA","trt":"JP Logística","placa":"CBD822","st":"Confirmado","fh":"2026-08-19 14:30:00","coord":"Silvana Romani","zona":"LIMA","h":-1.58,"rg":"OK","gr":"No ruta"},{"ref":"1106891","ori":"SAN MARTÍN","des":"SAN MARTÍN","trt":"TERRONES CARRERA JUAN","placa":"T1O858","st":"Llegada a Destino","fh":"2026-08-19 10:55:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":2.0,"rg":"MEDIA","gr":"En ruta"},{"ref":"1106892","ori":"SAN MARTÍN","des":"ALTO AMAZONAS","trt":"FESELL DISTRIBUIDORA S.A.C.","placa":"D5E793","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":17.45,"rg":"ALTA","gr":"No ruta"},{"ref":"1106894","ori":"SAN MARTÍN","des":"MARISCAL CÁCERES","trt":"ZW TRANSPORTES SOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA","placa":"T9S947","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.32,"rg":"OK","gr":"No ruta"},{"ref":"1106893","ori":"HUARAL","des":"LIMA","trt":"LEDESMA QUISPE MATIAS","placa":"B7T873","st":"En ruta","fh":"2026-08-19 12:30:00","coord":"Silvana Romani","zona":"LIMA","h":0.42,"rg":"OK","gr":"En ruta"},{"ref":"1106903","ori":"HUARAL","des":"LIMA","trt":"Grupo de Inversiones y Transportes Mendoza","placa":"D5K852","st":"Inicio Ruta","fh":"2026-08-19 12:27:13","coord":"Silvana Romani","zona":"LIMA","h":0.47,"rg":"OK","gr":"En ruta"},{"ref":"1106902","ori":"HUARAL","des":"LIMA","trt":"negocios seis srl","placa":"C6H817","st":"Confirmado","fh":"2026-08-19 13:00:00","coord":"Silvana Romani","zona":"LIMA","h":-0.08,"rg":"OK","gr":"No ruta"},{"ref":"1106904","ori":"CHICLAYO","des":"MAYNAS","trt":"EMPRESA DE TRANSPORTES LAURA EIRL","placa":"AKO800","st":"Confirmado","fh":"2026-08-19 13:00:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-0.08,"rg":"OK","gr":"No ruta"},{"ref":"1106905","ori":"CHICLAYO","des":"MOYOBAMBA","trt":"EDSA SERVICIOS LOGÍSTICOS SAC","placa":"F1J833","st":"Confirmado","fh":"2026-08-19 12:00:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":0.92,"rg":"OK","gr":"No ruta"},{"ref":"1106906","ori":"HUARAL","des":"PROV. CONST. DEL CALLAO","trt":"FONPELL TRANSPORTE S.A.C.","placa":"BXC943","st":"Confirmado","fh":"2026-08-19 14:30:00","coord":"Silvana Romani","zona":"LIMA","h":-1.58,"rg":"OK","gr":"No ruta"},{"ref":"1106908","ori":"HUARAL","des":"LIMA","trt":"Grupo de Inversiones y Transportes Mendoza","placa":"T5T925","st":"En ruta","fh":"2026-08-19 11:43:00","coord":"Silvana Romani","zona":"LIMA","h":1.21,"rg":"OK","gr":"En ruta"},{"ref":"1106909","ori":"HUARAL","des":"PROV. CONST. DEL CALLAO","trt":"Grupo de Inversiones y Transportes Mendoza","placa":"C0X843","st":"¡ALERTA DE RETRASO DE DESCARGA!","fh":"2026-08-19 12:26:00","coord":"Silvana Romani","zona":"LIMA","h":0.49,"rg":"OK","gr":"En ruta"},{"ref":"1106910","ori":"CHICLAYO","des":"MARISCAL CÁCERES","trt":"EMPRESA DE TRANSPORTES LAURA EIRL","placa":"M4C814","st":"Confirmado","fh":"2026-08-19 12:59:00","coord":"Faviola Apolinario","zona":"PROVINCIA","h":-0.06,"rg":"OK","gr":"No ruta"},{"ref":"1106915","ori":"CHICLAYO","des":"HUARAL","trt":"juan carlos peramas sanchez","placa":"B0X777","st":"Confirmado","fh":"2026-08-19 12:40:00","coord":"Walter Romero","zona":"LIMA","h":0.26,"rg":"OK","gr":"No ruta"},{"ref":"1106911","ori":"HUARAL","des":"LIMA","trt":"Grupo de Inversiones y Transportes Mendoza","placa":"A3H841","st":"En ruta","fh":"2026-08-19 11:44:00","coord":"Silvana Romani","zona":"LIMA","h":1.19,"rg":"OK","gr":"En ruta"},{"ref":"1106912","ori":"CHICLAYO","des":"HUARAL","trt":"Inversiones y transportes Marisa EIRL","placa":"T1J800","st":"Confirmado","fh":"2026-08-19 12:59:00","coord":"Walter Romero","zona":"LIMA","h":-0.06,"rg":"OK","gr":"No ruta"},{"ref":"1106914","ori":"CHICLAYO","des":"HUARAL","trt":"TRANSPORTES Y NEGOCIOS ORTIZ E.I.R.L.","placa":"APC861","st":"Confirmado","fh":"2026-08-19 12:59:00","coord":"Walter Romero","zona":"LIMA","h":-0.06,"rg":"OK","gr":"No ruta"},{"ref":"1106913","ori":"CHICLAYO","des":"HUARAL","trt":"Inversiones y transportes Marisa EIRL","placa":"AXZ910","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"LIMA","h":2.55,"rg":"MEDIA","gr":"No ruta"},{"ref":"1106917","ori":"CHICLAYO","des":"HUARAL","trt":"TRANSPORTES TAC","placa":"APX846","st":"Presenta para Carga","fh":"2026-08-19 11:49:07","coord":"Walter Romero","zona":"LIMA","h":1.1,"rg":"OK","gr":"En ruta"},{"ref":"1106935","ori":"HUARAL","des":"LIMA","trt":"Grupo de Inversiones y Transportes Mendoza","placa":"T3D899","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Silvana Romani","zona":"LIMA","h":17.02,"rg":"ALTA","gr":"No ruta"},{"ref":"1106936","ori":"CHICLAYO","des":"SULLANA","trt":"TRANS CARR.FRANK'S E.I.R.L","placa":"F2P868","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":15.45,"rg":"ALTA","gr":"No ruta"},{"ref":"1106937","ori":"CHICLAYO","des":"SULLANA","trt":"TRANS CARR.FRANK'S E.I.R.L","placa":"AXP707","st":"Inicio de Carga","fh":"2026-08-19 12:29:56","coord":"Walter Romero","zona":"PROVINCIA","h":0.42,"rg":"OK","gr":"En ruta"},{"ref":"1106939","ori":"CHICLAYO","des":"SULLANA","trt":"TRANS CARR.FRANK'S E.I.R.L","placa":"ATK739","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":17.02,"rg":"ALTA","gr":"No ruta"},{"ref":"1106938","ori":"HUARAL","des":"LIMA","trt":"Grupo de Inversiones y Transportes Mendoza","placa":"D8O744","st":"Confirmado","fh":"2026-08-19 14:50:00","coord":"Silvana Romani","zona":"LIMA","h":-1.91,"rg":"OK","gr":"No ruta"},{"ref":"1106943","ori":"CHICLAYO","des":"TUMBES","trt":"LOGISTICA INTEGRAL DE NEGOCIOS TORETO E.I.R.L.","placa":"M4C907","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":17.02,"rg":"ALTA","gr":"No ruta"},{"ref":"1106942","ori":"HUARAL","des":"LIMA","trt":"E&D CARDENAS CONTRATISTAS SAC","placa":"D7V879","st":"En ruta","fh":"2026-08-19 12:26:00","coord":"Silvana Romani","zona":"LIMA","h":0.49,"rg":"OK","gr":"En ruta"},{"ref":"1106944","ori":"CHICLAYO","des":"LIMA","trt":"CORPORACIÓN & TRANSPORTES RUTTA SAC","placa":"APJ738","st":"Confirmado","fh":"2026-08-19 13:30:00","coord":"Walter Romero","zona":"LIMA","h":-0.58,"rg":"OK","gr":"No ruta"},{"ref":"1106954","ori":"CHICLAYO","des":"CAJAMARCA","trt":"SERVICIOS GENERALES V&R SRL","placa":"ASX789","st":"Fin de Toldeo","fh":"2026-08-19 12:22:17","coord":"Walter Romero","zona":"PROVINCIA","h":0.55,"rg":"OK","gr":"En ruta"},{"ref":"1106957","ori":"CHICLAYO","des":"JAÉN","trt":"TRANS SERVIS DON JOSE EIRL","placa":"M2J910","st":"Inicio Ruta","fh":"2026-08-19 10:37:56","coord":"Faviola Apolinario","zona":"PROVINCIA","h":2.29,"rg":"MEDIA","gr":"En ruta"},{"ref":"1106958","ori":"CHICLAYO","des":"SANTA","trt":"SERVICIOS GENERALES ADJ EIRL","placa":"D7V896","st":"Confirmado","fh":"2026-08-19 13:00:00","coord":"Walter Romero","zona":"PROVINCIA","h":-0.08,"rg":"OK","gr":"No ruta"},{"ref":"1106970","ori":"CHICLAYO","des":"LIMA","trt":"CORPORACIÓN & TRANSPORTES RUTTA SAC","placa":"BDB803","st":"Confirmado","fh":"2026-08-19 13:00:00","coord":"Walter Romero","zona":"LIMA","h":-0.08,"rg":"OK","gr":"No ruta"},{"ref":"1106974","ori":"HUARAL","des":"LIMA","trt":"KELEHIMA GROUP S.A.C.","placa":"APC748","st":"En ruta","fh":"2026-08-19 12:28:00","coord":"Silvana Romani","zona":"LIMA","h":0.46,"rg":"OK","gr":"En ruta"},{"ref":"1106971","ori":"HUARAL","des":"LIMA","trt":"E&D CARDENAS CONTRATISTAS SAC","placa":"C7B804","st":"En ruta","fh":"2026-08-19 12:26:00","coord":"Silvana Romani","zona":"LIMA","h":0.49,"rg":"OK","gr":"En ruta"},{"ref":"1106972","ori":"PROV. CONST. DEL CALLAO","des":"LIMA","trt":"TRANSPORTE FLASH & RAPIDASH S.A.C.","placa":"BLV935","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Silvana Romani","zona":"LIMA","h":17.45,"rg":"ALTA","gr":"No ruta"},{"ref":"1106975","ori":"CHICLAYO","des":"LIMA","trt":"Empresa de Transporte Vigsan EIRL","placa":"ADB900","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"LIMA","h":17.02,"rg":"ALTA","gr":"No ruta"},{"ref":"1106976","ori":"PROV. CONST. DEL CALLAO","des":"LIMA","trt":"TRANSPORTE FLASH & RAPIDASH S.A.C.","placa":"VDJ774","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Silvana Romani","zona":"LIMA","h":17.45,"rg":"ALTA","gr":"No ruta"},{"ref":"1106978","ori":"HUARAL","des":"LIMA","trt":"CORPORATION LOGISTIC MALVINA SA","placa":"BNM780","st":"Inicio de Carga","fh":"2026-08-19 12:31:34","coord":"Silvana Romani","zona":"LIMA","h":0.4,"rg":"OK","gr":"En ruta"},{"ref":"1106980","ori":"CHICLAYO","des":"TRUJILLO","trt":"CORPORACION TRANS FANY S.R.L.","placa":"CEX814","st":"Confirmado","fh":"2026-08-19 12:59:00","coord":"Walter Romero","zona":"PROVINCIA","h":-0.06,"rg":"OK","gr":"No ruta"},{"ref":"1106982","ori":"CHICLAYO","des":"ASCOPE","trt":"CORPORACION TRANS FANY S.R.L.","placa":"CHS835","st":"Confirmado","fh":"2026-08-19 12:30:00","coord":"Walter Romero","zona":"PROVINCIA","h":0.42,"rg":"OK","gr":"No ruta"},{"ref":"1107007","ori":"TRUJILLO","des":"TRUJILLO","trt":"ETI COLLANTES E.I.R.L.","placa":"T3K887","st":"Inicio Ruta","fh":"2026-08-19 10:46:20","coord":"Walter Romero","zona":"PROVINCIA","h":2.15,"rg":"MEDIA","gr":"En ruta"},{"ref":"1107008","ori":"TRUJILLO","des":"TRUJILLO","trt":"ETI COLLANTES E.I.R.L.","placa":"T3K887","st":"Confirmado","fh":"2026-08-19 16:50:00","coord":"Walter Romero","zona":"PROVINCIA","h":-3.91,"rg":"OK","gr":"No ruta"},{"ref":"1107083","ori":"CORONEL PORTILLO","des":"LEONCIO PRADO","trt":"Worldpetrol sac","placa":"D0V941","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Faviola Apolinario","zona":"PROVINCIA","h":1.35,"rg":"OK","gr":"No ruta"},{"ref":"1107078","ori":"HUARAL","des":"CHINCHA","trt":"inversiones sara y lucas e.i.r.l","placa":"C9P843","st":"En espera de descargue","fh":"2026-08-19 12:11:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.74,"rg":"OK","gr":"En ruta"},{"ref":"1107081","ori":"HUARAL","des":"ICA","trt":"INVERSIONES VENTOCILLA MARTINEZ S.A.C.","placa":"BNE721","st":"En ruta","fh":"2026-08-19 11:42:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.22,"rg":"OK","gr":"En ruta"},{"ref":"1107084","ori":"HUARAL","des":"SANTA","trt":"Empresa de servicios generales Sansajul sac","placa":"BEQ926","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":0.39,"rg":"OK","gr":"No ruta"},{"ref":"1107095","ori":"HUARAL","des":"SANTA","trt":"Empresa de servicios generales Sansajul sac","placa":"BEQ848","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Walter Romero","zona":"PROVINCIA","h":0.39,"rg":"OK","gr":"No ruta"},{"ref":"1107098","ori":"HUARAL","des":"CUSCO","trt":"INVERSIONES GENERALES ANDRADA E.I.R.L","placa":"F9G716","st":"En ruta","fh":"2026-08-19 11:14:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":1.69,"rg":"OK","gr":"En ruta"},{"ref":"1107129","ori":"LIMA","des":"HUARAL","trt":"TORETO SAC","placa":"BSY932","st":"En ruta","fh":"2026-08-19 12:32:00","coord":"Silvana Romani","zona":"LIMA","h":0.39,"rg":"OK","gr":"En ruta"},{"ref":"1107134","ori":"LIMA","des":"LIMA","trt":"ARANDA PANDO DAVID ARTURO","placa":"B1T847","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"LIMA","h":2.15,"rg":"MEDIA","gr":"No ruta"},{"ref":"1107133","ori":"PROV. CONST. DEL CALLAO","des":"HUARAL","trt":"FONPELL TRANSPORTE S.A.C.","placa":"BXC943","st":"Confirmado","fh":"2026-08-19 14:30:00","coord":"Silvana Romani","zona":"LIMA","h":-1.58,"rg":"OK","gr":"No ruta"},{"ref":"1107131","ori":"LIMA","des":"HUARAL","trt":"TRANSPORTE AGUERO EIRL","placa":"F9T858","st":"Confirmado","fh":"2026-08-19 15:30:00","coord":"Silvana Romani","zona":"LIMA","h":-2.58,"rg":"OK","gr":"No ruta"},{"ref":"1107132","ori":"LIMA","des":"LIMA","trt":"VELASQUEZ AYALA ABELARDO VICTOR","placa":"D1X938","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"LIMA","h":2.15,"rg":"MEDIA","gr":"No ruta"},{"ref":"1107136","ori":"LIMA","des":"HUARAL","trt":"GRUPO SANTO TORIBIO LOGISTICA PERU SAC - GRUSTOLP SAC","placa":"CJB851","st":"Confirmado","fh":"2026-08-19 15:50:00","coord":"Silvana Romani","zona":"LIMA","h":-2.91,"rg":"OK","gr":"No ruta"},{"ref":"1107148","ori":"LIMA","des":"LIMA","trt":"ETAGPERU S.A.C.","placa":"F1E712","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Dayanna Espinoza","zona":"LIMA","h":2.15,"rg":"MEDIA","gr":"No ruta"},{"ref":"1107150","ori":"LIMA","des":"HUARAL","trt":"OPERADOR LOGISTICO MAREMOL SCRL","placa":"B4N882","st":"Confirmado","fh":"2026-08-19 16:30:00","coord":"Silvana Romani","zona":"LIMA","h":-3.58,"rg":"OK","gr":"No ruta"},{"ref":"1107195","ori":"LIMA","des":"HUAMANGA","trt":"corporacion RD","placa":"C3X938","st":"Confirmado","fh":"2026-08-20 09:00:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-20.08,"rg":"OK","gr":"No ruta"},{"ref":"1107198","ori":"LIMA","des":"HUAMANGA","trt":"corporacion RD","placa":"C3X938","st":"Confirmado","fh":"2026-08-20 11:30:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-22.58,"rg":"OK","gr":"No ruta"},{"ref":"1107199","ori":"LIMA","des":"HUAMANGA","trt":"corporacion RD","placa":"C3X938","st":"Confirmado","fh":"2026-08-19 16:40:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":-3.75,"rg":"OK","gr":"No ruta"},{"ref":"1107200","ori":"LIMA","des":"HUAMANGA","trt":"corporacion RD","placa":"C3X938","st":"Confirmado","fh":"2026-08-19 12:30:00","coord":"Katheryn Quispe","zona":"PROVINCIA","h":0.42,"rg":"OK","gr":"No ruta"},{"ref":"1107221","ori":"HUARAL","des":"LA CONVENCIÓN","trt":"TRANSPORTES JHENSS E.I.R.L.","placa":"AZY815","st":"Sin Monitoreo","fh":"(en blanco)","coord":"Katheryn Quispe","zona":"PROVINCIA","h":3.33,"rg":"MEDIA","gr":"No ruta"},{"ref":"1107279","ori":"LIMA","des":"HUARAL","trt":"CHERO SOLORZANO JONEL IVAN","placa":"C1H885","st":"En ruta","fh":"2026-08-19 11:58:00","coord":"Celina Andia","zona":"LIMA","h":0.95,"rg":"OK","gr":"En ruta"},{"ref":"1107297","ori":"CHICLAYO","des":"LIMA","trt":"Empresa de servicios generales Sansajul sac","placa":"BEQ848","st":"Confirmado","fh":"2026-08-19 13:00:00","coord":"Walter Romero","zona":"LIMA","h":-0.08,"rg":"OK","gr":"No ruta"}];
+const CORTE = "2026-08-19 12:55";
+
+/* ===== facturación OPL agosto 2026 (correo de Efletexia) ===== */
+const OPS=[
+ {op:"CRISAR LOGISTICA - TRT",pais:"Perú",viajes:1697,ub:59018.06,pct:6.22,fact:1119819.83,env:87831,noproc:96,gastos:0},
+ {op:"CRISAR ORIENTE SAC",pais:"Perú",viajes:146,ub:3103.99,pct:8.87,fact:41313.95,env:4039,noproc:30,gastos:0},
+ {op:"LOGISTICA MASTERS SAS",pais:"Colombia",viajes:462,ub:77501.06,pct:10.00,fact:637397.93,env:21638,noproc:20,gastos:34329.76},
+ {op:"Crisar Guatemala",pais:"Guatemala",viajes:190,ub:16560.93,pct:14.02,fact:131866.49,env:5796,noproc:61,gastos:2139.02},
+ {op:"SOLUCIONES LOGISTICAS DREAM TEC",pais:"México",viajes:350,ub:27489.58,pct:5.54,fact:536630.59,env:15932,noproc:0,gastos:0}
+];
+const CLIENTES=[
+ {pais:"Perú",cia:"COMERCIALIZADORA BABEL",viajes:540,ub:-3688.49,mg:-2.12},
+ {pais:"Perú",cia:"AJEPER",viajes:521,ub:19642.94,mg:6.47},
+ {pais:"Perú",cia:"COMERCIALIZADORA CODISAL",viajes:316,ub:29351.96,mg:9.97},
+ {pais:"Perú",cia:"SALEM",viajes:291,ub:10390.83,mg:7.41},
+ {pais:"Perú",cia:"AJEPER DEL ORIENTE",viajes:166,ub:6283.18,mg:9.76},
+ {pais:"Perú",cia:"PLANTA HUARAL",viajes:9,ub:141.63,mg:2.00},
+ {pais:"Colombia",cia:"AJECOLOMBIA",viajes:452,ub:77501.06,mg:10.30},
+ {pais:"Colombia",cia:"DIPEC",viajes:10,ub:0,mg:0},
+ {pais:"Guatemala",cia:"AJE GUATEMALA",viajes:190,ub:16560.93,mg:14.02},
+ {pais:"México",cia:"AJEPUE",viajes:157,ub:17035.17,mg:7.52},
+ {pais:"México",cia:"AJEMEX PTA MTY",viajes:103,ub:2704.31,mg:1.66},
+ {pais:"México",cia:"AJEVHS",viajes:70,ub:6630.13,mg:8.94},
+ {pais:"México",cia:"AJECHI",viajes:20,ub:1119.97,mg:6.33}
+];
+const TRTF=[
+ {pais:"Perú",n:"EMPRESA DE TRANSPORTES PATY SCRL",v:19,ub:1062.72,mg:2.50,f:50088.89},
+ {pais:"Perú",n:"Empresa de Transporte Vigsan EIRL",v:22,ub:1116.84,mg:3.42,f:38559.14},
+ {pais:"Perú",n:"FESELL DISTRIBUIDORA S.A.C.",v:24,ub:-1352.29,mg:-4.24,f:37598.92},
+ {pais:"Perú",n:"Inversiones y transportes Marisa EIRL",v:30,ub:-444.50,mg:-1.57,f:32754.86},
+ {pais:"Perú",n:"TRANSPORTE AGUERO EIRL",v:87,ub:686.24,mg:3.20,f:25283.58},
+ {pais:"Perú",n:"Sansajul SAC",v:24,ub:2200.44,mg:10.69,f:24285.04},
+ {pais:"Perú",n:"TRANSPORTES SERVICIOS OSPINA E.I.R.L",v:19,ub:3999.38,mg:20.47,f:23049.93},
+ {pais:"Perú",n:"CORPORACION TRANS FANY S.R.L.",v:21,ub:3383.74,mg:17.64,f:22635.90},
+ {pais:"Perú",n:"GRUPO SANTO TORIBIO - GRUSTOLP SAC",v:62,ub:1199.98,mg:6.85,f:20678.71},
+ {pais:"Perú",n:"IDONES INVERSIONES S.A.",v:16,ub:-2024.84,mg:-45.25,f:5280.18},
+ {pais:"Perú",n:"INVERSIONES MONTLEI GROUP S.A.C.",v:14,ub:-1103.60,mg:-28.73,f:4533.22},
+ {pais:"Colombia",n:"MPC ORTIZ LOGISTICA Y TRANSPORTE SAS",v:10,ub:1640.22,mg:11.32,f:14263.97},
+ {pais:"Colombia",n:"TRANSPORTADORA MULTIGLOBAL SAS",v:8,ub:1594.52,mg:11.03,f:14228.04},
+ {pais:"Colombia",n:"PEDRO YESID MIRANDA LANCHEROS",v:5,ub:974.81,mg:8.38,f:11443.10},
+ {pais:"Colombia",n:"SINDY LILIANA LOPEZ LOPEZ",v:5,ub:1234.50,mg:11.09,f:10952.14},
+ {pais:"Colombia",n:"YIMMY ALEXANDER PEÑA SIERRA",v:13,ub:1327.40,mg:12.94,f:10096.40},
+ {pais:"Colombia",n:"WILMAR ALBERTO TABARES GALLEGO",v:7,ub:1119.51,mg:11.40,f:9662.42},
+ {pais:"Colombia",n:"DIANA PAOLA CRUZ CRUZ",v:4,ub:1293.89,mg:14.47,f:8794.69},
+ {pais:"Colombia",n:"DIANA SOFIA VIEDA AGUDELO",v:4,ub:811.53,mg:9.46,f:8444.78},
+ {pais:"Colombia",n:"INVERSIONES LCD SAS",v:3,ub:-415.94,mg:-7.54,f:5491.61},
+ {pais:"Colombia",n:"INVERSIONES 750 SAS",v:2,ub:-217.05,mg:-6.03,f:3561.09},
+ {pais:"Guatemala",n:"Transportes Juan José",v:15,ub:1832.18,mg:8.94,f:22950.00},
+ {pais:"Guatemala",n:"Transporte Carmo",v:18,ub:2835.17,mg:18.66,f:16319.51},
+ {pais:"Guatemala",n:"Alejandro Jose Oliva Cordero",v:10,ub:1607.15,mg:11.39,f:15800.00},
+ {pais:"Guatemala",n:"KRESCO DE CENTROAMERICA",v:8,ub:2178.56,mg:21.90,f:11140.00},
+ {pais:"Guatemala",n:"RYB",v:19,ub:808.34,mg:11.30,f:8003.73},
+ {pais:"Guatemala",n:"TAPA S.A",v:13,ub:923.11,mg:15.44,f:6596.99},
+ {pais:"México",n:"ANGEL VAZQUEZ VARGAS",v:26,ub:6906.91,mg:10.31,f:75045.14},
+ {pais:"México",n:"EXSA SA DE CV",v:10,ub:58.41,mg:0.14,f:46449.14},
+ {pais:"México",n:"ERICK DANIEL RENDON ROBLES",v:21,ub:1739.99,mg:4.60,f:42357.01},
+ {pais:"México",n:"ALEJANDRA AMBROCIO ZETINA",v:44,ub:3535.72,mg:9.45,f:41900.79},
+ {pais:"México",n:"TRANSPORTES CHAVEZ",v:17,ub:338.80,mg:1.48,f:25703.41},
+ {pais:"México",n:"Transporte Gove Internacional",v:14,ub:549.79,mg:2.57,f:23887.06},
+ {pais:"México",n:"KARINA TELLEZ HERNANDEZ",v:34,ub:1275.91,mg:8.22,f:17404.76},
+ {pais:"México",n:"MARIA DE JESUS VAZQUEZ GARCIA",v:22,ub:1348.44,mg:8.88,f:17034.34}
+];
+
+const CIAS={};
+CLIENTES.forEach(c=>{(CIAS[c.pais]=CIAS[c.pais]||[]).push(c.cia)});
+
+const PROY=[
+ {n:"Fletexia BI (esta app)",resp:"Roxana",ini:"RG",pais:"Todos",est:["curso","Maqueta"],act:"Hoy",dias:0},
+ {n:"Hitos y rutas Perú",resp:"Javier",ini:"JS",pais:"Perú",est:["tarde","Atrasado"],act:"Hace 6 días",dias:6},
+ {n:"Integración GPS Colombia",resp:"Javier",ini:"JS",pais:"Colombia",est:["curso","En pruebas"],act:"Ayer",dias:1},
+ {n:"Reportería Bix",resp:"Diego",ini:"DR",pais:"Colombia",est:["ok","Aprobado"],act:"Ayer",dias:1},
+ {n:"Automatizar KPIs de Daniela",resp:"Diego",ini:"DR",pais:"Colombia",est:["espera","Por definir"],act:"Hace 9 días",dias:9},
+ {n:"Bot de WhatsApp",resp:"Eric",ini:"EN",pais:"Todos",est:["ok","En producción"],act:"Hace 2 días",dias:2},
+ {n:"Georreferenciación de clientes",resp:"Diego",ini:"DR",pais:"México",est:["curso","En curso"],act:"Hoy",dias:0},
+ {n:"Solución Sefu",resp:"Roxana",ini:"RG",pais:"Perú",est:["curso","En pruebas"],act:"Hoy",dias:0}
+];
+
+/* ===== clasificación de estados ===== */
+const CULM=['Llegada a Destino','Inicio Descargue','En Proceso de Descargue','Confirmación Inicio Descargue','En espera de descargue'];
+const RUTA=['En ruta','Inicio Ruta','En Resguardo','PARADA POR DESCANSO','Parada por Otros','Falla Mecánica'];
+const DESV=['¡ALERTA DE RETRASO DE CARGA!','¡ALERTA DE RETRASO DE DESCARGA!'];
+function clase(r){
+  if(r.st==='Sin Monitoreo')return 'sinact';
+  if(DESV.includes(r.st))return 'desv';
+  if(CULM.includes(r.st))return 'culm';
+  if(RUTA.includes(r.st))return 'ruta';
+  return 'pend';
+}
+const ETQ={culm:['Culminada','ok','var(--verde)'],ruta:['En ruta','curso','var(--azul)'],
+  pend:['Pendiente','espera','var(--ambar)'],desv:['Con desviación','tarde','var(--rojo)'],
+  sinact:['Sin actualización','sinm','var(--lila)']};
+
+const TOPE=5;                       /* horas: tope realista de una referencia viva */
+const activo=r=>r.h<=TOPE;
+let perfil='total';  /* por ahora solo el perfil de Marco */
+let fPais='Todos', fCia='Todas', fEstado='todos', verTodo=false;
+
+/* ===== sesión ===== */
+function entrar(p){
+  perfil=p;
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').classList.add('on');
+  aplicarPerfil();
+}
+function salir(){
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('login').style.display='block';
+}
+function aplicarPerfil(){
+  fPais='Todos'; fCia='Todas';
+  document.getElementById('saludo').textContent='Hola, Marcos';
+  document.getElementById('perfilNombre').textContent='Marcos Fidel';
+  document.getElementById('perfilRol').textContent='Acceso total · todos los países';
+  document.getElementById('pfMod').textContent='Todos';
+  document.getElementById('avatar').textContent='MF';
+  llenarPais(); llenarCia(); render();
+  buscar(mon()[0]?mon()[0].ref:'');   /* precarga silenciosa */
+  ir('inicio');                        /* la app siempre abre en la casita */
+}
+
+/* ===== filtros ===== */
+function llenarPais(){
+  const s=document.getElementById('selPais');
+  const opts=(perfil==='total')?['Todos',...Object.keys(CIAS)]:[fPais];
+  s.innerHTML=opts.map(o=>`<option${o===fPais?' selected':''}>${o}</option>`).join('');
+}
+function llenarCia(){
+  const s=document.getElementById('selCia');
+  let lista = fPais==='Todos' ? CLIENTES.map(c=>c.cia) : (CIAS[fPais]||[]);
+  if(perfil==='cliente') lista=['AJECOLOMBIA'];
+  if(!lista.includes(fCia)) fCia='Todas';
+  const opts=(perfil==='cliente')?['AJECOLOMBIA']:['Todas',...lista];
+  s.innerHTML=opts.map(o=>`<option${o===fCia?' selected':''}>${o}</option>`).join('');
+  fCia=s.value;
+}
+function cambioPais(){ fPais=document.getElementById('selPais').value; fCia='Todas'; llenarCia(); render(); }
+function limpiar(){ if(perfil==='total')fPais='Todos'; fCia='Todas'; llenarPais(); llenarCia(); render(); }
+function render(){
+  fPais=document.getElementById('selPais').value;
+  fCia=document.getElementById('selCia').value;
+  document.getElementById('chipPais').classList.toggle('act',fPais!=='Todos');
+  document.getElementById('chipCia').classList.toggle('act',fCia!=='Todas');
+  const ctx=(fPais==='Todos'?'Todos los países':fPais)+' · '+(fCia==='Todas'?'todas las compañías':fCia);
+  ['ctxInicio','ctxAlertas','ctxTorre','ctxFact','ctxCob'].forEach(id=>document.getElementById(id).textContent=ctx);
+  document.getElementById('pfPais').textContent=fPais;
+  document.getElementById('pfCia').textContent=fCia;
+  pintarInicio(); accesos(); pintarAlertas(); pintarTorre(); pintarFact(); pintarCob(); pintarTotal();
+}
+/* el tablero de monitoreo solo llega de Perú y no trae cliente */
+const hayMon=()=>(fPais==='Todos'||fPais==='Perú');
+const mon=()=>hayMon()?MON:[];
+const okPais=o=>fPais==='Todos'||o.pais===fPais;
+const okCia=o=>fCia==='Todas'||o.cia===fCia;
+
+/* ===== utilidades ===== */
+const fmtH=h=>{const a=Math.abs(h);const H=Math.floor(a);const M=Math.round((a-H)*60);return (h<0?'-':'')+(H?H+' h ':'')+M+' m';};
+const hora=f=>f.slice(11,16);
+const dia=f=>f.slice(8,10)+'/'+f.slice(5,7);
+const usd=n=>(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('es',{maximumFractionDigits:0});
+const cap=s=>s.length>26?s.slice(0,25)+'…':s;
+const vacio=t=>`<div style="text-align:center;color:var(--gris);font-size:12.5px;padding:20px 0">${t}</div>`;
+const sinMon=`<div class="empty"><b>Sin tablero de monitoreo</b><p>El reporte de Torre de Control hoy solo llega de Perú. Para los demás países habría que integrarlo.</p></div>`;
+
+/* ===== INICIO ===== */
+function pintarInicio(){}
+function fila(r){
+  const [txt,cl]=ETQ[clase(r)];
+  return `<div class="row" onclick="buscar('${r.ref}')">
+    <span class="grow"><span class="t mono">${r.ref}</span><span class="s">${r.ori} → ${r.des} · ${cap(r.trt)}</span></span>
+    <span class="r"><span class="pill ${cl}">${txt}</span><span class="s mono" style="color:${r.rg==='ALTA'?'var(--rojo)':r.rg==='MEDIA'?'var(--ambar)':'var(--gris)'}">${r.h>0?fmtH(r.h):'al día'}</span></span></div>`;
+}
+
+function accesos(){
+  const nAl=alertas().length;
+  const it=[
+    ['Seguimiento por referencia','Línea de tiempo de un viaje',"ir('rastreo')",''],
+    ['Alertas de Torre de Control','Retrasos de carga y descarga',"ir('alertas')",nAl?nAl+' activas':''],
+    ['Reporte de Torre de Control','Estados, orígenes y coordinadores',"ir('torre')",''],
+    ['Facturación OPL','Utilidad por operación y cliente',"ir('fact')",''],
+    ['Cobertura de flota','Flota propia contra terceros',"ir('cob')",''],
+    ['eFletexia Total','Proyectos y sus enlaces',"ir('total')",''],
+    ['Tu cuenta','Perfil y accesos',"ir('perfil')",'']
+  ];
+  document.getElementById('listaAccesos').innerHTML=it.map(([t,sb,fn,tag])=>
+    `<div class="row" onclick="${fn}"><span class="grow"><span class="t">${t}</span><span class="s">${sb}</span></span>
+     <span class="r">${tag?`<span class="pill tarde">${tag}</span>`:''}<span class="s" style="color:var(--naranja);font-size:15px">›</span></span></div>`).join('');
+}
+
+/* ===== ALERTAS (referencias con alerta activa en Torre de Control) ===== */
+/* datos extra que hoy solo están en la plataforma de TC */
+const TC={
+ "1106058":{titulo:"DESPACHO PT MAXD - MAKRO SJLUT (CON GPS) REQUIERE UN AUXILIAR PARA VALIDAR MERCADERIA, RETORNO PALLETS",
+   operador:"GABRIEL ARIAS",tel:"910684323",fase:"¡ALERTA DE RETRASO DE DESCARGA!",evento:"Inicio de Descarga",
+   oriCli:"COMERCIALIZADORA BABEL S.A.C. (MAXO)",oriComp:"19/08/2026 10:45",
+   desCli:"SUPERMERCADOS PERUANOS S.A.",desComp:"18/08/2026 07:00"}
+};
+function alertas(){
+  if(!hayMon())return [];
+  const l=MON.filter(r=>r.st.includes('ALERTA'));
+  const extra=MON.filter(r=>TC[r.ref]&&!l.includes(r));
+  return [...extra,...l];
+}
+function faseDe(r){ return TC[r.ref]?TC[r.ref].fase : r.st; }
+function eventoDe(r){
+  if(TC[r.ref])return TC[r.ref].evento;
+  return faseDe(r).includes('DESCARGA')?'Inicio de Descarga':'Inicio de Carga';
+}
+function pintarAlertas(){
+  const box=document.getElementById('alertasBox');
+  if(!hayMon()){box.innerHTML=sinMon;return;}
+  const a=alertas();
+  if(!a.length){box.innerHTML=`<div class="empty"><b>Sin alertas activas</b><p>Ninguna referencia tiene alerta en Torre de Control en este corte.</p></div>`;return;}
+  const carga=a.filter(r=>faseDe(r).includes('CARGA')&&!faseDe(r).includes('DESCARGA')).length;
+  const desc=a.filter(r=>faseDe(r).includes('DESCARGA')).length;
+  box.innerHTML=`
+  <dl class="kpis" style="margin-top:14px">
+    <div class="kpi alert"><dt>Alertas activas</dt><dd>${a.length}</dd><small>Corte ${CORTE}</small></div>
+    <div class="kpi warn"><dt>Carga / descarga</dt><dd>${carga} / ${desc}</dd><small>Por tipo de retraso</small></div>
+  </dl>
+  ${a.map(cardAlerta).join('')}`;
+}
+function cardAlerta(r){
+  const t=TC[r.ref]||{};
+  const dash='<span style="color:var(--gris2)">--/--/--</span>';
+  return `<div class="card">
+    <div class="card-t"><h3 class="mono" style="font-size:16px">${r.ref}</h3>
+      <span class="flag">${r.placa}</span>
+      <span class="note"></span></div>
+    <div class="fase">${faseDe(r)}</div>
+    ${t.titulo?`<div class="titulo">${t.titulo}</div>`:''}
+    <dl class="meta" style="margin-top:14px">
+      <div><dt>Despachador</dt><dd>${r.coord}</dd></div>
+      <div><dt>Operador</dt><dd>${t.operador||'—'}${t.tel?'<br>'+t.tel:''}</dd></div>
+      <div style="grid-column:1/-1"><dt>TRT</dt><dd>${r.trt}</dd></div>
+    </dl>
+    <div class="tramo">
+      <div class="tr-h">Origen · ${r.ori}</div>
+      <div class="tr-cli">${t.oriCli||'—'}</div>
+      <div class="tr-g"><span><b>Compromiso</b>${t.oriComp||'—'}</span><span><b>Arribo</b>${dash}</span><span><b>Ingreso</b>${dash}</span><span><b>Salida</b>${dash}</span></div>
+    </div>
+    <div class="tramo dest">
+      <div class="tr-h">Destino · ${r.des}</div>
+      <div class="tr-cli">${t.desCli||'—'}</div>
+      <div class="tr-g"><span><b>Compromiso</b>${t.desComp||'—'}</span><span><b>Arribo</b>${dash}</span><span><b>Ingreso</b>${dash}</span><span><b>Salida</b>${dash}</span></div>
+    </div>
+  </div>`;
+}
+/* ===== REPORTE 1: TORRE DE CONTROL ===== */
+function filtroEstado(k){ fEstado=k; verTodo=false; pintarTorre(); }
+function verMas(){ verTodo=true; pintarTorre(); }
+function donut(segs,total){
+  const R=52,C=2*Math.PI*R;let off=0;
+  const arcs=segs.filter(s=>s.v>0).map(s=>{
+    const len=C*s.v/total;const el=`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${s.c}" stroke-width="15"
+      stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
+    off+=len;return el;}).join('');
+  return `<svg class="donut" width="120" height="120" viewBox="0 0 120 120">
+    <circle cx="60" cy="60" r="${R}" fill="none" stroke="#1E1E25" stroke-width="15"/>${arcs}
+    <text x="60" y="57" text-anchor="middle" fill="#F2F2F4" font-family="Sora" font-weight="700" font-size="24">${total}</text>
+    <text x="60" y="74" text-anchor="middle" fill="#8A8A96" font-size="10">referencias</text></svg>`;
+}
+function gauge(pct,val,lb,meta){
+  const R=46,C=Math.PI*R,len=C*Math.min(pct,1);
+  return `<div class="gauge"><svg width="140" height="82" viewBox="0 0 120 70">
+    <path d="M8 60 A52 52 0 0 1 112 60" fill="none" stroke="#1E1E25" stroke-width="11" stroke-linecap="round"/>
+    <path d="M14 60 A46 46 0 0 1 106 60" fill="none" stroke="${pct<=1?'var(--verde)':'var(--rojo)'}" stroke-width="11" stroke-linecap="round"
+      stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}"/></svg>
+    <div class="val">${val}</div><div class="lb">${lb}</div>
+    ${meta?`<div class="lb" style="margin-top:6px">${meta}</div>`:''}</div>`;
+}
+function pintarTorre(){
+  const box=document.getElementById('repTorre');
+  const rs=mon();
+  if(!rs.length){box.innerHTML=sinMon;return;}
+  const g=k=>rs.filter(r=>clase(r)===k);
+  const segs=[
+    {k:'culm',v:g('culm').length,c:'var(--verde)'},
+    {k:'ruta',v:g('ruta').length,c:'var(--azul)'},
+    {k:'pend',v:g('pend').length,c:'var(--ambar)'},
+    {k:'desv',v:g('desv').length,c:'var(--rojo)'},
+    {k:'sinact',v:g('sinact').length,c:'var(--lila)'}
+  ];
+  const T=rs.length;
+  const pc=n=>(n*100/T).toFixed(1)+'%';
+  /* origen */
+  const byOri={};rs.forEach(r=>byOri[r.ori]=(byOri[r.ori]||0)+1);
+  const oris=Object.entries(byOri).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxOri=oris[0][1];
+  /* coordinadores */
+  const byC={};rs.forEach(r=>{const c=byC[r.coord]=byC[r.coord]||{n:0,a:0,s:0};c.n++;if(r.rg==='ALTA')c.a++;if(clase(r)==='sinact')c.s++;});
+  const coords=Object.entries(byC).sort((a,b)=>b[1].n-a[1].n);
+  /* tiempo promedio */
+  const pos=rs.filter(r=>r.h>0&&activo(r)).map(r=>r.h);
+  const prom=pos.reduce((s,x)=>s+x,0)/pos.length;
+  /* detalle */
+  let det=rs.slice();
+  if(fEstado!=='todos')det=det.filter(r=>clase(r)===fEstado);
+  det.sort((a,b)=>(activo(b)-activo(a))||b.h-a.h);
+  const most=verTodo?det.slice(0,40):det.slice(0,8);
+
+  box.innerHTML=`
+  <dl class="kpis" style="margin-top:14px">
+    <div class="kpi info"><dt>Referencias totales</dt><dd>${T}</dd><small>100% del total</small></div>
+    <div class="kpi good"><dt>Culminadas</dt><dd>${segs[0].v}</dd><small>${pc(segs[0].v)} del total</small></div>
+    <div class="kpi"><dt>En ruta</dt><dd>${segs[1].v}</dd><small>${pc(segs[1].v)} del total</small></div>
+    <div class="kpi warn"><dt>Pendientes</dt><dd>${segs[2].v}</dd><small>${pc(segs[2].v)} del total</small></div>
+    <div class="kpi alert"><dt>Con desviación</dt><dd>${segs[3].v}</dd><small>${pc(segs[3].v)} del total</small></div>
+    <div class="kpi lila"><dt>Sin actualización</dt><dd>${segs[4].v}</dd><small>${pc(segs[4].v)} del total</small></div>
+  </dl>
+
+  <div class="card">
+    <div class="card-t"><h3>Distribución por estado</h3></div>
+    <div class="donut-wrap">${donut(segs,T)}
+      <div class="leg">${segs.map(s=>`<div><i style="background:${s.c}"></i>${ETQ[s.k][0]}<b>${s.v}</b><span class="pc">${pc(s.v)}</span></div>`).join('')}</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Referencias por origen</h3><span class="note">Top 6</span></div>
+    ${oris.map(([n,v])=>`<div class="row"><span class="grow"><span class="t">${n}</span>
+      <div class="bar"><i class="a" style="width:${v*100/maxOri}%"></i></div></span>
+      <span class="r mono" style="font-size:12.5px">${v} <span style="color:var(--gris2)">(${pc(v)})</span></span></div>`).join('')}
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Tiempo promedio de actualización</h3></div>
+    ${gauge(prom/TOPE,fmtH(prom),'Promedio de las referencias vivas','')}
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Detalle de referencias</h3><span class="note">${det.length}</span></div>
+    <div class="chips" style="margin:0 0 12px">
+      ${['todos','culm','ruta','pend','desv','sinact'].map(k=>
+        `<button class="chip plain ${fEstado===k?'on':''}" onclick="filtroEstado('${k}')">${k==='todos'?'Todos':ETQ[k][0]}</button>`).join('')}
+    </div>
+    ${most.length?most.map(r=>{
+      const [txt,cl]=ETQ[clase(r)];
+      return `<div class="row" onclick="buscar('${r.ref}')">
+        <span class="grow"><span class="t mono">${r.ref} <span class="flag">${r.placa}</span></span>
+        <span class="s">${r.ori} → ${r.des}</span>
+        <span class="s">${cap(r.trt)} · ${r.coord}</span></span>
+        <span class="r"><span class="pill ${cl}">${txt}</span>
+        <span class="s mono">${dia(r.fh)} ${hora(r.fh)}</span>
+        <span class="s mono" style="color:${r.rg==='ALTA'?'var(--rojo)':r.rg==='MEDIA'?'var(--ambar)':'var(--gris2)'}">${r.h>0?'+'+fmtH(r.h):'—'}</span></span></div>`;
+    }).join(''):vacio('Sin referencias en ese estado.')}
+    ${!verTodo&&det.length>8?`<button class="more" onclick="verMas()">Ver más (${det.length-8})</button>`:''}
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Carga por coordinador</h3><span class="note">Referencias · vencidas</span></div>
+    ${coords.map(([n,c])=>`<div class="row"><span class="av">${n.split(' ').map(x=>x[0]).join('').slice(0,2)}</span>
+      <span class="grow"><span class="t">${n}</span>
+      <div class="bar"><i class="${c.a/c.n>.2?'r':c.a?'':'v'}" style="width:${100-c.a*100/c.n}%"></i></div>
+      <span class="s">${c.a} vencidas · ${c.s} sin monitoreo</span></span>
+      <span class="r mono" style="font-size:12.5px">${c.n}</span></div>`).join('')}
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Resumen del día</h3><span class="note">Corte ${CORTE}</span></div>
+    <div class="row"><span class="grow"><span class="t">Referencias monitoreadas</span></span><span class="r mono" style="font-size:12.5px">${T}</span></div>
+    <div class="row"><span class="grow"><span class="t">En rango OK</span></span><span class="r mono" style="font-size:12.5px;color:var(--verde)">${rs.filter(r=>r.rg==='OK').length}</span></div>
+    <div class="row"><span class="grow"><span class="t">Zona Lima / provincia</span></span><span class="r mono" style="font-size:12.5px">${rs.filter(r=>r.zona==='LIMA').length} / ${rs.filter(r=>r.zona==='PROVINCIA').length}</span></div>
+    <div class="row"><span class="grow"><span class="t">Más antigua entre las vivas</span></span><span class="r mono" style="font-size:12.5px;color:var(--rojo)">${fmtH(Math.max(...rs.filter(activo).map(r=>r.h)))}</span></div>
+    <div class="row"><span class="grow"><span class="t">Abiertas de días anteriores</span><span class="s">Más de ${TOPE} h · a depurar</span></span><span class="r mono" style="font-size:12.5px;color:var(--lila)">${rs.filter(r=>!activo(r)).length}</span></div>
+  </div>
+  <div class="nota">Este tablero no trae el cliente en cada referencia, por eso el filtro de compañía no lo afecta. Valdría la pena pedir ese campo a Torre de Control.</div>`;
+}
+
+/* ===== REPORTE 2: FACTURACIÓN OPL ===== */
+function pintarFact(){
+  const ops=OPS.filter(okPais);
+  const cls=CLIENTES.filter(o=>okPais(o)&&okCia(o));
+  const trs=TRTF.filter(okPais).sort((a,b)=>b.v-a.v).slice(0,6);
+  const box=document.getElementById('repFact');
+  if(!ops.length){box.innerHTML=vacio('Sin operaciones con este filtro.');return;}
+  const base = fCia==='Todas' ? ops : cls;
+  const viajes=base.reduce((s,x)=>s+x.viajes,0);
+  const ub=base.reduce((s,x)=>s+x.ub,0);
+  const fact=ops.reduce((s,x)=>s+x.fact,0);
+  const gastos=ops.reduce((s,x)=>s+x.gastos,0);
+  const env=ops.reduce((s,x)=>s+x.env,0);
+  const nop=ops.reduce((s,x)=>s+x.noproc,0);
+  const maxUb=Math.max(...cls.map(c=>Math.abs(c.ub)),1);
+  box.innerHTML=`
+  <dl class="kpis" style="margin-top:14px">
+    <div class="kpi"><dt>Viajes del mes</dt><dd>${viajes.toLocaleString('es')}</dd><small>${ops.length} operación${ops.length>1?'es':''}</small></div>
+    <div class="kpi ${ub>=0?'good':'alert'}"><dt>Utilidad bruta</dt><dd>${usd(ub)}</dd><small>USD</small></div>
+    <div class="kpi info"><dt>Total a facturar</dt><dd>${usd(fact)}</dd><small>USD · sin filtro de compañía</small></div>
+    <div class="kpi ${nop?'warn':'good'}"><dt>Envíos no procesados</dt><dd>${nop}</dd><small>de ${env.toLocaleString('es')} envíos</small></div>
+  </dl>
+  ${gastos?`<div class="nota">Gastos del mes por ${usd(gastos)} USD (servidores, contabilidad, renta). Colombia queda con utilidad neta de $32,669 frente a $77,501 de bruta.</div>`:''}
+
+  <div class="card">
+    <div class="card-t"><h3>Por operación</h3><span class="note">Agosto 2026</span></div>
+    ${ops.map(o=>`<div class="row"><span class="grow"><span class="t">${cap(o.op)} <span class="flag">${o.pais}</span></span>
+      <span class="s">${o.viajes.toLocaleString('es')} viajes · margen ${o.pct.toFixed(2)}%</span></span>
+      <span class="r"><span class="t mono">${usd(o.ub)}</span><span class="s">${usd(o.fact)} facturado</span></span></div>`).join('')}
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Por cliente</h3><span class="note">Utilidad bruta USD</span></div>
+    ${cls.length?cls.sort((a,b)=>b.viajes-a.viajes).map(c=>`<div class="row"><span class="grow">
+      <span class="t">${cap(c.cia)} <span class="flag">${c.pais}</span></span>
+      <div class="bar"><i class="${c.ub<0?'r':c.mg>=8?'v':''}" style="width:${Math.abs(c.ub)*100/maxUb}%"></i></div>
+      <span class="s">${c.viajes} viajes · margen ${c.mg.toFixed(2)}%</span></span>
+      <span class="r mono" style="font-size:12.5px;color:${c.ub<0?'var(--rojo)':'var(--texto)'}">${usd(c.ub)}</span></div>`).join(''):vacio('Sin clientes con este filtro.')}
+    ${cls.some(c=>c.ub<0)?'<div class="nota" style="margin-top:12px">BABEL cierra el mes en negativo: 540 viajes con margen de −2.12%. Es el cliente con más volumen de Perú.</div>':''}
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Transportistas del mes</h3><span class="note">Por viajes</span></div>
+    ${trs.length?trs.map(t=>`<div class="row"><span class="grow"><span class="t">${cap(t.n)} <span class="flag">${t.pais}</span></span>
+      <div class="bar"><i class="${t.mg>=8?'v':t.mg<3?'r':''}" style="width:${Math.min(t.mg*5,100)}%"></i></div>
+      <span class="s">margen ${t.mg.toFixed(2)}%</span></span>
+      <span class="r"><span class="t mono">${t.v}</span><span class="s">${usd(t.ub)}</span></span></div>`).join(''):vacio('Sin transportistas con este filtro.')}
+  </div>`;
+}
+
+/* ===== REPORTE 3: COBERTURA DE FLOTA OPL ===== */
+const COB = {"generado":"19/08/2026 10:02","meses":["2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08"],"paises":["Guatemala","México"],"evol":[{"pais":"Guatemala","mes":"2026-01","v":2420,"p":315,"ef":2103,"tp":137894.8,"to":809477.5,"cp":137894.8,"co":809477.5},{"pais":"Guatemala","mes":"2026-02","v":2288,"p":571,"ef":2255,"tp":211224.4,"to":656088.7,"cp":211224.4,"co":656088.7},{"pais":"Guatemala","mes":"2026-03","v":2650,"p":633,"ef":2649,"tp":370922.7,"to":754118.7,"cp":370922.7,"co":754118.7},{"pais":"Guatemala","mes":"2026-04","v":2583,"p":674,"ef":2578,"tp":552462.0,"to":875493.0,"cp":552462.0,"co":875493.0},{"pais":"Guatemala","mes":"2026-05","v":2997,"p":1082,"ef":2995,"tp":1242473.5,"to":1047440.7,"cp":1242473.5,"co":1047440.7},{"pais":"Guatemala","mes":"2026-06","v":2808,"p":734,"ef":2806,"tp":619553.3,"to":960456.6,"cp":619553.3,"co":960456.6},{"pais":"Guatemala","mes":"2026-07","v":2941,"p":650,"ef":2892,"tp":467466.0,"to":980825.0,"cp":467466.0,"co":980825.0},{"pais":"Guatemala","mes":"2026-08","v":1543,"p":326,"ef":1543,"tp":246634.6,"to":520125.7,"cp":246634.6,"co":520125.7},{"pais":"México","mes":"2026-01","v":1881,"p":768,"ef":1786,"tp":779143.8,"to":930242.0,"cp":857003.6,"co":972501.2},{"pais":"México","mes":"2026-02","v":1733,"p":719,"ef":1718,"tp":694481.9,"to":873390.6,"cp":731878.7,"co":894968.0},{"pais":"México","mes":"2026-03","v":2085,"p":806,"ef":2030,"tp":786454.4,"to":1067127.0,"cp":825293.8,"co":1101611.6},{"pais":"México","mes":"2026-04","v":2227,"p":842,"ef":2062,"tp":929408.5,"to":1205175.4,"cp":988461.5,"co":1239655.1},{"pais":"México","mes":"2026-05","v":2507,"p":875,"ef":2202,"tp":905487.1,"to":1475121.4,"cp":950380.9,"co":1511435.4},{"pais":"México","mes":"2026-06","v":2118,"p":747,"ef":2002,"tp":947013.5,"to":1146754.9,"cp":999580.0,"co":1189532.4},{"pais":"México","mes":"2026-07","v":2338,"p":947,"ef":2042,"tp":938063.6,"to":1126663.5,"cp":989444.4,"co":1155748.7},{"pais":"México","mes":"2026-08","v":1366,"p":570,"ef":1134,"tp":680188.6,"to":652245.5,"cp":713595.6,"co":661305.8}],"tot":[{"pais":"Guatemala","v":20230,"p":4985,"ef":19821,"tp":3848631.3,"to":6604025.9,"cp":3848631.3,"co":6604025.9,"tra":72,"trap":1},{"pais":"México","v":16255,"p":6274,"ef":14976,"tp":6660241.4,"to":8476720.3,"cp":7055638.5,"co":8726758.2,"tra":124,"trap":1}],"dim":{"ori":[{"pais":"Guatemala","n":"PLANTA AMATITLAN - BEBIDAS","v":11410,"p":3617,"ef":0,"tp":3092842.0,"to":2898921.0,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"CEDI AMATITLAN","v":7616,"p":1342,"ef":0,"tp":742293.1,"to":3363747.2,"cp":0.0,"co":0.0},{"pais":"México","n":"PLANTA PUEBLA","v":6873,"p":1969,"ef":0,"tp":2679112.6,"to":4366411.0,"cp":0.0,"co":0.0},{"pais":"México","n":"CENTRO DE CONSOLIDACION PUEBLA","v":2795,"p":285,"ef":0,"tp":248269.5,"to":2205506.5,"cp":0.0,"co":0.0},{"pais":"México","n":"PLANTA MONTERREY MAQUILA","v":2540,"p":1429,"ef":0,"tp":1363168.9,"to":860129.5,"cp":0.0,"co":0.0},{"pais":"México","n":"PLANTA VILLAHERMOSA MAQUILA","v":1792,"p":976,"ef":0,"tp":1115378.7,"to":749180.8,"cp":0.0,"co":0.0},{"pais":"México","n":"EL MOLINETE","v":1128,"p":873,"ef":0,"tp":650616.3,"to":103959.2,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"AJEMAYA SUCURSAL QUETZALTENANGO","v":944,"p":26,"ef":0,"tp":13496.2,"to":326506.5,"cp":0.0,"co":0.0},{"pais":"México","n":"MAQUILA REFRESCOS UNION","v":360,"p":357,"ef":0,"tp":328020.6,"to":2715.1,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"VILLA NUEVA","v":260,"p":0,"ef":0,"tp":0.0,"to":14851.2,"cp":0.0,"co":0.0},{"pais":"México","n":"CHIHUAHUA 2","v":230,"p":229,"ef":0,"tp":200027.2,"to":1553.3,"cp":0.0,"co":0.0},{"pais":"México","n":"MAQUILA JUNGLE GROUP","v":194,"p":35,"ef":0,"tp":21002.5,"to":100728.8,"cp":0.0,"co":0.0},{"pais":"México","n":"TIJUANA","v":151,"p":0,"ef":0,"tp":0.0,"to":69879.6,"cp":0.0,"co":0.0},{"pais":"México","n":"CIUDAD JUAREZ","v":50,"p":6,"ef":0,"tp":12059.4,"to":8242.1,"cp":0.0,"co":0.0},{"pais":"México","n":"MERIDA","v":32,"p":9,"ef":0,"tp":4761.1,"to":7509.7,"cp":0.0,"co":0.0},{"pais":"México","n":"ECATEPEC 2","v":30,"p":30,"ef":0,"tp":14045.6,"to":0.0,"cp":0.0,"co":0.0},{"pais":"México","n":"LOS REYES LA PAZ","v":28,"p":27,"ef":0,"tp":7240.9,"to":292.1,"cp":0.0,"co":0.0},{"pais":"México","n":"TUXTLA GUTIERREZ","v":27,"p":26,"ef":0,"tp":12432.0,"to":204.2,"cp":0.0,"co":0.0},{"pais":"México","n":"TULTITLAN 2","v":17,"p":16,"ef":0,"tp":3906.2,"to":408.1,"cp":0.0,"co":0.0},{"pais":"México","n":"SAN NICOLAS","v":8,"p":7,"ef":0,"tp":199.9,"to":0.3,"cp":0.0,"co":0.0}],"cli":[{"pais":"Guatemala","n":"AJENICARAGUA, S.A.","v":2768,"p":403,"ef":0,"tp":824550.0,"to":19800.0,"cp":0.0,"co":0.0},{"pais":"México","n":"TIENDAS TRES B","v":1569,"p":172,"ef":0,"tp":119120.0,"to":1056076.3,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"ECONORED EL SALVADOR, S.A. DE C.V.","v":1440,"p":36,"ef":0,"tp":22434.9,"to":931978.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"ECONORED DE HONDURAS S.A.","v":1074,"p":346,"ef":0,"tp":429690.0,"to":789386.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"SUCURSAL RUTA AL ATLANTICO","v":1062,"p":112,"ef":0,"tp":31448.7,"to":208651.7,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"COMERCIALIZADORA SAN FELIPE, SOCIENDAD ANONIMA","v":950,"p":13,"ef":0,"tp":4213.8,"to":346303.1,"cp":0.0,"co":0.0},{"pais":"México","n":"INTERCOMPANY EL MOLINETE","v":909,"p":758,"ef":0,"tp":76385.3,"to":11554.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"SUCURSAL MIXCO","v":850,"p":112,"ef":0,"tp":24262.5,"to":167090.2,"cp":0.0,"co":0.0},{"pais":"México","n":"NUEVA WAL MART DE México","v":790,"p":46,"ef":0,"tp":151158.4,"to":651300.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"ECONORED DE HONDURAS, S.A.","v":781,"p":592,"ef":0,"tp":908153.0,"to":227875.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"SUCURSAL QUETZALTENANGO","v":763,"p":668,"ef":0,"tp":400942.6,"to":40109.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"CORPORACION SIMAJ, SOCIEDAD ANONIMA","v":675,"p":0,"ef":0,"tp":0.0,"to":592740.0,"cp":0.0,"co":0.0},{"pais":"México","n":"INTERCOMPANY PLANTA PUE A  MTY MAQUILA","v":553,"p":433,"ef":0,"tp":483714.0,"to":189640.3,"cp":0.0,"co":0.0},{"pais":"México","n":"GRUPO ZORRO ABARROTERO","v":550,"p":3,"ef":0,"tp":1604.6,"to":352396.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"MALDONADO TOJIN , JUAN","v":548,"p":0,"ef":0,"tp":0.0,"to":266140.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"CORPORACION PEES, S.A.","v":514,"p":0,"ef":0,"tp":0.0,"to":306152.6,"cp":0.0,"co":0.0},{"pais":"México","n":"TIENDAS CHEDRAUI","v":507,"p":3,"ef":0,"tp":1900.8,"to":280272.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"DISTRO SOCIEDAD ANONIMA","v":458,"p":1,"ef":0,"tp":402.5,"to":213083.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"MAYOREO ELECTRONICO, S.A","v":420,"p":193,"ef":0,"tp":42608.3,"to":49718.9,"cp":0.0,"co":0.0},{"pais":"México","n":"INTERCOMPANY PLANTA VILLAHERMOSA MAQUILA","v":409,"p":394,"ef":0,"tp":893532.1,"to":28830.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"DISTRIBUIDORA ALEXANDRITA, SOCIEDAD ANONIMA","v":400,"p":0,"ef":0,"tp":0.0,"to":211080.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"SUCURSAL CHIMALTENANGO","v":393,"p":374,"ef":0,"tp":113409.1,"to":4756.1,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"SUCURSAL VILLA NUEVA","v":378,"p":142,"ef":0,"tp":6178.3,"to":5951.1,"cp":0.0,"co":0.0},{"pais":"México","n":"INTERCOMPANY LOS REYES LA PAZ","v":377,"p":374,"ef":0,"tp":167943.3,"to":2153.3,"cp":0.0,"co":0.0}],"veh":[{"pais":"Guatemala","n":"20 T","v":13205,"p":3503,"ef":0,"tp":2413649.6,"to":4139329.9,"cp":0.0,"co":0.0},{"pais":"México","n":"SENCILLO","v":11483,"p":4699,"ef":0,"tp":4376022.1,"to":5691459.8,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"10 T","v":3109,"p":130,"ef":0,"tp":50147.4,"to":1129208.5,"cp":0.0,"co":0.0},{"pais":"México","n":"TORTHON","v":2862,"p":515,"ef":0,"tp":430049.6,"to":1816651.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"22 T","v":1524,"p":822,"ef":0,"tp":1083534.7,"to":370838.0,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"18 T","v":764,"p":6,"ef":0,"tp":3487.0,"to":645494.2,"cp":0.0,"co":0.0},{"pais":"México","n":"FULL","v":707,"p":551,"ef":0,"tp":1287282.9,"to":312677.7,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"12 T","v":651,"p":227,"ef":0,"tp":140244.3,"to":215320.2,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"24 T","v":467,"p":4,"ef":0,"tp":6320.0,"to":28879.7,"cp":0.0,"co":0.0},{"pais":"México","n":"TRAILER 53","v":344,"p":117,"ef":0,"tp":111344.6,"to":282584.6,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"05 T","v":72,"p":2,"ef":0,"tp":1486.0,"to":3078.6,"cp":0.0,"co":0.0},{"pais":"México","n":"TRAILER 48","v":72,"p":14,"ef":0,"tp":24233.9,"to":50573.3,"cp":0.0,"co":0.0},{"pais":"México","n":"CAMIONETA","v":26,"p":0,"ef":0,"tp":0.0,"to":15000.0,"cp":0.0,"co":0.0},{"pais":"México","n":"INTERMODAL","v":10,"p":8,"ef":0,"tp":39362.8,"to":10487.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"14 T","v":6,"p":0,"ef":0,"tp":0.0,"to":5185.8,"cp":0.0,"co":0.0},{"pais":"México","n":"RABON","v":3,"p":0,"ef":0,"tp":0.0,"to":2490.2,"cp":0.0,"co":0.0}],"tra":[{"pais":"México","n":"SOLUCIONES LOGISTICAS DREAM TEC","v":6274,"p":6274,"ef":0,"tp":6660241.4,"to":0.0,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"CRISAR GUATEMALA, S.A.","v":4985,"p":4985,"ef":0,"tp":3848631.3,"to":0.0,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"SOSA PINEDA SILVIO CESAR","v":2354,"p":0,"ef":0,"tp":0.0,"to":0.0,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"CARRETO CALDERON, EVELYN BEATRIZ","v":944,"p":0,"ef":0,"tp":0.0,"to":352224.0,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"QUI¥ONEZ VALLE, ERICK EDUARDO","v":724,"p":0,"ef":0,"tp":0.0,"to":200282.7,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"LOGÍSTICA EMPRESARIAL SIMAJ, S.A.","v":697,"p":0,"ef":0,"tp":0.0,"to":613219.4,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"CARRERA SANDOVAL, ANGEL BOANERGES","v":601,"p":0,"ef":0,"tp":0.0,"to":348869.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"TRANSPORTE PESADO - AMATITLAN","v":554,"p":0,"ef":0,"tp":0.0,"to":258.0,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"RODRIGUEZ CALDERON, LESTER LEOPOLDO","v":543,"p":0,"ef":0,"tp":0.0,"to":233174.1,"cp":0.0,"co":0.0},{"pais":"México","n":"NUEVA WAL MART DE México","v":529,"p":0,"ef":0,"tp":0.0,"to":469388.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"DIAZ ESCOBAR, PEDRO","v":516,"p":0,"ef":0,"tp":0.0,"to":303903.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"OPTIMUM INTERNATIONAL VALUE, S.A.","v":504,"p":0,"ef":0,"tp":0.0,"to":213849.9,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"MALDONADO TOJIN, JUAN","v":500,"p":0,"ef":0,"tp":0.0,"to":221558.0,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"COMLOG, S.A.","v":485,"p":0,"ef":0,"tp":0.0,"to":344131.7,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"TRANSPORTES TURISTICOS PALAX, S.A.","v":446,"p":0,"ef":0,"tp":0.0,"to":206885.2,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"HERNANDEZ CACERES, MARCO VINICIO","v":433,"p":0,"ef":0,"tp":0.0,"to":88497.1,"cp":0.0,"co":0.0},{"pais":"México","n":"GUTIERREZ TOXQUI RAUL","v":429,"p":0,"ef":0,"tp":0.0,"to":261418.2,"cp":0.0,"co":0.0},{"pais":"México","n":"FLETERA 2000 S.A DE C,V","v":420,"p":0,"ef":0,"tp":0.0,"to":470887.0,"cp":0.0,"co":0.0},{"pais":"México","n":"TIENDAS CHEDRAUI","v":394,"p":0,"ef":0,"tp":0.0,"to":212194.6,"cp":0.0,"co":0.0},{"pais":"México","n":"MONTIEL AMASTAL JUSTO","v":374,"p":0,"ef":0,"tp":0.0,"to":351940.8,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"ORDO¥EZ TELON, MELANNY EMILSA","v":361,"p":0,"ef":0,"tp":0.0,"to":114352.4,"cp":0.0,"co":0.0},{"pais":"México","n":"TRANSPORTES EL RANCHO LOZADA MARTINEZ","v":350,"p":0,"ef":0,"tp":0.0,"to":185898.5,"cp":0.0,"co":0.0},{"pais":"Guatemala","n":"IXCHOP MORALES, CARLOS ARTURO","v":342,"p":0,"ef":0,"tp":0.0,"to":163874.6,"cp":0.0,"co":0.0},{"pais":"México","n":"ELIZONDO ORTIZ OSVALDO","v":338,"p":0,"ef":0,"tp":0.0,"to":213673.5,"cp":0.0,"co":0.0}]},"fx":{"Guatemala":["GTQ",7.7519],"México":["MXN",17.1391]}};
+const MESL={'01':'Ene','02':'Feb','03':'Mar','04':'Abr','05':'May','06':'Jun','07':'Jul','08':'Ago'};
+function pintarCob(){
+  const box=document.getElementById('repCob');
+  const tot=COB.tot.filter(okPais);
+  if(!tot.length){
+    box.innerHTML=`<div class="empty"><b>Sin datos de cobertura</b><p>El reporte de cobertura de flota hoy solo llega de Guatemala y México.</p></div>`;
+    return;
+  }
+  const S=(a,k)=>a.reduce((s,x)=>s+x[k],0);
+  const v=S(tot,'v'), pr=S(tot,'p'), ef=S(tot,'ef');
+  const tp=S(tot,'tp'), to=S(tot,'to'), cp=S(tot,'cp'), co=S(tot,'co');
+  const cobV=pr*100/v, cobF=tp*100/(tp+to), efPct=ef*100/v;
+  const trt=S(tot,'tra');
+  /* moneda local cuando hay un solo país */
+  const uno=tot.length===1?COB.fx[tot[0].pais]:null;
+  const mon=n=>uno?uno[0]+' '+Math.round(n*uno[1]).toLocaleString('es'):usd(n);
+  const evol=COB.evol.filter(okPais);
+  const pm={};
+  evol.forEach(r=>{const m=pm[r.mes]=pm[r.mes]||{v:0,p:0,tp:0,to:0};m.v+=r.v;m.p+=r.p;m.tp+=r.tp;m.to+=r.to;});
+  const meses=Object.entries(pm).sort();
+  const maxV=Math.max(...meses.map(([,x])=>x.v));
+  const maxF=Math.max(...meses.map(([,x])=>x.tp+x.to));
+  const lista=(d,t)=>{
+    const arr=COB.dim[d].filter(okPais).sort((a,b)=>b.v-a.v).slice(0,6);
+    const max=arr[0]?arr[0].v:1;
+    return `<div class="card"><div class="card-t"><h3>${t}</h3><span class="note">Viajes · cobertura</span></div>
+    ${arr.map(x=>{const c=x.p*100/x.v;return `<div class="row"><span class="grow">
+      <span class="t">${cap(x.n)} <span class="flag">${x.pais.slice(0,3).toUpperCase()}</span></span>
+      <div class="bar"><i class="${c>=50?'v':c>=25?'':'r'}" style="width:${x.v*100/max}%"></i></div>
+      <span class="s">${c.toFixed(0)}% con flota propia</span></span>
+      <span class="r mono" style="font-size:12.5px">${x.v.toLocaleString('es')}</span></div>`}).join('')}</div>`;
+  };
+  /* evolución: dos series por mes */
+  const serie=meses.map(([m,x])=>{
+    const cv=x.p*100/x.v, cf=(x.tp+x.to)?x.tp*100/(x.tp+x.to):0;
+    return `<div class="mes">
+      <div class="mes-h"><span>${MESL[m.slice(5)]||m}</span><span class="mono">${cv.toFixed(0)}% · ${cf.toFixed(0)}%</span></div>
+      <div class="dual"><i class="v" style="width:${cv}%"></i></div>
+      <div class="dual"><i class="f" style="width:${cf}%"></i></div></div>`;
+  }).join('');
+  /* barras OPL vs otros por mes */
+  const barras=(k1,k2,max,fmt)=>meses.map(([m,x])=>`
+    <div class="mm"><span class="ml">${MESL[m.slice(5)]||m}</span>
+      <div class="mb"><i class="v" style="width:${x[k1]*100/max}%"></i><i class="o" style="width:${x[k2]*100/max}%"></i></div>
+      <span class="mv mono">${fmt(x[k1])}</span></div>`).join('');
+
+  box.innerHTML=`
+  <dl class="kpis" style="margin-top:14px">
+    <div class="kpi info"><dt>Viajes totales</dt><dd>${v.toLocaleString('es')}</dd><small>${COB.meses[0]} a ${COB.meses[COB.meses.length-1]}</small></div>
+    <div class="kpi ${cobV>=50?'good':'alert'}"><dt>Cobertura viajes</dt><dd>${cobV.toFixed(0)}%</dd><small>${pr.toLocaleString('es')} con flota propia</small></div>
+    <div class="kpi"><dt>Facturación total</dt><dd style="font-size:19px">${mon(tp+to)}</dd><small>${uno?uno[0]:'USD'}</small></div>
+    <div class="kpi ${cobF>=50?'good':'warn'}"><dt>Cobertura facturación</dt><dd>${cobF.toFixed(0)}%</dd><small>${mon(tp)} de OPL</small></div>
+    <div class="kpi"><dt>Costo por viaje</dt><dd style="font-size:21px">${mon((cp+co)/v)}</dd><small>Promedio general</small></div>
+    <div class="kpi warn"><dt>Costo por viaje OPL</dt><dd style="font-size:21px">${mon(cp/pr)}</dd><small>${(cp/pr)/((cp+co)/v)>1?'+'+(((cp/pr)/((cp+co)/v)-1)*100).toFixed(0)+'% sobre el promedio':'bajo el promedio'}</small></div>
+    <div class="kpi"><dt>Transportistas</dt><dd>${trt}</dd><small>Distintos en el período</small></div>
+    <div class="kpi ${efPct>=95?'good':'warn'}"><dt>En eFletex</dt><dd>${efPct.toFixed(1)}%</dd><small>${(v-ef).toLocaleString('es')} quedaron fuera</small></div>
+  </dl>
+
+  <div class="card">
+    <div class="card-t"><h3>Cobertura en el tiempo</h3><span class="note">Meta 100%</span></div>
+    <div class="leyenda"><span><i class="v"></i>Cobertura viajes</span><span><i class="f"></i>Cobertura facturación</span></div>
+    ${serie}
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Facturación: OPL vs otros</h3><span class="note">${uno?uno[0]:'USD'} por mes</span></div>
+    <div class="leyenda"><span><i class="v"></i>OPL</span><span><i class="o"></i>Otros</span></div>
+    ${barras('tp','to',maxF,n=>mon(n))}
+  </div>
+
+  <div class="card">
+    <div class="card-t"><h3>Viajes: OPL vs otros</h3><span class="note">Por mes</span></div>
+    <div class="leyenda"><span><i class="v"></i>OPL</span><span><i class="o"></i>Otros</span></div>
+    ${barras('p','v',maxV,n=>n.toLocaleString('es'))}
+  </div>
+
+  ${lista('ori','Orígenes')}
+  ${lista('cli','Clientes')}
+  ${lista('veh','Tipo de vehículo')}
+  ${lista('tra','Transportistas')}
+
+  <div class="nota">Reporte generado el ${COB.generado}. Cubre Guatemala y México; Perú y Colombia todavía no entran.</div>`;
+}
+
+/* ===== EFLETEXIA TOTAL ===== */
+function pintarTotal(){
+  const ps=PROY.filter(p=>fPais==='Todos'||p.pais===fPais||p.pais==='Todos');
+  const atras=ps.filter(p=>p.dias>=3);
+  document.getElementById('kpisTotal').innerHTML=`
+    <div class="kpi"><dt>Proyectos activos</dt><dd>${ps.length}</dd><small>${fPais==='Todos'?'Todos los países':fPais}</small></div>
+    <div class="kpi ${atras.length?'alert':'good'}"><dt>Sin actualizar</dt><dd>${atras.length}</dd><small>Más de 3 días</small></div>`;
+  document.getElementById('notaProy').textContent=ps.length+' en curso';
+  document.getElementById('listaProy').innerHTML=ps.length?ps.map(p=>
+    `<div class="row"><span class="av">${p.ini}</span>
+      <span class="grow"><span class="t">${p.n} <span class="flag">${p.pais}</span></span>
+      <span class="s">${p.resp} · ${p.act} · <span class="link">abrir enlace</span></span></span>
+      <span class="pill ${p.est[0]}">${p.est[1]}</span></div>`).join(''):vacio('Sin proyectos en este país.');
+  document.getElementById('listaPend').innerHTML=atras.length?atras.map(p=>
+    `<div class="row"><span class="av">${p.ini}</span>
+      <span class="grow"><span class="t">${p.n}</span><span class="s">${p.resp} · ${p.act}</span></span>
+      <span class="pill tarde">${p.dias} días</span></div>`).join(''):vacio('Todos actualizados.');
+}
+
+/* ===== navegación y seguimiento ===== */
+function ir(t){
+  document.querySelectorAll('.tab').forEach(s=>s.classList.remove('on'));
+  document.getElementById('t-'+t).classList.add('on');
+  document.getElementById('btnBack').classList.toggle('on',t!=='inicio');
+  document.getElementById('scroller').scrollTop=0;
+}
+
+/* ETA simulada mientras Torre de Control no entregue el dato real.
+   Estable por referencia: misma referencia, misma hora proyectada. */
+function eta(r){
+  const t=TC[r.ref]||{};
+  if(t.desComp)return {txt:t.desComp,sim:false};
+  if(clase(r)==='culm')return {txt:'En destino',sim:false};
+  const semilla=[...r.ref].reduce((a,c)=>a+c.charCodeAt(0),0);
+  const mismo=r.ori===r.des;
+  const base=mismo?3:(r.zona==='LIMA'?6:14);
+  const horas=base+(semilla%5);
+  const d=new Date(r.fh.replace(' ','T'));
+  d.setMinutes(d.getMinutes()+Math.round(horas*60));
+  const p=n=>String(n).padStart(2,'0');
+  return {txt:`${p(d.getDate())}/${p(d.getMonth()+1)} ${p(d.getHours())}:${p(d.getMinutes())}`,sim:true};
+}
+function buscar(codigo){
+  const input=document.getElementById('ref');
+  const q=(codigo||input.value||'').trim().toUpperCase();
+  if(codigo)input.value=codigo;
+  ir('rastreo');
+  document.getElementById('chipsRastreo').innerHTML=mon().slice(0,3).map(r=>`<button class="chip" onclick="buscar('${r.ref}')">${r.ref}</button>`).join('');
+  const out=document.getElementById('salida');
+  if(!q){out.innerHTML='<div class="empty"><b>Escribe una referencia</b><p>También puedes buscar por placa, por ejemplo F2K919.</p></div>';return;}
+  const r=MON.find(x=>x.ref===q||x.placa.toUpperCase()===q);
+  if(!r){out.innerHTML=`<div class="empty"><b>No encontramos ${q}</b><p>Revisa el número. Las referencias del corte de hoy tienen 7 dígitos.</p></div>`;return;}
+  if(!hayMon()){out.innerHTML=`<div class="empty"><b>${q} no está en tu alcance</b><p>Esa referencia es de Perú. Cambia el filtro de arriba o pide el acceso.</p></div>`;return;}
+  const [txt,cl]=ETQ[clase(r)];
+  const t=TC[r.ref]||{};
+  const E=eta(r);
+  const vencida=r.rg==='ALTA', media=r.rg==='MEDIA';
+  out.innerHTML=`
+  <div class="card">
+    <div class="res-head"><div><div class="res-id mono">${r.ref}</div><div class="res-route">${r.ori} → ${r.des}</div></div>
+      <span class="pill ${cl}">${txt}</span></div>
+    <dl class="meta">
+      <div><dt>Placa</dt><dd>${r.placa}</dd></div>
+      <div><dt>Zona</dt><dd>${r.zona}</dd></div>
+      <div><dt>Coordinador</dt><dd>${r.coord}</dd></div>
+      <div><dt>Último status</dt><dd>${dia(r.fh)} ${hora(r.fh)}</dd></div>
+      <div><dt>Llegada proyectada</dt><dd style="color:var(--naranja-2)">${E.txt}</dd></div>
+    </dl>
+  </div>
+  <div class="card"><div class="card-t"><h3>Línea de tiempo</h3><span class="note">Torre de Control</span></div>
+    <div class="tl">
+      ${t.pub?`<div class="hito done"><span class="node"></span><div class="hn">Publicación del viaje</div>
+        <div class="hg">Fecha y hora en que se publicó</div>
+        <div class="ht"><span class="real">${t.pub}</span></div></div>`:''}
+      <div class="hito done"><span class="node"></span><div class="hn">Origen · ${r.ori}</div>
+        <div class="hg">Zona ${r.zona}${t.oriComp?' · compromiso '+t.oriComp:''}</div>
+        <div class="ht"><span class="real">${t.oriCli||'Ruta asignada'}</span></div></div>
+      <div class="hito ${clase(r)==='culm'?'done':'now'}"><span class="node"></span><div class="hn">${r.st}</div>
+        <div class="hg">Último status registrado</div>
+        <div class="ht"><span class="real">${dia(r.fh)} ${hora(r.fh)}</span></div></div>
+      <div class="hito ${clase(r)==='culm'?'now':''}"><span class="node"></span><div class="hn">Destino · ${r.des}</div>
+        <div class="hg">Hora proyectada de llegada</div>
+        <div class="ht"><span class="real">${E.txt}</span>
+        <span class="delta pend">${clase(r)==='culm'?'En descargue':'Pendiente'}</span></div></div>
+    </div>
+    ${vencida?`<div class="nota">Esta referencia lleva ${fmtH(r.h)} sin actualizar.</div>`:''}
+
+  </div>`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoCube · Simulador de Cubicaje y Distribución de Carga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --abyss:#04121a;
+  --deep:#071c27;
+  --panel:#0b2733;
+  --panel-2:#0e3040;
+  --line:#164254;
+  --line-soft:#102f3d;
+  --cyan:#00d9e8;
+  --cyan-dim:#0a8f9b;
+  --cyan-glow:rgba(0,217,232,.18);
+  --ok:#12e0a2;
+  --warn:#ffb020;
+  --bad:#ff4b6b;
+  --txt:#dff2f7;
+  --txt-2:#9fc2ce;
+  --muted:#5f8593;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:'Barlow Condensed','Inter',system-ui,sans-serif;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--abyss);
+  color:var(--txt);
+  font-family:var(--body);
+  font-size:14px;
+  line-height:1.5;
+  overflow:hidden;
+  background-image:
+    linear-gradient(rgba(0,217,232,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,217,232,.022) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:var(--deep)}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:0}
+::-webkit-scrollbar-thumb:hover{background:var(--cyan-dim)}
+
+/* ---------- SHELL ---------- */
+.shell{display:flex;flex-direction:column;height:100vh}
+
+.topbar{
+  border-bottom:2px solid var(--cyan);
+  background:linear-gradient(180deg,var(--deep),var(--abyss));
+  display:flex;align-items:stretch;gap:0;
+  flex-shrink:0;
+  box-shadow:0 0 34px rgba(0,217,232,.14);
+}
+.brand{
+  padding:12px 22px;display:flex;align-items:center;gap:13px;
+  border-right:1px solid var(--line);min-width:250px;
+}
+.brand-mark{
+  width:34px;height:34px;border:2px solid var(--cyan);position:relative;flex-shrink:0;
+  display:grid;place-items:center;
+}
+.brand-mark:before{content:'';position:absolute;inset:5px;border:1px solid var(--cyan-dim)}
+.brand-mark:after{content:'';position:absolute;width:100%;height:2px;background:var(--cyan);
+  animation:scanline 2.8s ease-in-out infinite}
+@keyframes scanline{0%,100%{top:2px;opacity:.35}50%{top:28px;opacity:1}}
+.brand h1{font-family:var(--disp);font-size:23px;font-weight:700;letter-spacing:.055em;
+  text-transform:uppercase;line-height:1}
+.brand h1 span{color:var(--cyan)}
+.brand small{display:block;font-family:var(--mono);font-size:8.5px;color:var(--muted);
+  letter-spacing:.24em;text-transform:uppercase;margin-top:3px}
+
+.plates{display:flex;align-items:center;gap:10px;padding:10px 20px;border-right:1px solid var(--line)}
+.wave-state{display:flex;align-items:stretch;flex:1;gap:0}
+.ws{padding:10px 20px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;min-width:110px}
+.ws .k{font-family:var(--mono);font-size:8.5px;color:var(--muted);letter-spacing:.19em;text-transform:uppercase}
+.ws .v{font-family:var(--disp);font-size:25px;font-weight:700;line-height:1.05;color:var(--txt)}
+.ws .v em{font-style:normal;font-size:11px;color:var(--muted);margin-left:3px}
+.ws.big .v{color:var(--cyan);font-size:31px}
+.ws.ok .v{color:var(--ok)} .ws.warn .v{color:var(--warn)} .ws.bad .v{color:var(--bad)}
+.ws .d{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px}
+.uni-row{display:flex;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.uni-row:hover{background:rgba(0,217,232,.05)}
+.uni-row.on{background:rgba(0,217,232,.09);box-shadow:inset 3px 0 0 var(--cyan)}
+.uni-row input{accent-color:var(--cyan);cursor:pointer}
+.uni-row .id{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--cyan);min-width:46px}
+.uni-row .meta{flex:1;font-family:var(--mono);font-size:9.5px;color:var(--muted);line-height:1.4}
+.uni-row .meta b{color:var(--txt-2);font-weight:500}
+.uni-row .cap{font-family:var(--mono);font-size:11px;color:var(--txt);text-align:right;white-space:nowrap}
+.uni-row .cap em{font-style:normal;font-size:8.5px;color:var(--muted);display:block}
+.orden{background:var(--panel);border:1px solid var(--line-soft);border-left:3px solid var(--cyan);margin-bottom:13px}
+.orden>header{display:flex;align-items:center;gap:14px;padding:11px 15px;border-bottom:1px solid var(--line-soft);
+  cursor:pointer;background:linear-gradient(90deg,rgba(0,217,232,.06),transparent)}
+.orden>header:hover{background:linear-gradient(90deg,rgba(0,217,232,.12),transparent)}
+.orden .nro{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--cyan);min-width:104px}
+.orden .nro em{font-style:normal;font-size:8.5px;color:var(--muted);display:block;letter-spacing:.17em}
+.orden .inner{padding:15px;display:none}
+.orden.open .inner{display:block}
+.vacia{background:var(--deep);border:1px dashed var(--line);border-left:3px solid var(--muted);
+  padding:10px 15px;margin-bottom:9px;display:flex;align-items:center;gap:14px}
+.vacia .id{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);min-width:104px}
+.vacia .txt{font-family:var(--mono);font-size:11px;color:var(--muted);flex:1}
+.plate-field label{display:block;font-family:var(--mono);font-size:8.5px;color:var(--muted);
+  letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px}
+.plate-in{
+  background:var(--abyss);border:1px solid var(--line);color:var(--cyan);
+  font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.16em;
+  padding:6px 11px;width:112px;text-align:center;text-transform:uppercase;outline:none;
+  transition:border-color .16s,box-shadow .16s;
+}
+.plate-in:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-glow)}
+.plate-in.bad{border-color:var(--bad);color:var(--bad)}
+.combo-arrow{color:var(--line);font-size:19px;padding-top:14px}
+.plate-stack{display:flex;flex-direction:column;gap:4px;padding-top:13px}
+.plate-stack .btn{font-size:9.5px;padding:3px 8px;letter-spacing:.08em}
+.combo-badge{
+  border:2px solid var(--cyan);background:var(--cyan-glow);padding:5px 15px;text-align:center;
+  margin-top:13px;min-width:104px;
+}
+.combo-badge .code{font-family:var(--disp);font-size:25px;font-weight:700;color:var(--cyan);
+  letter-spacing:.06em;line-height:1}
+.combo-badge .pbm{font-family:var(--mono);font-size:9px;color:var(--txt-2);letter-spacing:.1em}
+.combo-badge.err{border-color:var(--bad);background:rgba(255,75,107,.1)}
+.combo-badge.err .code{color:var(--bad);font-size:15px;padding:5px 0}
+
+.limit-chips{display:flex;align-items:center;gap:7px;padding:0 18px;flex:1;overflow-x:auto}
+.chip{
+  border:1px solid var(--line);border-left:3px solid var(--cyan-dim);
+  background:var(--deep);padding:5px 11px;flex-shrink:0;
+}
+.chip .k{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:.16em;
+  text-transform:uppercase;display:block}
+.chip .v{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--txt)}
+.chip .v em{font-style:normal;font-size:9px;color:var(--muted)}
+
+/* ---------- NAV ---------- */
+.tabs{display:flex;border-bottom:1px solid var(--line);background:var(--deep);flex-shrink:0}
+.tab{
+  font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;
+  padding:11px 24px;cursor:pointer;transition:.16s;position:relative;white-space:nowrap;
+}
+.tab:hover{color:var(--txt-2);background:rgba(0,217,232,.035)}
+.tab.on{color:var(--cyan);border-bottom-color:var(--cyan);background:rgba(0,217,232,.07)}
+.tab .n{font-family:var(--mono);font-size:9px;color:var(--line);margin-right:7px}
+.tab.on .n{color:var(--cyan-dim)}
+
+.stage{flex:1;overflow-y:auto;padding:22px 26px 60px}
+.view{display:none;animation:fade .3s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* ---------- PRIMITIVES ---------- */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+
+.card{background:var(--panel);border:1px solid var(--line-soft);border-top:2px solid var(--cyan-dim)}
+.card>header{
+  padding:10px 15px;border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:linear-gradient(180deg,rgba(0,217,232,.05),transparent);
+}
+.card>header h3{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--txt)}
+.card>header .sub{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em}
+.card .body{padding:15px}
+.card.locked{border-top-color:var(--line)}
+.lock{font-family:var(--mono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line);padding:2px 7px}
+
+.sec-title{
+  font-family:var(--disp);font-size:12px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--cyan-dim);margin:26px 0 12px;display:flex;align-items:center;gap:13px;
+}
+.sec-title:first-child{margin-top:0}
+.sec-title:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+label.f{display:block;font-family:var(--mono);font-size:8.5px;color:var(--muted);
+  letter-spacing:.16em;text-transform:uppercase;margin-bottom:4px}
+input.f,select.f{
+  width:100%;background:var(--abyss);border:1px solid var(--line);color:var(--txt);
+  font-family:var(--mono);font-size:12.5px;padding:7px 9px;outline:none;transition:.15s;
+}
+input.f:focus,select.f:focus{border-color:var(--cyan);box-shadow:0 0 0 2px var(--cyan-glow)}
+input.f:disabled{color:var(--muted);background:var(--deep)}
+select.f{cursor:pointer}
+.fld{margin-bottom:11px}
+.frow{display:grid;gap:10px}
+
+.btn{
+  font-family:var(--disp);font-size:14px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--line);color:var(--txt-2);
+  padding:8px 18px;cursor:pointer;transition:.15s;
+}
+.btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,232,.06)}
+.btn.primary{border-color:var(--cyan);color:var(--abyss);background:var(--cyan);font-weight:700}
+.btn.primary:hover{background:#3ee8f5;box-shadow:0 0 22px var(--cyan-glow)}
+.btn.sm{font-size:11.5px;padding:5px 11px;letter-spacing:.1em}
+.btn.danger:hover{border-color:var(--bad);color:var(--bad);background:rgba(255,75,107,.07)}
+.btn:disabled{opacity:.34;cursor:not-allowed}
+.btn:disabled:hover{border-color:var(--line);color:var(--txt-2);background:transparent}
+
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px}
+th{
+  text-align:left;padding:7px 9px;color:var(--muted);font-size:8.5px;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:500;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+td{padding:6px 9px;border-bottom:1px solid var(--line-soft);color:var(--txt-2)}
+tbody tr:hover{background:rgba(0,217,232,.045)}
+tbody tr.hit{background:rgba(0,217,232,.12);box-shadow:inset 3px 0 0 var(--cyan)}
+tbody tr.hit td{color:var(--txt)}
+td.num,th.num{text-align:right}
+.t-wrap{max-height:330px;overflow-y:auto;border:1px solid var(--line-soft)}
+.t-wrap thead th{position:sticky;top:0;background:var(--panel-2);z-index:2}
+
+.pill{font-family:var(--mono);font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;
+  padding:2px 7px;border:1px solid;display:inline-block}
+.p-alta{color:var(--bad);border-color:rgba(255,75,107,.45);background:rgba(255,75,107,.1)}
+.p-media{color:var(--warn);border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.1)}
+.p-baja{color:var(--muted);border-color:var(--line);background:var(--deep)}
+.p-ok{color:var(--ok);border-color:rgba(18,224,162,.45);background:rgba(18,224,162,.1)}
+.p-bad{color:var(--bad);border-color:rgba(255,75,107,.45);background:rgba(255,75,107,.1)}
+.p-cyan{color:var(--cyan);border-color:var(--cyan-dim);background:var(--cyan-glow)}
+
+.note{
+  border-left:3px solid var(--warn);background:rgba(255,176,32,.07);padding:9px 13px;
+  font-size:12px;color:var(--txt-2);margin-top:12px;
+}
+.note strong{color:var(--warn)}
+.note.cy{border-left-color:var(--cyan);background:var(--cyan-glow)}
+.note.cy strong{color:var(--cyan)}
+
+/* ---------- KPI ---------- */
+.kpi{background:var(--panel);border:1px solid var(--line-soft);border-left:3px solid var(--cyan);padding:13px 15px}
+.kpi .k{font-family:var(--mono);font-size:8.5px;color:var(--muted);letter-spacing:.19em;
+  text-transform:uppercase;margin-bottom:5px}
+.kpi .v{font-family:var(--disp);font-size:31px;font-weight:700;line-height:1;color:var(--txt)}
+.kpi .v em{font-style:normal;font-size:13px;color:var(--muted);margin-left:3px}
+.kpi .d{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:5px}
+.kpi.ok{border-left-color:var(--ok)} .kpi.ok .v{color:var(--ok)}
+.kpi.bad{border-left-color:var(--bad)} .kpi.bad .v{color:var(--bad)}
+.kpi.warn{border-left-color:var(--warn)} .kpi.warn .v{color:var(--warn)}
+
+/* ---------- AXLE GAUGES ---------- */
+.gauge{margin-bottom:13px}
+.gauge-head{display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--mono);font-size:10.5px;margin-bottom:4px}
+.gauge-head .name{color:var(--txt-2);letter-spacing:.08em}
+.gauge-head .val{font-weight:700;color:var(--txt)}
+.gauge-head .val em{font-style:normal;color:var(--muted);font-weight:400;font-size:9.5px}
+.bar{height:19px;background:var(--abyss);border:1px solid var(--line);position:relative;overflow:hidden}
+.bar .fill{height:100%;transition:width .55s cubic-bezier(.22,1,.36,1),background .3s;position:relative}
+.bar .fill.ok{background:linear-gradient(90deg,rgba(18,224,162,.35),var(--ok))}
+.bar .fill.warn{background:linear-gradient(90deg,rgba(255,176,32,.35),var(--warn))}
+.bar .fill.bad{background:linear-gradient(90deg,rgba(255,75,107,.35),var(--bad))}
+.bar .tara{position:absolute;top:0;left:0;height:100%;background:repeating-linear-gradient(
+  45deg,rgba(255,255,255,.09) 0 4px,transparent 4px 8px);border-right:1px solid rgba(255,255,255,.22)}
+.bar .mark{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--txt);opacity:.55}
+.bar .lbl{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-family:var(--mono);
+  font-size:9.5px;font-weight:700;color:#04121a;letter-spacing:.08em;
+  text-shadow:0 1px 2px rgba(255,255,255,.35)}
+
+/* ---------- TRUCK CANVAS ---------- */
+.truck-wrap{background:var(--abyss);border:1px solid var(--line);position:relative}
+.truck-wrap svg{display:block;width:100%;height:auto}
+.cg-readout{
+  position:absolute;top:11px;right:13px;font-family:var(--mono);font-size:10px;
+  background:rgba(4,18,26,.9);border:1px solid var(--line);padding:6px 10px;color:var(--txt-2);
+}
+.cg-readout b{color:var(--cyan);font-size:13px}
+.playbar{display:flex;align-items:center;gap:11px;padding:9px 13px;border-top:1px solid var(--line);
+  background:var(--deep)}
+.playbar input[type=range]{flex:1;accent-color:var(--cyan);cursor:pointer}
+.step-txt{font-family:var(--mono);font-size:10.5px;color:var(--txt-2);min-width:210px}
+.step-txt b{color:var(--cyan)}
+
+/* ---------- TRIPS ---------- */
+.trip{background:var(--panel);border:1px solid var(--line-soft);margin-bottom:15px}
+.trip>header{display:flex;align-items:center;gap:13px;padding:10px 15px;
+  border-bottom:1px solid var(--line-soft);cursor:pointer;background:linear-gradient(90deg,rgba(0,217,232,.06),transparent)}
+.trip>header:hover{background:linear-gradient(90deg,rgba(0,217,232,.12),transparent)}
+.trip-no{font-family:var(--disp);font-size:26px;font-weight:700;color:var(--cyan);line-height:1;min-width:52px}
+.trip-no em{font-style:normal;font-size:9px;color:var(--muted);display:block;letter-spacing:.19em}
+.trip-meta{display:flex;gap:22px;flex:1;flex-wrap:wrap}
+.trip-meta div{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.trip-meta div b{display:block;color:var(--txt);font-size:14px;font-weight:700;margin-top:2px}
+.trip .inner{padding:15px;display:none}
+.trip.open .inner{display:block}
+.caret{color:var(--cyan-dim);font-size:12px;transition:transform .22s}
+.trip.open .caret{transform:rotate(90deg)}
+
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .big{font-family:var(--disp);font-size:20px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--line);margin-bottom:9px}
+.empty p{font-size:12.5px;max-width:400px;margin:0 auto}
+
+.legend{display:flex;gap:15px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;
+  color:var(--muted);padding:9px 13px;border-top:1px solid var(--line-soft)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:11px;height:11px;display:block;border:1px solid rgba(255,255,255,.2)}
+
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);
+  background:var(--panel-2);border:1px solid var(--cyan);border-left:4px solid var(--cyan);
+  padding:11px 20px;font-family:var(--mono);font-size:11.5px;color:var(--txt);z-index:99;
+  transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 8px 34px rgba(0,0,0,.55);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.bad{border-color:var(--bad);border-left-color:var(--bad)}
+
+@media (max-width:1100px){
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:1fr}
+  .topbar{flex-wrap:wrap}
+  .limit-chips{width:100%;border-top:1px solid var(--line);padding:8px 18px}
+}
+@media (max-width:720px){
+  .g2,.g4{grid-template-columns:1fr}
+  body{overflow:auto}.shell{height:auto}.stage{overflow:visible}
+  .brand{min-width:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body><div class="shell">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div><h1>Auto<span>Cube</span></h1><small>Planificador de despacho</small></div>
+    </div>
+    <div class="wave-state" id="waveState"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-v="req"><span class="n">01</span>Requerimientos</button>
+    <button class="tab" data-v="ola"><span class="n">02</span>Ola de despacho</button>
+    <button class="tab" data-v="ordenes"><span class="n">03</span>Órdenes de carga</button>
+    <button class="tab" data-v="manif"><span class="n">04</span>Estiba y manifiesto</button>
+    <button class="tab" data-v="maestros"><span class="n">·</span>Maestros</button>
+  </div>
+
+  <div class="stage">
+
+  <!-- ============ 01 · REQUERIMIENTOS ============ -->
+  <div class="view on" id="v-req">
+    <div class="grid g4" style="margin-bottom:20px">
+      <div class="kpi"><div class="k">Órdenes de carga</div><div class="v" id="kOrdenes">0</div><div class="d" id="kOrdenesD">—</div></div>
+      <div class="kpi"><div class="k">Palés asignados</div><div class="v" id="kPales">0</div><div class="d" id="kPalesD">—</div></div>
+      <div class="kpi"><div class="k">Peso requerido</div><div class="v" id="kPeso">0<em>kg</em></div><div class="d" id="kPesoD">—</div></div>
+      <div class="kpi" id="kStockCard"><div class="k">Cobertura de stock</div><div class="v" id="kStock">—</div><div class="d" id="kStockD">Big Magic</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <header>
+        <div><h3>Requerimientos del día</h3>
+        <div class="sub">Origen · cliente · orden de compra — la clave que consolida la hoja T24</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn sm" id="btnImport">⇪ Importar pedidos</button>
+          <button class="btn sm" id="btnSyncStock">↻ Sincronizar Big Magic</button>
+          <button class="btn sm" id="btnAddReq">+ Añadir requerimiento</button>
+        </div>
+      </header>
+      <div class="body" style="padding:0">
+        <div class="t-wrap" style="max-height:none;border:none">
+          <table id="tblReq">
+            <thead><tr>
+              <th style="width:132px">Origen</th><th style="width:128px">Cliente</th>
+              <th style="width:112px">Orden compra</th><th style="width:118px">SKU</th>
+              <th>Descripción</th>
+              <th class="num">Palés</th><th class="num">Stock</th><th class="num">Asign.</th>
+              <th class="num">Peso</th><th style="width:96px">Fuente</th><th style="width:88px">Cierre</th>
+              <th style="width:96px">Prioridad</th><th style="width:34px"></th>
+            </tr></thead><tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">Solicitud de reabastecimiento</div>
+    <div class="card" style="margin-bottom:20px;border-top-color:var(--warn)">
+      <header>
+        <div><h3>Posición de inventario en los CEDI</h3>
+        <div class="sub">De aquí nace la necesidad: cobertura actual contra cobertura objetivo</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--txt-2)">
+            <input type="checkbox" id="genReemplaza" checked style="accent-color:var(--cyan)">
+            Reemplazar el pedido actual</label>
+          <button class="btn sm" id="btnGenerar">⚡ Generar requerimientos</button>
+        </div>
+      </header>
+      <div class="body" style="padding:0">
+        <div class="t-wrap" style="max-height:340px;border:none">
+          <table id="tblSolic"><thead><tr>
+            <th>CEDI / cliente</th><th>SKU</th>
+            <th class="num">Stock<br>actual</th><th class="num">Venta<br>día</th>
+            <th class="num">Cobertura<br>hoy</th><th class="num">Objetivo<br>días</th>
+            <th class="num">Ya<br>solicitado</th><th class="num">En<br>camino</th>
+            <th class="num">Objetivo<br>palés</th>
+            <th class="num">Solicitar</th><th>Planta que abastece</th>
+            <th>Prioridad</th><th>Estado</th>
+          </tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+      <div class="legend" id="solicPie"></div>
+    </div>
+
+    <div class="card" id="importBox" style="display:none;margin-bottom:20px;border-top-color:var(--warn)">
+      <header><div><h3>Importar pedidos del día</h3>
+        <div class="sub">CSV o texto pegado desde Excel · una línea por requerimiento</div></div>
+        <button class="btn sm" id="btnImportClose">✕ Cerrar</button></header>
+      <div class="body">
+        <div class="grid g2" style="align-items:start">
+          <div>
+            <label class="f">Pegar desde Excel o cargar archivo</label>
+            <textarea id="impText" spellcheck="false" style="width:100%;height:150px;background:var(--abyss);
+              border:1px solid var(--line);color:var(--txt);font-family:var(--mono);font-size:11px;
+              padding:9px;outline:none;resize:vertical"
+              placeholder="origen;cliente;orden_compra;sku;pales;prioridad;cierre"></textarea>
+            <div style="display:flex;gap:8px;margin-top:9px;align-items:center;flex-wrap:wrap">
+              <input type="file" id="impFile" accept=".csv,.txt" style="display:none">
+              <button class="btn sm" id="btnFile">Elegir archivo CSV</button>
+              <button class="btn sm" id="btnEjemplo">Cargar ejemplo</button>
+              <label style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--txt-2)">
+                <input type="checkbox" id="impReemplaza" checked style="accent-color:var(--cyan)">
+                Reemplazar el pedido actual</label>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.16em;
+              text-transform:uppercase;margin-bottom:7px">Formato esperado</div>
+            <table style="font-size:10.5px"><tbody>
+              <tr><td style="color:var(--cyan)">origen</td><td>Código o nombre de planta (PL-HUA, Huachipa)</td></tr>
+              <tr><td style="color:var(--cyan)">cliente</td><td>Código del maestro (C-1001)</td></tr>
+              <tr><td style="color:var(--cyan)">orden_compra</td><td>Número de OC del cliente</td></tr>
+              <tr><td style="color:var(--cyan)">sku</td><td>Código de producto (BC-2250)</td></tr>
+              <tr><td style="color:var(--cyan)">pales</td><td>Parihuelas completas, entero</td></tr>
+              <tr><td style="color:var(--cyan)">prioridad</td><td>Alta · Media · Baja</td></tr>
+              <tr><td style="color:var(--cyan)">cierre</td><td>Hora límite de recepción, HH:MM</td></tr>
+            </tbody></table>
+            <div style="font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:8px">
+              Separador: punto y coma, coma o tabulación. La cabecera es opcional.</div>
+          </div>
+        </div>
+        <div id="impPrev" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <div class="sec-title">Consolidado por planta de origen</div>
+    <div class="grid g3" id="origBox" style="margin-bottom:22px"></div>
+
+    <div class="sec-title">Consolidado por destino</div>
+    <div class="grid g3" id="destBox"></div>
+
+    <div class="note cy" style="margin-top:16px">
+      <strong>Este es el pool completo del día, de todas las plantas.</strong> El stock es por planta:
+      una línea solo puede atenderse con lo que produce su origen. Un vehículo carga en una sola planta
+      salvo que se autoricen dos recojos. La flota llega por olas: en cada una declaras qué unidades
+      tienes, el sistema toma lo más urgente que quepa y el resto vuelve al pool con más urgencia.
+    </div>
+  </div>
+
+  <!-- ============ 02 · OLA DE DESPACHO ============ -->
+  <div class="view" id="v-ola">
+    <div class="grid" style="grid-template-columns:360px 1fr;align-items:start">
+      <div>
+        <div class="card">
+          <header><h3>Flota disponible</h3><span class="sub" id="flotaSub">para esta ola</span></header>
+          <div class="body" style="padding:0">
+            <div class="t-wrap" style="max-height:300px;border:none" id="flotaBox"></div>
+          </div>
+          <div class="legend" style="justify-content:space-between">
+            <span><b id="flotaCount" style="color:var(--cyan)">0</b> unidades declaradas</span>
+            <span style="display:flex;gap:6px">
+              <button class="btn sm" id="btnAllUnits">Todas</button>
+              <button class="btn sm" id="btnNoUnits">Ninguna</button></span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <header><h3>Reglas de la corrida</h3></header>
+          <div class="body">
+            <div class="fld"><label class="f">Estándar de parihuelas</label>
+              <select class="f" id="optModoStd">
+                <option value="maximo">Hasta 24 por unidad de arrastre</option>
+                <option value="estricto">Exactamente 24 (estricto)</option>
+                <option value="libre">Sin tope: solo la física</option>
+              </select></div>
+            <div class="fld"><label class="f">Palés estándar por unidad de arrastre</label>
+              <input class="f" id="optStd" type="number" value="24" min="1" max="40">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px" id="stdHint">&nbsp;</div></div>
+            <div class="fld"><label class="f">Puntos de recojo por vehículo</label>
+              <select class="f" id="optOrig"><option value="1" selected>Uno (una sola planta)</option>
+              <option value="2">Hasta dos plantas</option></select></div>
+            <div class="fld"><label class="f">Destinos por vehículo</label>
+              <select class="f" id="optDest"><option value="1">Uno</option><option value="2" selected>Hasta dos</option></select></div>
+            <div class="fld"><label class="f">Margen sobre límite de eje (%)</label>
+              <input class="f" id="optMargin" type="number" value="2" min="0" max="15" step="0.5"></div>
+            <div class="fld"><label class="f">Duración de cada ola (h)</label>
+              <input class="f" id="optHoras" type="number" value="2.5" min="0.5" max="8" step="0.5"></div>
+            <label style="display:flex;gap:8px;align-items:center;font-size:12px;color:var(--txt-2);margin:12px 0">
+              <input type="checkbox" id="optCert" checked style="accent-color:var(--cyan)">
+              Aplicar certificados de bonificación MTC</label>
+            <button class="btn primary" id="btnRun" style="width:100%">▶ Planificar ola</button>
+            <button class="btn sm" id="btnConfirm" style="width:100%;margin-top:7px" disabled>✓ Emitir órdenes y pasar a la siguiente ola</button>
+            <button class="btn sm danger" id="btnReset" style="width:100%;margin-top:7px">↺ Reiniciar planificación</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi" id="kcOrd"><div class="k">Órdenes de esta ola</div><div class="v">—</div><div class="d">&nbsp;</div></div>
+          <div class="kpi" id="kcAsig"><div class="k">Palés asignados</div><div class="v">—</div><div class="d">&nbsp;</div></div>
+          <div class="kpi" id="kcPend"><div class="k">Saldo tras la ola</div><div class="v">—</div><div class="d">&nbsp;</div></div>
+          <div class="kpi" id="kcEstado"><div class="k">Cumplimiento SUTRAN</div><div class="v">—</div><div class="d">&nbsp;</div></div>
+        </div>
+
+        <div class="sec-title">Ranking de urgencia</div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="body" style="padding:0">
+            <div class="t-wrap" style="max-height:280px;border:none">
+              <table id="tblRank"><thead><tr>
+                <th style="width:34px">#</th><th>Destino</th><th>Orden compra</th>
+                <th class="num">Palés</th><th class="num">kg</th><th>Prioridad</th>
+                <th class="num">Cierre</th><th class="num">Horas<br>restantes</th>
+                <th class="num">Olas<br>esperadas</th><th class="num">Urgencia</th><th>Estado</th>
+              </tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+          <div class="legend"><span>Urgencia = prioridad declarada + presión de la ventana de recepción + castigo por olas esperadas</span></div>
+        </div>
+
+        <div class="sec-title">Asignación de la ola</div>
+        <div id="olaBox">
+          <div class="empty"><div class="big">Ola sin planificar</div>
+            <p>Declara qué unidades están disponibles y pulsa «Planificar ola». El sistema toma los requerimientos más urgentes del pool y los reparte entre esas unidades.</p></div>
+        </div>
+
+        <div class="sec-title">Historial de olas</div>
+        <div class="card"><div class="body" style="padding:0">
+          <div class="t-wrap" style="max-height:220px;border:none">
+            <table id="tblOlas"><thead><tr><th>Ola</th><th class="num">Hora</th>
+            <th class="num">Unidades</th><th class="num">Órdenes</th><th class="num">Vacías</th>
+            <th class="num">Palés</th><th class="num">kg</th><th class="num">Saldo</th>
+            </tr></thead><tbody></tbody></table></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 03 · ÓRDENES DE CARGA ============ -->
+  <div class="view" id="v-ordenes">
+    <div class="sec-title">Órdenes de carga emitidas</div>
+    <div id="ordenesBox">
+      <div class="empty"><div class="big">Sin órdenes emitidas</div>
+        <p>Las órdenes se emiten al confirmar una ola. Cada una queda ligada a una unidad, un chofer y una secuencia de estiba.</p></div>
+    </div>
+  </div>
+
+  <!-- ============ 03 · MANIFIESTO ============ -->
+  <div class="view" id="v-manif">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+      <div class="sec-title" style="margin:0;flex:1">Plano de estiba y manifiesto por ejes</div>
+      <select class="f" id="manifTrip" style="width:auto;font-size:11.5px"></select>
+    </div>
+    <div id="manifBox">
+      <div class="empty"><div class="big">Nada que mostrar</div>
+        <p>Emite al menos una orden de carga para ver el plano de estiba paso a paso y el manifiesto de pesos por eje.</p></div>
+    </div>
+  </div>
+
+  <!-- ============ MAESTROS ============ -->
+  <div class="view" id="v-maestros">
+    <div class="sec-title">Configuración por única vez</div>
+    <div class="note cy" style="margin-top:0;margin-bottom:18px">
+      <strong>Seis maestros, todos de carga única.</strong> Normativa MTC, productos, clientes,
+      transportistas, vehículos y certificados. En la operación diaria solo se cargan los
+      requerimientos: nadie vuelve a tocar dimensiones de palé ni tamaños de vehículo a mano.
+      El conjunto se arma con dos placas (tracto + carroza) o hasta cuatro, para las
+      configuraciones de 23 m tipo bitrén que contempla la tabla del MTC.
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <header><h3>Plantas de origen</h3>
+        <span class="sub">puntos de recojo · el stock se lleva por planta</span></header>
+      <div class="body" style="padding:0"><div class="t-wrap" style="max-height:200px">
+        <table id="tblPlanta"><thead><tr><th>Código</th><th>Planta</th><th>Ciudad</th>
+        <th class="num">Rampas</th><th>Ventana de carga</th><th class="num">SKU que produce</th>
+        <th class="num">Stock total</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px;border-top-color:var(--cyan)">
+      <header><div><h3>Armar unidad de transporte</h3>
+        <div class="sub">Escribe las placas: el tipo sale del maestro y la configuración MTC se resuelve sola</div></div></header>
+      <div class="body">
+        <div id="armaBox" style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap"></div>
+        <div id="armaRes" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <header><h3>Unidades de transporte armadas</h3>
+        <span class="sub">tracto + unidades de arrastre · es lo que se declara disponible en cada ola</span></header>
+      <div class="body" style="padding:0"><div class="t-wrap" style="max-height:280px">
+        <table id="tblUni"><thead><tr><th>Unidad</th><th>Placas</th><th>Config.<br>MTC</th>
+        <th>Transportista</th><th>Chofer</th><th class="num">Carga útil</th>
+        <th class="num">Posiciones</th><th>Estado</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+
+    <div class="card locked" style="margin-bottom:18px">
+      <header><div><h3>Tabla de pesos y medidas · MTC / SUTRAN</h3>
+        <div class="sub">D.S. 058-2003-MTC · Reglamento Nacional de Vehículos</div></div>
+        <span class="lock">Catálogo normativo</span></header>
+      <div class="body" style="padding:0"><div class="t-wrap"><table id="tblMtc">
+        <thead><tr><th>Configuración</th><th>Tipo</th><th class="num">Long. máx.</th>
+        <th class="num">Eje<br>delantero</th><th class="num">1º conj.</th><th class="num">2º conj.</th>
+        <th class="num">3º conj.</th><th class="num">4º conj.</th><th class="num">Peso bruto<br>máx.</th><th>Notas</th>
+        </tr></thead><tbody></tbody></table></div></div>
+      <div class="legend">
+        <span>(1) Conjunto de ejes con un eje direccional</span>
+        <span>(2) Vehículos con facilidad de distribución de peso por ejes</span>
+        <span>(3) Ejes separados &gt; 2,40 m entre centros de ruedas</span>
+        <span>(4) Eje direccional</span>
+        <span>(5) Ejes direccionales separados &gt; 1,70 m</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <header><h3>Maestro de productos</h3>
+        <span class="sub">dimensiones, camas y paquetes por SKU</span></header>
+      <div class="body" style="padding:0"><div class="t-wrap" style="max-height:300px">
+        <table id="tblProd"><thead><tr>
+          <th>SKU</th><th>Descripción</th><th>Formato</th>
+          <th class="num">L×A palé (m)</th><th class="num">Camas</th><th class="num">Alto<br>total (m)</th>
+          <th class="num">Paquetes<br>/palé</th><th class="num">Peso bruto<br>(kg)</th>
+          <th class="num">Apilable</th><th>Volteo</th>
+        </tr></thead><tbody></tbody></table></div></div>
+      <div class="legend"><span>«Camas» = pisos de producto sobre la parihuela · el alto total incluye 0,15 m de parihuela</span></div>
+    </div>
+
+    <div class="grid g2" style="margin-bottom:18px">
+      <div class="card">
+        <header><h3>Maestro de clientes</h3><span class="sub">propios y terceros por CEDI</span></header>
+        <div class="body" style="padding:0"><div class="t-wrap" style="max-height:260px">
+          <table id="tblCli"><thead><tr><th>Código</th><th>Nombre</th><th>Tipo</th>
+          <th>CEDI</th><th>Ventana</th></tr></thead><tbody></tbody></table></div></div>
+      </div>
+      <div class="card">
+        <header><h3>Transportistas y OPL</h3><span class="sub">cadena Efletexia → OPL → transportista</span></header>
+        <div class="body" style="padding:0"><div class="t-wrap" style="max-height:260px">
+          <table id="tblTrans"><thead><tr><th>Código</th><th>Nombre</th><th>Tipo</th>
+          <th>OPL / contacto</th><th class="num">Unidades</th></tr></thead><tbody></tbody></table></div></div>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-bottom:18px">
+      <div class="card">
+        <header><h3>Vehículos · Tractos</h3><span class="sub">tara y geometría por placa</span></header>
+        <div class="body" style="padding:0"><div class="t-wrap" style="max-height:250px">
+          <table id="tblTract"><thead><tr><th>Placa</th><th>Tipo</th><th>Transportista</th>
+          <th class="num">Tara<br>delant.</th><th class="num">Tara<br>motriz</th>
+          <th class="num">Entre<br>ejes (m)</th><th class="num">Avance<br>kingpin</th>
+          </tr></thead><tbody></tbody></table></div></div>
+      </div>
+      <div class="card">
+        <header><h3>Vehículos · Carrozas</h3><span class="sub">tara, geometría y plataforma</span></header>
+        <div class="body" style="padding:0"><div class="t-wrap" style="max-height:250px">
+          <table id="tblSemi"><thead><tr><th>Placa</th><th>Tipo</th><th>Transportista</th>
+          <th class="num">Tara<br>kingpin</th><th class="num">Tara<br>posterior</th>
+          <th class="num">Kingpin x</th><th class="num">Posterior x</th>
+          <th class="num">Acople<br>siguiente</th><th class="num">Útil L×A</th>
+          </tr></thead><tbody></tbody></table></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <header><h3>Certificados de bonificación MTC</h3>
+        <span class="sub">incrementan la capacidad legal de la unidad</span></header>
+      <div class="body" style="padding:0"><div class="t-wrap" style="max-height:230px">
+        <table id="tblCert"><thead><tr><th>Placa</th><th>Certificado</th><th>Tipo</th>
+        <th class="num">+ PBM</th><th class="num">+ por eje</th><th>Vence</th><th>Estado</th>
+        </tr></thead><tbody></tbody></table></div></div>
+      <div class="legend"><span>Los incrementos se transcriben del certificado físico. El simulador no los deduce.</span></div>
+    </div>
+
+    <div class="note" style="margin-top:18px">
+      <strong>Dato pendiente de confirmar con Crisar.</strong> El maestro de vehículos necesita el
+      tipo exacto de tracto y carroza por placa; sin eso no se puede resolver la configuración
+      MTC ni derivar los límites por eje. Es el punto que quedó a cargo de Roxana.
+    </div>
+  </div>
+
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* ==================================================================
+   AUTOCUBE · Maestros (configuración única) + requerimientos del día
+   Alineado a la minuta "Qubo revisión" · 13-ago-2026
+   ================================================================== */
+
+/* ---------- 1. CATÁLOGO NORMATIVO MTC / SUTRAN (estático) ---------- */
+const MTC = [
+ {c:'C2',      k:'rigido', L:12.30, f:7,  g:[11],            pbm:18},
+ {c:'C2RB1',   k:'rigido', L:20.50, f:7,  g:[11,11],         pbm:29},
+ {c:'C2RB2',   k:'rigido', L:20.50, f:7,  g:[11,18],         pbm:36},
+ {c:'C2R2',    k:'rigido', L:23.00, f:7,  g:[11,11,11],      pbm:40},
+ {c:'C2R3',    k:'rigido', L:23.00, f:7,  g:[11,11,18],      pbm:47},
+ {c:'C3',      k:'rigido', L:13.20, f:7,  g:[18],            pbm:25},
+ {c:'C3R2',    k:'rigido', L:23.00, f:7,  g:[18,11,11],      pbm:47},
+ {c:'C3R3',    k:'rigido', L:23.00, f:7,  g:[18,11,18],      pbm:48, n:[2]},
+ {c:'C3R4',    k:'rigido', L:23.00, f:7,  g:[18,18,18],      pbm:48, n:[2]},
+ {c:'C3RB1',   k:'rigido', L:20.50, f:7,  g:[18,11],         pbm:36},
+ {c:'C3RB2',   k:'rigido', L:20.50, f:7,  g:[18,18],         pbm:43},
+ {c:'C4',      k:'rigido', L:13.20, f:7,  g:[23],            pbm:30, n:[1]},
+ {c:'C4RB1',   k:'rigido', L:20.50, f:7,  g:[23,11],         pbm:41, n:[1]},
+ {c:'C4RB2',   k:'rigido', L:20.50, f:7,  g:[23,18],         pbm:48, n:[1]},
+ {c:'C4R2',    k:'rigido', L:23.00, f:7,  g:[23,11,11],      pbm:48, n:[1,2]},
+ {c:'C4R3',    k:'rigido', L:23.00, f:7,  g:[23,11,18],      pbm:48, n:[1,2]},
+ {c:'8x4',     k:'rigido', L:13.20, f:14, g:[18],            pbm:32, n:[5]},
+ {c:'8x4RB1',  k:'rigido', L:20.50, f:14, g:[18,11],         pbm:43, n:[5]},
+ {c:'8x4RB2',  k:'rigido', L:20.50, f:14, g:[18,18],         pbm:48, n:[5]},
+ {c:'8x4R2',   k:'rigido', L:23.00, f:14, g:[18,11,11],      pbm:48, n:[2,5]},
+ {c:'8x4R3',   k:'rigido', L:23.00, f:14, g:[18,11,18],      pbm:48, n:[2,5]},
+ {c:'8x4R4',   k:'rigido', L:23.00, f:14, g:[18,18,18],      pbm:48, n:[2,5]},
+ {c:'T2S1',    k:'artic',  L:20.50, f:7,  g:[11,11],         pbm:29},
+ {c:'T2S2',    k:'artic',  L:20.50, f:7,  g:[11,18],         pbm:36},
+ {c:'T2Se2',   k:'artic',  L:20.50, f:7,  g:[11,11,11],      pbm:40},
+ {c:'T2S3',    k:'artic',  L:20.50, f:7,  g:[11,25],         pbm:43},
+ {c:'T2Se3',   k:'artic',  L:20.50, f:7,  g:[11,11,18],      pbm:47, n:[4]},
+ {c:'T3S1',    k:'artic',  L:20.50, f:7,  g:[18,11],         pbm:36},
+ {c:'T3S2',    k:'artic',  L:20.50, f:7,  g:[18,18],         pbm:43},
+ {c:'T3Se2',   k:'artic',  L:20.50, f:7,  g:[18,11,11],      pbm:47},
+ {c:'T3S3',    k:'artic',  L:20.50, f:7,  g:[18,25],         pbm:48, n:[2]},
+ {c:'T3Se3',   k:'artic',  L:20.50, f:7,  g:[18,11,18],      pbm:48, n:[2,4]},
+ {c:'T3S2S2',  k:'artic',  L:23.00, f:7,  g:[18,18,18],      pbm:48, n:[2]},
+ {c:'T3Se2Se2',k:'artic',  L:23.00, f:7,  g:[18,22,22],      pbm:48, n:[2,3]},
+ {c:'T3S2S1S2',k:'artic',  L:23.00, f:7,  g:[18,18,11,18],   pbm:48, n:[2]},
+ {c:'T3Se2S1Se2',k:'artic',L:23.00, f:7,  g:[18,22,11,22],   pbm:48, n:[2,3]},
+ {c:'B2',      k:'bus',    L:13.20, f:7,  g:[11],            pbm:18},
+ {c:'B3-1',    k:'bus',    L:14.00, f:7,  g:[16],            pbm:23},
+ {c:'B4-1',    k:'bus',    L:15.00, f:14, g:[16],            pbm:30, n:[5]},
+ {c:'BA-1',    k:'bus',    L:18.30, f:7,  g:[11,7],          pbm:25},
+];
+const MTC_NOTAS = {1:'Conjunto de ejes con un eje direccional',
+ 2:'Vehículo con facilidad de distribución de peso por ejes',
+ 3:'Ejes separados > 2,40 m entre centros de ruedas', 4:'Eje direccional',
+ 5:'Conjunto direccional de dos ejes simples separados > 1,70 m'};
+const mtcKey = s => String(s).replace(/[\s-]/g,'').toUpperCase();
+const MTC_IDX = {}; MTC.forEach(r => MTC_IDX[mtcKey(r.c)] = r);
+
+/* ---------- 2. TRANSPORTISTAS Y OPL ---------- */
+// Efletexia conecta a la OPL con el transportista y con el cliente final.
+const TRANSPORTISTAS = [
+ {cod:'OPL-CRI', nombre:'Crisar Logística',                tipo:'OPL',           contacto:'Claudia Hernández'},
+ {cod:'TR-DRM',  nombre:'Soluciones Logísticas Dream Tec', tipo:'Transportista', opl:'OPL-CRI'},
+ {cod:'TR-AND',  nombre:'Transportes Andinos SAC',         tipo:'Transportista', opl:'OPL-CRI'},
+ {cod:'TR-PRO',  nombre:'Flota propia Efletexia',          tipo:'Propio'},
+];
+const TRANS_IDX = {}; TRANSPORTISTAS.forEach(t => TRANS_IDX[t.cod] = t);
+
+/* ---------- 3. CERTIFICADOS DE BONIFICACIÓN MTC ---------- */
+// Incrementan la capacidad legal de la unidad. Los valores se transcriben del
+// certificado físico: el simulador no los deduce ni los inventa.
+const CERTIFICADOS = [
+ {placa:'XXC-789', nro:'BON-2026-04417', tipo:'Bonificación por suspensión neumática',
+  pbmExtra:1500, ejeExtra:[0,0,1500], emision:'2026-01-18', vence:'2027-01-17'},
+ {placa:'XXC-455', nro:'BON-2025-09912', tipo:'Bonificación por suspensión neumática',
+  pbmExtra:2000, ejeExtra:[0,0,2000], emision:'2025-06-02', vence:'2026-06-01'},
+];
+const CERT_IDX = {}; CERTIFICADOS.forEach(c => CERT_IDX[c.placa] = c);
+const HOY = '2026-08-20';
+const certVigente = c => !!c && c.vence >= HOY;
+
+/* ---------- 4. FLOTA · TRACTOS ---------- */
+const TRACTORES = [
+ {placa:'ABC-123', tipo:'T3', marca:'Volvo FH 440',       trans:'TR-DRM', taraF:4600, taraD:2900, wb:3.75, kpAdv:0.50},
+ {placa:'ABC-456', tipo:'T3', marca:'Scania R450',        trans:'TR-DRM', taraF:4750, taraD:3050, wb:3.80, kpAdv:0.45},
+ {placa:'BDX-901', tipo:'T3', marca:'Freightliner CA126', trans:'TR-AND', taraF:4520, taraD:2980, wb:3.70, kpAdv:0.60},
+ {placa:'CTR-220', tipo:'T2', marca:'Hino 500 GH',        trans:'TR-AND', taraF:3400, taraD:2100, wb:3.40, kpAdv:0.40},
+ {placa:'DFG-778', tipo:'T2', marca:'JAC N-Series',       trans:'TR-PRO', taraF:3250, taraD:2050, wb:3.30, kpAdv:0.35},
+];
+
+/* ---------- 5. FLOTA · CARROZAS (semirremolques) ---------- */
+// xNext  = punto sobre el bastidor donde apoya el kingpin de la unidad siguiente (null = unidad de cola).
+// Lcarga = largo de caja realmente cargable. En una unidad que arrastra otra la caja
+//          termina antes del acople, porque la unidad siguiente monta encima.
+const SEMIS = [
+ {placa:'XXC-789', tipo:'S2',  marca:'Furgón Randon 13.6', trans:'TR-DRM', taraKp:2300, xKp:1.40,
+  rear:[{n:'Tándem remolque', x:10.50, ejes:2, tara:4200}], L:13.60, W:2.45, H:2.70, xNext:null},
+ {placa:'XXC-455', tipo:'S3',  marca:'Furgón Fameca 14.4', trans:'TR-DRM', taraKp:2600, xKp:1.45,
+  rear:[{n:'Trídem remolque', x:10.90, ejes:3, tara:5000}], L:14.40, W:2.45, H:2.75, xNext:null},
+ {placa:'YHT-330', tipo:'Se3', marca:'Plataforma Ballesta',trans:'TR-AND', taraKp:2450, xKp:1.40,
+  rear:[{n:'Eje direccional', x:9.30, ejes:1, tara:1500},
+        {n:'Tándem posterior', x:11.20, ejes:2, tara:3300}], L:13.60, W:2.45, H:2.70, xNext:null},
+ {placa:'ZQP-112', tipo:'S1',  marca:'Furgón corto 9.0',   trans:'TR-PRO', taraKp:1750, xKp:1.30,
+  rear:[{n:'Eje simple remolque', x:7.20, ejes:1, tara:2400}], L:9.00, W:2.45, H:2.60, xNext:null},
+ // --- unidades de bitrén (configuraciones de 23 m del MTC) ---
+ {placa:'BTR-101', tipo:'S2', marca:'Bitrén frontal 9.2',  trans:'TR-DRM', taraKp:1900, xKp:1.30,
+  rear:[{n:'Tándem unidad 1', x:6.90, ejes:2, tara:3100}], L:9.20, Lcarga:7.00, W:2.45, H:2.70, xNext:7.30},
+ {placa:'BTR-102', tipo:'S2', marca:'Bitrén de cola 9.2',  trans:'TR-DRM', taraKp:1900, xKp:1.30,
+  rear:[{n:'Tándem unidad 2', x:6.90, ejes:2, tara:3100}], L:9.20, W:2.45, H:2.70, xNext:null},
+ {placa:'DLY-050', tipo:'S1', marca:'Dolly de enlace',     trans:'TR-AND', taraKp: 700, xKp:0.60,
+  rear:[{n:'Eje del dolly', x:2.30, ejes:1, tara:1400}], L:2.90, Lcarga:0, W:2.45, H:0, xNext:2.40},
+ {placa:'BTR-201', tipo:'S2', marca:'Plataforma enlace 8.6',trans:'TR-AND',taraKp:1800, xKp:1.25,
+  rear:[{n:'Tándem enlace', x:6.40, ejes:2, tara:2950}], L:8.60, W:2.45, H:2.70, xNext:null},
+];
+
+/* ---------- 6. MAESTRO DE CLIENTES ---------- */
+// Cada código de cliente está ligado a un CEDI. Propio = transferencia interna.
+const CLIENTES = [
+ {cod:'C-1001', nombre:'CEDI Lurín',               tipo:'Propio',  cedi:'LUR', ciudad:'Lima',     ventana:'06:00 – 14:00', cierre:'10:00', dir:'Av. Los Faisanes 380, Lurín'},
+ {cod:'C-1002', nombre:'CEDI Huachipa',            tipo:'Propio',  cedi:'HUA', ciudad:'Lima',     ventana:'06:00 – 12:00', cierre:'12:00', dir:'Ca. Las Torres 1120, Huachipa'},
+ {cod:'C-2050', nombre:'Distribuidora Caral Lima', tipo:'Tercero', cedi:'CAR', ciudad:'Lima',     ventana:'08:00 – 16:00', cierre:'16:00', dir:'Av. Argentina 4570, Callao'},
+ {cod:'C-2077', nombre:'Mayorista Trujillo Norte', tipo:'Tercero', cedi:'TRU', ciudad:'Trujillo', ventana:'07:00 – 15:00', cierre:'15:00', dir:'Panamericana Nte. Km 558'},
+ {cod:'C-1003', nombre:'CEDI Arequipa',            tipo:'Propio',  cedi:'AQP', ciudad:'Arequipa', ventana:'05:00 – 13:00', cierre:'13:00', dir:'Vía de Evitamiento 2200, AQP'},
+];
+const CLI_IDX = {}; CLIENTES.forEach(c => CLI_IDX[c.cod] = c);
+const PLANTAS = [
+ {cod:'PL-HUA', nombre:'Planta Huachipa', ciudad:'Lima',     rampas:6, carga:'05:00 – 20:00'},
+ {cod:'PL-TRU', nombre:'Planta Trujillo', ciudad:'Trujillo', rampas:3, carga:'06:00 – 18:00'},
+ {cod:'PL-AQP', nombre:'Planta Arequipa', ciudad:'Arequipa', rampas:2, carga:'06:00 – 17:00'},
+];
+const PL_IDX = {}; PLANTAS.forEach(p => PL_IDX[p.cod] = p);
+
+/* ---------- 7. PERFIL FÍSICO DEL PRODUCTO ---------- */
+// camas = pisos de producto sobre la parihuela · paq = paquetes totales por palé
+const PRODUCTOS = [
+ {sku:'BC-3000', desc:'Big Cola 3.0 L',          fmt:'PET',   l:1.20,a:1.00, camas:4, hCama:0.42, paq:252, kg:1420, apil:1, volteo:false},
+ {sku:'BC-2250', desc:'Big Cola 2.25 L',         fmt:'PET',   l:1.20,a:1.00, camas:5, hCama:0.36, paq:350, kg:1350, apil:1, volteo:false},
+ {sku:'CF-3000', desc:'Cifrut 3.0 L',            fmt:'PET',   l:1.20,a:1.00, camas:4, hCama:0.42, paq:252, kg:1390, apil:1, volteo:false},
+ {sku:'CI-0625', desc:'Cielo 625 ml',            fmt:'PET',   l:1.20,a:1.00, camas:6, hCama:0.30, paq:576, kg:1180, apil:1, volteo:false},
+ {sku:'FT-0500', desc:'Free Tea 500 ml',         fmt:'PET',   l:1.20,a:1.00, camas:6, hCama:0.29, paq:624, kg:1120, apil:1, volteo:false},
+ {sku:'SP-0500', desc:'Sporade 500 ml',          fmt:'PET',   l:1.20,a:1.00, camas:6, hCama:0.29, paq:600, kg:1050, apil:1, volteo:false},
+ {sku:'PU-0400', desc:'Pulp 400 ml',             fmt:'PET',   l:1.20,a:1.00, camas:5, hCama:0.32, paq:600, kg: 980, apil:1, volteo:false},
+ {sku:'VO-0300', desc:'Volt 300 ml',             fmt:'Lata',  l:1.20,a:1.00, camas:5, hCama:0.27, paq:720, kg: 720, apil:2, volteo:false},
+ {sku:'OR-0355', desc:'Oro 355 ml retornable',   fmt:'Vidrio',l:1.20,a:1.00, camas:3, hCama:0.38, paq:180, kg:1480, apil:1, volteo:true },
+ {sku:'EM-VAC1', desc:'Empaque vacío / preforma',fmt:'Sec.',  l:1.20,a:1.00, camas:7, hCama:0.20, paq:1400,kg: 340, apil:2, volteo:false},
+];
+PRODUCTOS.forEach(p => p.h = +(p.camas*p.hCama + 0.15).toFixed(2)); // + altura de la parihuela
+const PROD_IDX = {}; PRODUCTOS.forEach(p => PROD_IDX[p.sku] = p);
+
+/* ---------- 8. STOCK (integración Big Magic) ---------- */
+// El stock es por planta: no todas producen todos los formatos.
+// 0 significa que esa planta no fabrica ese SKU.
+const STOCK_BASE = {
+ 'PL-HUA': {'BC-3000':46,'BC-2250':58,'CF-3000':40,'CI-0625':72,'FT-0500':35,
+            'SP-0500':28,'PU-0400':44,'VO-0300':60,'OR-0355':22,'EM-VAC1':90},
+ 'PL-TRU': {'BC-3000':24,'BC-2250':30,'CF-3000':26,'CI-0625':38,'FT-0500':18,
+            'SP-0500':0, 'PU-0400':22,'VO-0300':0, 'OR-0355':14,'EM-VAC1':40},
+ 'PL-AQP': {'BC-3000':18,'BC-2250':22,'CF-3000':0, 'CI-0625':30,'FT-0500':0,
+            'SP-0500':16,'PU-0400':0, 'VO-0300':20,'OR-0355':0, 'EM-VAC1':26},
+};
+let STOCK = {};
+function syncBigMagic(){
+  STOCK = {};
+  Object.keys(STOCK_BASE).forEach(pl => {
+    STOCK[pl] = {};
+    Object.keys(STOCK_BASE[pl]).forEach(sku => {
+      const b = STOCK_BASE[pl][sku];
+      STOCK[pl][sku] = b ? Math.max(0, b + Math.round((Math.random()-.45)*10)) : 0;
+    });
+  });
+}
+syncBigMagic();
+const stockDe = (pl, sku) => (STOCK[pl] && STOCK[pl][sku]) || 0;
+
+/* ---------- 9. REQUERIMIENTOS DEL DÍA ---------- */
+// Clave operativa observada en la hoja T24: origen + código de cliente + orden de compra
+const PRIOS = {Alta:3, Media:2, Baja:1};
+// cierre = hora límite de recepción en el destino (impulsa la urgencia)
+// El día arranca vacío: los requerimientos se generan desde la posición de
+// inventario de los CEDI, o se importan desde un archivo.
+let REQS = [];
+let REQ_SEQ = 1;
+const HORA_CORTE = 6.0;   // hora de inicio de la planificación (06:00)
+const reqKey = r => r.origen + '|' + r.cli + '|' + r.oc;
+
+/* ---------- 9b. UNIDADES DE TRANSPORTE ARMADAS ---------- */
+// Una unidad = tracto + 1..3 unidades de arrastre. Es lo que se declara disponible
+// en cada ola. La configuración MTC se resuelve sola a partir de las placas.
+const UNIDADES = [
+ {id:'UT-01', placas:['ABC-123','XXC-789'],                     trans:'TR-DRM', chofer:'J. Quispe'},
+ {id:'UT-02', placas:['ABC-456','XXC-455'],                     trans:'TR-DRM', chofer:'M. Ccahua'},
+ {id:'UT-03', placas:['BDX-901','YHT-330'],                     trans:'TR-AND', chofer:'L. Ramos'},
+ {id:'UT-04', placas:['CTR-220','ZQP-112'],                     trans:'TR-AND', chofer:'F. Bautista'},
+ {id:'UT-05', placas:['DFG-778','BTR-201'],                     trans:'TR-PRO', chofer:'A. Núñez'},
+ {id:'UT-06', placas:['ABC-123','BTR-101','BTR-102'],           trans:'TR-DRM', chofer:'R. Ticona'},
+ {id:'UT-07', placas:['BDX-901','BTR-101','DLY-050','BTR-201'], trans:'TR-AND', chofer:'S. Mamani'},
+];
+const UNI_IDX = {}; UNIDADES.forEach(u => UNI_IDX[u.id] = u);
+
+/* ---------- 9a-bis. POSICIÓN DE INVENTARIO EN LOS CEDI ----------
+   Aquí nace la solicitud de reabastecimiento. Cada fila dice cuánto le queda al
+   CEDI, cuánto rota por día y qué cobertura quiere mantener. La necesidad es:
+       objetivo = días objetivo × venta diaria + stock de seguridad
+       solicitar = objetivo − stock actual − lo que ya va en camino          */
+let INVENTARIO = [
+ // CEDI Lurín
+ {cli:'C-1001', sku:'BC-2250', stock: 6, venta:5.2, objDias:3, seg:2},
+ {cli:'C-1001', sku:'CI-0625', stock:11, venta:4.8, objDias:3, seg:2},
+ {cli:'C-1001', sku:'VO-0300', stock:19, venta:2.1, objDias:3, seg:1},
+ // CEDI Huachipa
+ {cli:'C-1002', sku:'FT-0500', stock: 4, venta:5.6, objDias:3, seg:2},
+ {cli:'C-1002', sku:'CF-3000', stock: 9, venta:3.4, objDias:3, seg:2},
+ {cli:'C-1002', sku:'EM-VAC1', stock: 8, venta:2.8, objDias:3, seg:1},
+ // Distribuidora Caral Lima (tercero)
+ {cli:'C-2050', sku:'VO-0300', stock: 5, venta:4.4, objDias:2, seg:1},
+ {cli:'C-2050', sku:'PU-0400', stock: 7, venta:4.0, objDias:2, seg:1},
+ // Mayorista Trujillo Norte (tercero)
+ {cli:'C-2077', sku:'CI-0625', stock: 3, venta:6.1, objDias:3, seg:2},
+ {cli:'C-2077', sku:'BC-2250', stock:12, venta:4.2, objDias:3, seg:2},
+ // CEDI Arequipa
+ {cli:'C-1003', sku:'BC-3000', stock: 5, venta:4.4, objDias:3, seg:2},
+ {cli:'C-1003', sku:'SP-0500', stock: 2, venta:3.8, objDias:3, seg:2},
+ {cli:'C-1003', sku:'CI-0625', stock:16, venta:3.0, objDias:3, seg:1},
+ {cli:'C-1001', sku:'FT-0500', stock: 5, venta:4.5, objDias:3, seg:2},
+ {cli:'C-1002', sku:'BC-2250', stock: 7, venta:5.0, objDias:3, seg:2},
+ {cli:'C-2050', sku:'CI-0625', stock: 6, venta:5.2, objDias:2, seg:1},
+ {cli:'C-2077', sku:'SP-0500', stock: 4, venta:3.6, objDias:3, seg:2},
+ {cli:'C-1003', sku:'PU-0400', stock: 3, venta:3.2, objDias:3, seg:1},
+];
+
+/* ---------- 9b-bis. PLANTILLAS POR TIPO DE VEHÍCULO ----------
+   Con OPLs la flota rota a diario. Cuando entra una placa nueva, estos valores
+   prellenan el alta para que sea usable de inmediato; luego se corrigen con la
+   ficha técnica real de la unidad.                                            */
+const PLANTILLA_TRACTO = {
+ T2: {taraF:3300, taraD:2100, wb:3.40, kpAdv:0.40, marca:'Tracto 2 ejes'},
+ T3: {taraF:4600, taraD:2900, wb:3.75, kpAdv:0.50, marca:'Tracto 3 ejes'},
+};
+const PLANTILLA_CARROZA = {
+ S1:  {taraKp:1750, xKp:1.30, L:9.00,  W:2.45, H:2.60, xNext:null,
+       rear:[{n:'Eje simple remolque', x:7.20, ejes:1, tara:2400}], marca:'Semirremolque 1 eje'},
+ S2:  {taraKp:2300, xKp:1.40, L:13.60, W:2.45, H:2.70, xNext:null,
+       rear:[{n:'Tándem remolque', x:10.50, ejes:2, tara:4200}], marca:'Semirremolque tándem'},
+ S3:  {taraKp:2600, xKp:1.45, L:14.40, W:2.45, H:2.75, xNext:null,
+       rear:[{n:'Trídem remolque', x:10.90, ejes:3, tara:5000}], marca:'Semirremolque trídem'},
+ Se2: {taraKp:2350, xKp:1.40, L:13.60, W:2.45, H:2.70, xNext:null,
+       rear:[{n:'Ejes separados', x:10.40, ejes:2, tara:4100}], marca:'Semirremolque ejes separados'},
+ Se3: {taraKp:2450, xKp:1.40, L:13.60, W:2.45, H:2.70, xNext:null,
+       rear:[{n:'Eje direccional', x:9.30, ejes:1, tara:1500},
+             {n:'Tándem posterior', x:11.20, ejes:2, tara:3300}], marca:'Semirremolque autodireccional'},
+};
+// Tipos que el catálogo del MTC admite en cada posición
+const TIPOS_TRACTO  = Object.keys(PLANTILLA_TRACTO);
+const TIPOS_CARROZA = Object.keys(PLANTILLA_CARROZA);
+
+/* ---------- 9c. ESTADO DE LA PLANIFICACIÓN POR OLAS ---------- */
+let POOL = [];        // palés pendientes de asignar
+let OLAS = [];        // historial de olas ejecutadas
+let ORDENES = [];     // órdenes de carga emitidas
+let OLA_ACTUAL = 1;
+let DISPONIBLES = ['UT-01','UT-02','UT-03','UT-04','UT-05'];   // flota de la ola en curso
+
+/* ---------- 10. PARÁMETROS OPERATIVOS ---------- */
+// El estándar de 24 parihuelas es norma operativa, no un error de cálculo.
+let PARAMS = { stdPales:24, modoStd:'maximo', maxDestinos:2, maxOrigenes:1,
+               usarCert:true, margin:2, strat:'urgencia', horasOla:2.5 };
+</script>
+<script>
+/* ==================================================================
+   MOTOR · cadena de N unidades (tracto + 1..3 unidades de arrastre)
+   ================================================================== */
+let RIG = null, RESULT = null;
+let PLACAS = ['ABC-123','XXC-789'];   // [tracto, unidad 1, unidad 2, ...]
+
+/* ---------- Resolver la combinación completa ---------- */
+function resolveRig(placas, usarCert){
+  const pt = (placas[0]||'').trim().toUpperCase();
+  const t = TRACTORES.find(x => x.placa.toUpperCase() === pt);
+  if(!t) return {err:'La placa de tracto no está en el maestro de vehículos.', bad:[0]};
+  if(placas.length < 2) return {err:'Falta al menos una unidad de arrastre.', bad:[1]};
+
+  const us = [], bad = [];
+  for(let i=1;i<placas.length;i++){
+    const p = (placas[i]||'').trim().toUpperCase();
+    const s = SEMIS.find(x => x.placa.toUpperCase() === p);
+    if(!s){ bad.push(i); continue; }
+    if(us.some(u => u.placa === s.placa)){ bad.push(i); }
+    us.push(s);
+  }
+  if(bad.length) return {err:'Hay placas de arrastre no registradas o repetidas.', bad};
+
+  // Toda unidad que no sea la última debe tener punto de acople
+  for(let i=0;i<us.length-1;i++)
+    if(us[i].xNext == null)
+      return {err:'La unidad '+us[i].placa+' ('+us[i].marca+') no puede arrastrar otra: no tiene punto de acople.',
+              bad:[i+2]};
+
+  const code = t.tipo + us.map(u=>u.tipo).join('');
+  const norm = MTC_IDX[mtcKey(code)];
+  if(!norm) return {err:'La combinación '+code+' no existe en la tabla del MTC.', bad:placas.map((_,i)=>i)};
+
+  // Reparto de conjuntos: delantero y 1º al tracto; el resto a las unidades en orden
+  const gRest = norm.g.slice(1);
+  const need = us.reduce((a,u)=>a+u.rear.length, 0);
+  if(gRest.length !== need)
+    return {err:'La tabla del MTC define '+gRest.length+' conjunto(s) posterior(es) para '+code+
+                ', pero las unidades registradas suman '+need+'.', bad:placas.map((_,i)=>i?i:null).filter(x=>x!=null)};
+
+  let limFront = norm.f*1000, limDrive = norm.g[0]*1000, pbm = norm.pbm*1000;
+  const base = {limFront, limDrive, pbm, rear:[...gRest.map(v=>v*1000)]};
+
+  let gi = 0, off = 0;
+  const units = us.map((s, idx) => {
+    const cert = CERT_IDX[s.placa] || null;
+    const certAplica = !!(usarCert && certVigente(cert));
+    const rear = s.rear.map((g,j) => {
+      const b = gRest[gi++]*1000;
+      const extra = certAplica ? ((cert.ejeExtra||[])[j+2] || 0) : 0;
+      return {...g, lim: b + extra, base: b};
+    });
+    if(certAplica) pbm += cert.pbmExtra || 0;
+    const totEjes = rear.reduce((a,g)=>a+g.ejes,0);
+    const share = rear.map(g => g.ejes/totEjes);
+    const xTdEff = rear.reduce((a,g,i)=>a + g.x*share[i], 0);
+    const den = xTdEff - s.xKp;
+    const rnNext = s.xNext != null ? (s.xNext - s.xKp)/den : 0;
+
+    // rejilla de posiciones (el dolly no lleva carga)
+    const pd = 1.00, pw = 1.20;
+    const Lc = s.Lcarga != null ? s.Lcarga : s.L;
+    const cargable = s.H > 0 && Lc >= 2.0;
+    const nSlots = cargable ? Math.floor(Lc / pd) : 0;
+    const nRows  = cargable ? Math.max(1, Math.floor(s.W / pw)) : 0;
+    const slots = [];
+    for(let k=0;k<nSlots;k++) for(let r=0;r<nRows;r++)
+      slots.push({slot:k, row:r, x: pd/2 + k*pd});
+
+    const u = {...s, idx, rear, share, xTdEff, den, rnNext, cert, certAplica,
+      Lc, slots, nSlots, nRows, pd, cargable,
+      xMin: nSlots?pd/2:0, xMax: nSlots?pd/2+(nSlots-1)*pd:0, off};
+    off += (s.xNext != null ? s.xNext : s.L + 0.4) - (us[idx+1] ? us[idx+1].xKp : 0);
+    return u;
+  });
+
+  const kf = t.kpAdv / t.wb;
+  const taraTract = t.taraF + t.taraD;
+  const taraUnits = units.reduce((a,u)=> a + u.taraKp + u.rear.reduce((b,g)=>b+g.tara,0), 0);
+  const taraTotal = taraTract + taraUnits;
+
+  // rejilla global: orden de pared frontal de la unidad 1 hasta la puerta de la última
+  const cells = [];
+  units.forEach(u => u.slots.forEach(s =>
+    cells.push({u:u.idx, slot:s.slot, row:s.row, x:s.x, gx:u.off + s.x, gi:cells.length, p:null, parada:null})));
+  cells.forEach((c,i)=> c.gi = i);
+
+  // Largo real: del frente de la cabina a la puerta de la última unidad.
+  // No es la suma de plataformas: la primera unidad monta sobre la quinta rueda.
+  const u0 = units[0], last = units[units.length-1];
+  const cabFront = u0.xKp + t.kpAdv - t.wb - 1.55;
+  const largo = (last.off + last.L) - cabFront;
+  return {t, units, code, norm, kf, limFront, limDrive, pbm, base,
+    taraTract, taraUnits, taraTotal, cells, capPos: cells.length,
+    nUnits: units.length, largo, largoMax: norm.L,
+    largoOk: largo <= norm.L + 0.01,
+    certs: units.filter(u=>u.cert).map(u=>({...u.cert, aplica:u.certAplica}))};
+}
+
+/* ---------- Cadena de reacciones ----------
+   Cada unidad se apoya en su kingpin y en su conjunto posterior equivalente.
+   La reacción del kingpin de la unidad i cae sobre el bastidor de la i−1,
+   y la de la primera unidad cae sobre la quinta rueda del tracto.        */
+function chainLoads(rig, estado, margin){
+  const n = rig.units.length;
+  const rearW = new Array(n), Qs = new Array(n+1);
+  let Qnext = 0;
+  for(let i=n-1;i>=0;i--){
+    const u = rig.units[i], st = estado[i] || {W:0, M:0};
+    const Rcargo = (st.M - st.W*u.xKp) / u.den;
+    const Rnext  = Qnext * u.rnNext;
+    rearW[i] = Rcargo + Rnext;
+    Qs[i] = u.taraKp + (st.W - Rcargo) + (Qnext - Rnext);
+    Qnext = Qs[i];
+  }
+  const Q0 = Qs[0];
+  const front = rig.t.taraF + Q0*rig.kf;
+  const drive = rig.t.taraD + Q0*(1-rig.kf);
+  const ejes = [
+    {n:'E1 · Eje delantero (direccional)', w:front, lim:rig.limFront, base:rig.base.limFront, u:-1},
+    {n:'E2 · '+(rig.t.tipo==='T3'?'Tándem motriz':'Eje motriz'), w:drive, lim:rig.limDrive, base:rig.base.limDrive, u:-1}
+  ];
+  rig.units.forEach((u,i) => u.rear.forEach((g,j) => ejes.push({
+    n:'E'+(ejes.length+1)+' · '+g.n, w: g.tara + rearW[i]*u.share[j],
+    lim:g.lim, base:g.base, u:i })));
+
+  const m = 1 - (margin||0)/100;
+  ejes.forEach(e => { e.pct = e.w/e.lim; e.ok = e.w <= e.lim*m + 0.5; e.sinCert = e.w <= e.base + 0.5; });
+  const Wtot = estado.reduce((a,s)=>a+(s?s.W:0),0);
+  const pbv = rig.taraTotal + Wtot;
+  return {ejes, Qs, rearW, pbv, Wtot, pbvOk: pbv <= rig.pbm + 0.5, pbvPct: pbv/rig.pbm,
+    ok: ejes.every(e=>e.ok) && pbv <= rig.pbm + 0.5,
+    dependeCert: rig.certs.some(c=>c.aplica) && (!ejes.every(e=>e.sinCert) || pbv > rig.base.pbm + 0.5)};
+}
+
+/* ---------- Coste de una configuración ---------- */
+function costOf(rig, estado, margin){
+  const L = chainLoads(rig, estado, margin);
+  const m = 1 - (margin||0)/100;
+  let pen = 0, peor = 0;
+  L.ejes.forEach(e => { const lim = e.lim*m;
+    if(e.w > lim) pen += Math.pow((e.w-lim)/lim, 2);
+    peor = Math.max(peor, e.w/lim); });
+  if(L.pbv > rig.pbm) pen += Math.pow((L.pbv-rig.pbm)/rig.pbm, 2);
+  peor = Math.max(peor, L.pbv/rig.pbm);
+  return {cost: pen*1000 + peor, pen, peor, L};
+}
+
+/* ---------- Techo de la cadena ----------
+   ΣW = Σ A_i + Qmax − Σ taraKp_i     (generalización de A+B)          */
+function ceiling(rig, margin){
+  const m = 1 - (margin||0)/100;
+  const A = rig.units.map(u => Math.min(...u.rear.map((g,j)=> (g.lim*m - g.tara)/u.share[j])));
+  const qF = (rig.limFront*m - rig.t.taraF) / rig.kf;
+  const qD = (rig.limDrive*m - rig.t.taraD) / (1 - rig.kf);
+  const Qmax = Math.min(qF, qD);
+  const sumA = A.reduce((a,b)=>a+b,0);
+  const sumKp = rig.units.reduce((a,u)=>a+u.taraKp,0);
+  const wAxles = sumA + Qmax - sumKp;
+  const wPbm = rig.pbm - rig.taraTotal;
+  const wMax = Math.max(0, Math.min(wAxles, wPbm));
+  return {A, sumA, Qmax, qF, qD, wAxles, wPbm, wMax,
+    bind: wAxles < wPbm ? 'ejes' : 'peso bruto', holgura: wPbm - wAxles};
+}
+
+/* ---------- Estiba: bloques por parada + búsqueda local sobre la cadena ----------
+   LIFO global: la parada 1 se descarga primero, así que ocupa las posiciones
+   más cercanas a la puerta de la última unidad.                          */
+function placeBlocks(rig, grupos, margin){
+  const ord = [...grupos].sort((a,b) => b.parada - a.parada);   // última parada al frente
+  const total = ord.reduce((a,g)=>a+g.pallets.length,0);
+  if(total > rig.capPos) return null;
+
+  const cells = rig.cells.map(c => ({...c, p:null, parada:null}));
+  // reparto inicial: cada parada toma un tramo contiguo del índice global
+  const rangos = []; let ini = 0;
+  ord.forEach((g,i) => {
+    const fin = (i === ord.length-1) ? cells.length
+              : ini + Math.max(g.pallets.length, Math.round(g.pallets.length*1.25));
+    const f = Math.min(fin, cells.length - ord.slice(i+1).reduce((a,x)=>a+x.pallets.length,0));
+    rangos.push([ini, f]);
+    const libres = cells.filter(c => c.gi >= ini && c.gi < f);
+    [...g.pallets].sort((a,b)=>b.kg-a.kg).forEach((p,j) => {
+      if(libres[j]){ libres[j].p = p; libres[j].parada = g.parada; }});
+    ini = f;
+  });
+
+  // estado agregado por unidad (W, M) para evaluar la cadena en O(unidades)
+  const est = () => {
+    const e = rig.units.map(()=>({W:0, M:0}));
+    cells.forEach(c => { if(c.p){ e[c.u].W += c.p.kg; e[c.u].M += c.p.kg*c.x; }});
+    return e;
+  };
+  let estado = est(), best = costOf(rig, estado, margin);
+
+  for(let it=0; it<260; it++){
+    const occ = cells.filter(c=>c.p);
+    let mejor = null, mejorCost = best.cost;
+    for(const o of occ){
+      const gi2 = ord.findIndex(g => g.parada === o.parada);
+      const [a,b] = rangos[gi2];
+      for(const e of cells){
+        if(e.p || e.gi < a || e.gi >= b) continue;
+        const st = estado.map(s=>({...s}));
+        st[o.u].W -= o.p.kg; st[o.u].M -= o.p.kg*o.x;
+        st[e.u].W += o.p.kg; st[e.u].M += o.p.kg*e.x;
+        const c = costOf(rig, st, margin);
+        if(c.cost < mejorCost - 1e-9){ mejorCost = c.cost; mejor = [o,e,st,c]; }
+      }
+    }
+    if(!mejor) break;
+    mejor[1].p = mejor[0].p; mejor[1].parada = mejor[0].parada;
+    mejor[0].p = null; mejor[0].parada = null;
+    estado = mejor[2]; best = mejor[3];
+  }
+
+  const placed = cells.filter(c=>c.p);
+  placed.sort((a,b) => a.gi - b.gi).forEach((c,i)=> c.seq = i+1);
+  const porUnidad = rig.units.map((u,i) => {
+    const ps = placed.filter(c=>c.u===i);
+    const W = ps.reduce((a,c)=>a+c.p.kg,0);
+    return {W, n:ps.length, xcg: W ? ps.reduce((a,c)=>a+c.p.kg*c.x,0)/W : 0};
+  });
+  return {cells, placed, estado, rangos, ord, porUnidad,
+    xcgGlobal: placed.length ? placed.reduce((a,c)=>a+c.p.kg*c.gx,0)/placed.reduce((a,c)=>a+c.p.kg,0) : 0,
+    axles: best.L, cost: best};
+}
+
+/* ==================================================================
+   SOLICITUD DE REABASTECIMIENTO
+   De la posición de inventario del CEDI sale la necesidad, la prioridad
+   y la hora de cierre. El requerimiento deja de ser un dato escrito a mano.
+   ================================================================== */
+
+// Dos estados distintos que no hay que mezclar:
+//   despachado = ya tiene orden de carga emitida, va en camino al CEDI
+//   solicitado = está en el pool del día, pero todavía sin camión asignado
+function comprometido(cli, sku){
+  let desp = 0, sol = 0;
+  ORDENES.forEach(o => o.pallets.forEach(p => { if(p.cli===cli && p.sku===sku) desp++; }));
+  POOL.forEach(p => { if(p.cli===cli && p.sku===sku) sol++; });
+  return {desp, sol, total: desp + sol};
+}
+
+// Planta que debe abastecer: primero la de la misma ciudad, luego la de más stock
+function plantaSugerida(cli, sku, faltan){
+  const c = CLI_IDX[cli] || {};
+  const cand = PLANTAS.filter(p => stockDe(p.cod, sku) > 0);
+  if(!cand.length) return {cod:null, motivo:'ningún origen produce este SKU'};
+  const local = cand.filter(p => p.ciudad === c.ciudad);
+  const orden = [...(local.length ? local : cand)]
+    .sort((a,b) => stockDe(b.cod, sku) - stockDe(a.cod, sku));
+  const p = orden[0];
+  return {cod:p.cod,
+    motivo: local.length ? 'planta en la misma ciudad'
+          : 'única con stock disponible: ' + stockDe(p.cod, sku) + ' palés',
+    cubre: stockDe(p.cod, sku) >= faltan};
+}
+
+function solicitudes(){
+  return INVENTARIO.map(r => {
+    const prod = PROD_IDX[r.sku] || {};
+    const cli = CLI_IDX[r.cli] || {};
+    const c = comprometido(r.cli, r.sku);
+    const cobertura = r.venta > 0 ? r.stock / r.venta : 99;
+    const covProyectada = r.venta > 0 ? (r.stock + c.total) / r.venta : 99;
+    const objetivo = Math.round(r.objDias * r.venta + r.seg);
+    const faltan = Math.max(0, objetivo - r.stock - c.total);
+    // La cobertura manda sobre la prioridad: por debajo de un día es quiebre
+    const prio = cobertura < 1 ? 'Alta' : cobertura < 2 ? 'Media' : 'Baja';
+    const pl = faltan > 0 ? plantaSugerida(r.cli, r.sku, faltan) : {cod:null};
+    // El estado describe el inventario, no el trámite: un quiebre sigue siendo
+    // quiebre aunque ya esté solicitado, hasta que la carga llegue.
+    const estado = faltan > 0
+      ? (cobertura < 1 ? 'quiebre' : cobertura < 2 ? 'critico' : 'reponer')
+      : (c.desp ? 'despachado' : c.sol ? 'solicitado' : 'cubierto');
+    return {...r, prod, cli, cliNom:cli.nombre, cedi:cli.cedi,
+      desp:c.desp, sol:c.sol, transito:c.total, cobertura, covProyectada,
+      objetivo, faltan, prio, planta:pl, cierre: cli.cierre || '23:59', estado,
+      kg: faltan * (prod.kg || 0)};
+  }).sort((a,b) => a.cobertura - b.cobertura);
+}
+
+// Convierte las solicitudes con necesidad en líneas de requerimiento
+function generarRequerimientos(reemplazar){
+  // Al reemplazar hay que descontar primero lo ya solicitado: si no, la necesidad
+  // sale cubierta por el propio pedido que se está por sustituir y no genera nada.
+  if(reemplazar){ REQS = []; REQ_SEQ = 1; POOL = []; }
+  const s = solicitudes().filter(x => x.faltan > 0 && x.planta.cod);
+  const ocs = {};
+  s.forEach(x => {
+    const k = x.planta.cod + '|' + x.cli.cod;
+    if(!ocs[k]) ocs[k] = 'RA-' + String(Date.now()).slice(-5) + '-' + (Object.keys(ocs).length + 1);
+    REQS.push({id:REQ_SEQ++, origen:x.planta.cod, cli:x.cli.cod, oc:ocs[k], sku:x.sku,
+               pales:x.faltan, prio:x.prio, cierre:x.cierre,
+               fuente:'reabastecimiento',
+               just:`cobertura ${x.cobertura.toFixed(1)} d · objetivo ${x.objDias} d · stock ${x.stock}`});
+  });
+  const sinOrigen = solicitudes().filter(x => x.faltan > 0 && !x.planta.cod);
+  return {lineas:s.length, pales:s.reduce((a,x)=>a+x.faltan,0), sin:sinOrigen};
+}
+
+/* ---------- Requerimientos → palés ---------- */
+function explodeReqs(){
+  const out = [], usado = {};
+  REQS.forEach(r => {
+    const p = PROD_IDX[r.sku]; if(!p) return;
+    const k = r.origen + '|' + r.sku;
+    const disp = Math.max(0, stockDe(r.origen, r.sku) - (usado[k]||0));
+    const asign = Math.min(r.pales, disp);
+    usado[k] = (usado[k]||0) + asign;
+    const cli = CLI_IDX[r.cli] || {nombre:'?', cedi:'?', tipo:'?'};
+    const pl  = PL_IDX[r.origen] || {nombre:'?', ciudad:'?'};
+    for(let i=0;i<asign;i++)
+      out.push({sku:r.sku, desc:p.desc, kg:p.kg, prio:r.prio, pr:PRIOS[r.prio], fmt:p.fmt,
+        apil:p.apil, cli:r.cli, cliNom:cli.nombre, cedi:cli.cedi, cliTipo:cli.tipo,
+        oc:r.oc, origen:r.origen, plantaNom:pl.nombre, ciudad:pl.ciudad,
+        reqId:r.id, tag:r.id+'#'+i});
+  });
+  return out;
+}
+function reqAsignados(){
+  const usado = {}, res = {};
+  REQS.forEach(r => {
+    const k = r.origen + '|' + r.sku;
+    const disp = Math.max(0, stockDe(r.origen, r.sku) - (usado[k]||0));
+    const a = Math.min(r.pales, disp);
+    usado[k] = (usado[k]||0) + a; res[r.id] = a;
+  });
+  return res;
+}
+
+/* ==================================================================
+   PLANIFICACIÓN POR OLAS
+   ================================================================== */
+
+/* ---------- Urgencia de un palé ---------- */
+// Tres componentes explícitos y auditables: prioridad declarada, cuánto falta
+// para el cierre de recepción, y cuántas olas lleva esperando.
+const PESO_PRIO = {Alta:300, Media:180, Baja:80};
+const hhmm = h => String(Math.floor(h)).padStart(2,'0')+':'+String(Math.round((h%1)*60)).padStart(2,'0');
+function horaDeOla(ola){ return HORA_CORTE + (ola-1)*PARAMS.horasOla; }
+
+function urgencia(p, ola){
+  const ahora = horaDeOla(ola);
+  const [hh,mm] = String(p.cierre||'23:59').split(':').map(Number);
+  const cierre = hh + (mm||0)/60;
+  const rest = cierre - ahora;
+  const espera = Math.max(0, ola - (p.desdeOla||1));
+  const sPrio = PESO_PRIO[p.prio] || 80;
+  const sVent = rest <= 0 ? 400 : Math.max(0, 200 - rest*25);
+  const sEsp  = espera * 60;
+  return {score: sPrio + sVent + sEsp, sPrio, sVent, sEsp, rest, espera,
+          vencido: rest <= 0, cierre: p.cierre};
+}
+
+/* ---------- Construir / reiniciar el pool ---------- */
+function resetPool(){
+  POOL = explodeReqs().map((p,i) => {
+    const r = REQS.find(x => x.id === p.reqId) || {};
+    return {...p, cierre: r.cierre || '23:59', desdeOla: 1, uid: 'P'+i};
+  });
+  OLAS = []; ORDENES = []; OLA_ACTUAL = 1;
+  return POOL;
+}
+
+/* ---------- Ranking de urgencia sobre todo el pool ---------- */
+function rankingPool(ola){
+  return POOL.map(p => ({...p, u: urgencia(p, ola)}))
+             .sort((a,b) => b.u.score - a.u.score || b.kg - a.kg);
+}
+// Agrupado por orden de compra, que es como lo mira el planificador
+function rankingOrdenes(ola){
+  const g = {};
+  rankingPool(ola).forEach(p => {
+    const k = p.cli+'|'+p.oc;
+    if(!g[k]) g[k] = {cli:p.cli, cliNom:p.cliNom, cedi:p.cedi, oc:p.oc, prio:p.prio,
+                      cierre:p.cierre, pales:0, kg:0, score:p.u.score, u:p.u, skus:{}};
+    g[k].pales++; g[k].kg += p.kg; g[k].skus[p.sku] = (g[k].skus[p.sku]||0)+1;
+    g[k].score = Math.max(g[k].score, p.u.score);
+  });
+  return Object.values(g).sort((a,b) => b.score - a.score);
+}
+
+/* ---------- Cargar una unidad desde el ranking ---------- */
+function cargarUnidad(rig, ranking, margin){
+  const capPales = PARAMS.modoStd === 'libre' ? rig.capPos
+                 : Math.min(PARAMS.stdPales * rig.nUnits, rig.capPos);
+  const ceil = ceiling(rig, margin);
+  if(!ranking.length) return null;
+
+  // 1. El punto de recojo lo fija el palé más urgente. Un vehículo no pasa por
+  //    dos plantas salvo que se autorice: cada recojo es una parada extra en origen.
+  const ordOrig = [...new Set(ranking.map(p => p.origen))];
+  const origenes = ordOrig.slice(0, Math.max(1, PARAMS.maxOrigenes));
+  ranking = ranking.filter(p => origenes.includes(p.origen));
+  if(!ranking.length) return null;
+
+  // 2. El destino lo fija el palé más urgente de ese origen
+  const porCli = {};
+  ranking.forEach(p => (porCli[p.cli] = porCli[p.cli] || []).push(p));
+  const orden = [...new Set(ranking.map(p => p.cli))];
+  const destinos = orden.slice(0, Math.max(1, PARAMS.maxDestinos));
+
+  let take = [], W = 0;
+  for(const c of destinos){
+    for(const p of porCli[c]){
+      if(take.length >= capPales) break;
+      if(W + p.kg <= ceil.wMax){ take.push(p); W += p.kg; }
+    }
+    if(take.length >= capPales) break;
+  }
+  if(!take.length) return null;
+
+  // Una parada de uno o dos palés no justifica el desvío
+  if(PARAMS.maxDestinos > 1){
+    const cnt = {}; take.forEach(p => cnt[p.cli] = (cnt[p.cli]||0)+1);
+    const ks = Object.keys(cnt);
+    if(ks.length > 1){
+      const flojos = ks.filter(c => cnt[c] < 3 && cnt[c] < porCli[c].length);
+      if(flojos.length && flojos.length < ks.length){
+        const f = new Set(flojos); take = take.filter(p => !f.has(p.cli));
+      }
+    }
+  }
+  if(!take.length) return null;
+
+  const armar = lista => {
+    const g = {}; lista.forEach(p => (g[p.cli] = g[p.cli] || []).push(p));
+    return Object.keys(g).sort((a,b) => g[a].length - g[b].length)
+      .map((k,i) => ({parada:i+1, cli:k, cliNom:CLI_IDX[k].nombre, cedi:CLI_IDX[k].cedi, pallets:g[k]}));
+  };
+
+  let pl = null, guard = 0;
+  while(guard++ < 60 && take.length){
+    pl = placeBlocks(rig, armar(take), margin);
+    if(pl && pl.axles.ok) break;
+    if(take.length <= 1){ pl = null; break; }
+    let iMax = 0; take.forEach((p,i)=>{ if(p.kg > take[iMax].kg) iMax = i; });
+    take.splice(iMax,1);
+  }
+  if(!pl || !pl.axles.ok) return null;
+
+  W = take.reduce((a,p)=>a+p.kg,0);
+  const recojos = [...new Set(take.map(p=>p.origen))]
+    .map(o => ({cod:o, nombre:(PL_IDX[o]||{}).nombre, ciudad:(PL_IDX[o]||{}).ciudad,
+                pales: take.filter(p=>p.origen===o).length,
+                kg: take.filter(p=>p.origen===o).reduce((a,p)=>a+p.kg,0)}));
+  return {pallets:take, W, placement:pl, axles:pl.axles, paradas:armar(take), recojos, capPales, ceil,
+    usoPeso: W/ceil.wMax, usoLegal: W/(rig.pbm - rig.taraTotal), usoStd: take.length/capPales,
+    urgMax: Math.max(...take.map(p=>p.u?p.u.score:0)),
+    urgMin: Math.min(...take.map(p=>p.u?p.u.score:0))};
+}
+
+/* ---------- Planificar una ola ---------- */
+function planificarOla(ids, opt){
+  const margin = opt.margin;
+  const ola = OLA_ACTUAL;
+  let ranking = rankingPool(ola);
+  const demandaInicial = ranking.length, kgInicial = ranking.reduce((a,p)=>a+p.kg,0);
+
+  // Resolver cada unidad declarada disponible
+  const flota = [], rechazadas = [];
+  ids.forEach(id => {
+    const u = UNI_IDX[id]; if(!u) return;
+    const rig = resolveRig(u.placas, PARAMS.usarCert);
+    if(rig.err){ rechazadas.push({id, motivo:rig.err}); return; }
+    flota.push({id, u, rig, cap: ceiling(rig, margin).wMax, pos: rig.capPos});
+  });
+  // La carga más urgente va primero a la unidad de mayor capacidad
+  flota.sort((a,b) => b.cap - a.cap || b.pos - a.pos);
+
+  const ordenes = [], vacias = [];
+  const asignados = new Set();
+  flota.forEach((f, i) => {
+    const disp = ranking.filter(p => !asignados.has(p.uid));
+    const carga = disp.length ? cargarUnidad(f.rig, disp, margin) : null;
+    if(!carga){
+      vacias.push({...f, motivo: disp.length ? 'no se pudo armar una carga válida' : 'sin demanda pendiente'});
+      return;
+    }
+    carga.pallets.forEach(p => asignados.add(p.uid));
+    ordenes.push({
+      nro: 'OC-'+String(ola).padStart(2,'0')+'-'+String(ordenes.length+1).padStart(2,'0'),
+      ola, unidad:f.id, chofer:f.u.chofer, trans:f.u.trans, placas:f.u.placas,
+      rig:f.rig, code:f.rig.code, ...carga,
+      origen: carga.recojos.map(r=>r.cod).join('+'),
+      origenNom: carga.recojos.map(r=>r.nombre).join(' + '),
+      emitida: hhmm(horaDeOla(ola)),
+      limitante: (() => {
+        const rest = ranking.filter(p => !asignados.has(p.uid));
+        if(carga.pallets.length >= carga.capPales)
+          return PARAMS.modoStd==='libre' ? 'posiciones' : 'estándar de '+carga.capPales;
+        if(!rest.length) return 'demanda';
+        if(carga.W + Math.min(...rest.map(p=>p.kg)) > carga.ceil.wMax)
+          return carga.ceil.bind === 'ejes' ? 'ejes' : 'peso bruto';
+        return 'reparto por ejes';
+      })()
+    });
+  });
+
+  const pend = ranking.filter(p => !asignados.has(p.uid));
+  const capProm = flota.length ? flota.reduce((a,f)=>a+f.cap,0)/flota.length : 0;
+  const posProm = flota.length ? flota.reduce((a,f)=>a+f.pos,0)/flota.length : 26;
+  const kgPend = pend.reduce((a,p)=>a+p.kg,0);
+  const faltan = pend.length ? Math.max(
+      Math.ceil(kgPend/Math.max(capProm,1)), Math.ceil(pend.length/Math.max(posProm,1))) : 0;
+
+  const porOrigen = {};
+  pend.forEach(p => { const g = porOrigen[p.origen] = porOrigen[p.origen] ||
+    {cod:p.origen, nombre:p.plantaNom, pales:0, kg:0}; g.pales++; g.kg += p.kg; });
+
+  return {ola, hora: hhmm(horaDeOla(ola)), flota, rechazadas, ordenes, vacias,
+    pendPorOrigen: Object.values(porOrigen).sort((a,b)=>b.pales-a.pales),
+    asignados: asignados.size, demandaInicial, kgInicial,
+    kgAsignado: ordenes.reduce((a,o)=>a+o.W,0), pendientes: pend, kgPend,
+    unidadesFaltantes: faltan, ranking,
+    urgVencidos: pend.filter(p=>p.u.vencido).length,
+    cumple: ordenes.every(o=>o.axles.ok)};
+}
+
+/* ---------- Confirmar la ola: emite las órdenes y avanza ---------- */
+function confirmarOla(res){
+  const ids = new Set();
+  res.ordenes.forEach(o => o.pallets.forEach(p => ids.add(p.uid)));
+  POOL = POOL.filter(p => !ids.has(p.uid));
+  ORDENES = ORDENES.concat(res.ordenes);
+  OLAS.push({ola:res.ola, hora:res.hora, unidades:res.flota.length, ordenes:res.ordenes.length,
+             vacias:res.vacias.length, pales:res.asignados, kg:res.kgAsignado,
+             pendientes:res.pendientes.length, kgPend:res.kgPend});
+  OLA_ACTUAL++;
+  return {pendientes: POOL.length};
+}
+
+</script>
+<script>
+/* ==================================================================
+   RENDER
+   ================================================================== */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const kg  = v => Math.round(v).toLocaleString('es-PE');
+const t1  = v => (v/1000).toFixed(2);
+const pct = v => (v*100).toFixed(1);
+
+const SKU_COLORS = ['#00d9e8','#12e0a2','#ffb020','#ff4b6b','#8b6cf0','#38bdf8','#f472b6','#a3e635','#fb923c','#7f9db0'];
+const skuColor = sku => SKU_COLORS[PRODUCTOS.findIndex(p=>p.sku===sku) % SKU_COLORS.length];
+const PL_COLORS = {'PL-HUA':'#00d9e8','PL-TRU':'#12e0a2','PL-AQP':'#8b6cf0'};
+const plColor = cod => PL_COLORS[cod] || '#7f9db0';
+const CLI_COLORS = ['#00d9e8','#ffb020','#8b6cf0','#12e0a2','#f472b6'];
+const cliColor = cod => CLI_COLORS[CLIENTES.findIndex(c=>c.cod===cod) % CLI_COLORS.length];
+
+function toast(msg, bad){
+  const el = $('#toast'); el.textContent = msg;
+  el.className = 'toast show' + (bad?' bad':'');
+  clearTimeout(el._t); el._t = setTimeout(()=> el.className='toast'+(bad?' bad':''), 3400);
+}
+const opt = () => ({
+  margin:+$('#optMargin').value||0, strat:$('#optStrat').value,
+  maxTrips:+$('#optMaxTrips').value||6
+});
+
+/* ---------- MAESTROS ---------- */
+function renderMaestros(){
+  $('#tblMtc').querySelector('tbody').innerHTML = MTC.map(r=>{
+    const g = [0,1,2,3].map(i => r.g[i]!=null ? r.g[i] : '—');
+    const tipo = r.k==='artic' ? '<span class="pill p-cyan">Articulado</span>'
+               : r.k==='bus'   ? '<span class="pill p-baja">Bus</span>'
+                               : '<span class="pill p-baja">Rígido</span>';
+    return `<tr data-code="${mtcKey(r.c)}"><td style="color:var(--txt);font-weight:700">${r.c}</td>
+      <td>${tipo}</td><td class="num">${r.L.toFixed(2)}</td><td class="num">${r.f}</td>
+      <td class="num">${g[0]}</td><td class="num">${g[1]}</td><td class="num">${g[2]}</td><td class="num">${g[3]}</td>
+      <td class="num" style="color:var(--cyan);font-weight:700">${r.pbm}${r.n?'<sup>'+r.n.join(',')+'</sup>':''}</td>
+      <td style="font-size:9.5px;color:var(--muted)">${(r.n||[]).map(k=>'('+k+')').join(' ')}</td></tr>`;
+  }).join('');
+
+  $('#tblProd').querySelector('tbody').innerHTML = PRODUCTOS.map(p=>`
+    <tr><td style="color:var(--cyan);font-weight:700">
+      <span style="display:inline-block;width:8px;height:8px;background:${skuColor(p.sku)};margin-right:6px"></span>${p.sku}</td>
+    <td style="color:var(--txt)">${p.desc}</td><td>${p.fmt}</td>
+    <td class="num">${p.l.toFixed(2)} × ${p.a.toFixed(2)}</td>
+    <td class="num" style="color:var(--txt);font-weight:700">${p.camas}</td>
+    <td class="num">${p.h.toFixed(2)}</td><td class="num">${p.paq}</td>
+    <td class="num" style="color:var(--txt);font-weight:700">${kg(p.kg)}</td>
+    <td class="num">${p.apil}</td>
+    <td>${p.volteo?'<span class="pill p-bad">No voltear</span>':'<span class="pill p-baja">Libre</span>'}</td></tr>`).join('');
+
+  $('#tblPlanta').querySelector('tbody').innerHTML = PLANTAS.map(p=>{
+    const sk = Object.keys(STOCK_BASE[p.cod]||{}).filter(s=>STOCK_BASE[p.cod][s]>0);
+    const tot = sk.reduce((a,s)=>a+stockDe(p.cod,s),0);
+    return `<tr><td style="color:var(--cyan);font-weight:700">
+      <span style="display:inline-block;width:8px;height:8px;background:${plColor(p.cod)};margin-right:6px"></span>${p.cod}</td>
+    <td style="color:var(--txt)">${p.nombre}</td><td>${p.ciudad}</td>
+    <td class="num">${p.rampas}</td><td>${p.carga}</td>
+    <td class="num" style="color:var(--txt)">${sk.length} de ${PRODUCTOS.length}</td>
+    <td class="num" style="color:var(--txt);font-weight:700">${tot}</td></tr>`;
+  }).join('');
+
+  $('#tblCli').querySelector('tbody').innerHTML = CLIENTES.map(c=>`
+    <tr><td style="color:var(--cyan);font-weight:700">
+      <span style="display:inline-block;width:8px;height:8px;background:${cliColor(c.cod)};margin-right:6px"></span>${c.cod}</td>
+    <td style="color:var(--txt)">${c.nombre}<div style="font-size:9px;color:var(--muted)">${c.dir}</div></td>
+    <td><span class="pill ${c.tipo==='Propio'?'p-cyan':'p-media'}">${c.tipo}</span></td>
+    <td style="color:var(--txt)">${c.cedi}</td><td>${c.ventana}</td></tr>`).join('');
+
+  $('#tblTrans').querySelector('tbody').innerHTML = TRANSPORTISTAS.map(t=>{
+    const u = TRACTORES.filter(x=>x.trans===t.cod).length + SEMIS.filter(x=>x.trans===t.cod).length;
+    return `<tr><td style="color:var(--cyan);font-weight:700">${t.cod}</td>
+      <td style="color:var(--txt)">${t.nombre}</td>
+      <td><span class="pill ${t.tipo==='OPL'?'p-media':t.tipo==='Propio'?'p-cyan':'p-baja'}">${t.tipo}</span></td>
+      <td>${t.opl ? (TRANS_IDX[t.opl]||{}).nombre : (t.contacto||'—')}</td>
+      <td class="num" style="color:var(--txt)">${u||'—'}</td></tr>`;
+  }).join('');
+
+  $('#tblTract').querySelector('tbody').innerHTML = TRACTORES.map(t=>`
+    <tr data-placa="${t.placa}"><td style="color:var(--cyan);font-weight:700">${t.placa}</td>
+    <td>${t.tipo}<div style="font-size:9px;color:var(--muted)">${t.marca}</div></td>
+    <td style="font-size:10px">${(TRANS_IDX[t.trans]||{}).nombre||'—'}</td>
+    <td class="num">${kg(t.taraF)}</td><td class="num">${kg(t.taraD)}</td>
+    <td class="num">${t.wb.toFixed(2)}</td><td class="num">${t.kpAdv.toFixed(2)}</td></tr>`).join('');
+
+  $('#tblSemi').querySelector('tbody').innerHTML = SEMIS.map(s=>{
+    const c = CERT_IDX[s.placa];
+    return `<tr data-placa="${s.placa}"><td style="color:var(--cyan);font-weight:700">${s.placa}
+      ${c?`<span class="pill ${certVigente(c)?'p-ok':'p-bad'}" style="margin-left:5px">BON</span>`:''}</td>
+    <td>${s.tipo}<div style="font-size:9px;color:var(--muted)">${s.marca}</div></td>
+    <td style="font-size:10px">${(TRANS_IDX[s.trans]||{}).nombre||'—'}</td>
+    <td class="num">${kg(s.taraKp)}</td><td class="num">${kg(s.rear.reduce((a,g)=>a+g.tara,0))}</td>
+    <td class="num">${s.xKp.toFixed(2)}</td><td class="num">${s.rear.map(g=>g.x.toFixed(2)).join(' / ')}</td>
+    <td class="num">${s.xNext!=null?`<span style="color:var(--ok)">${s.xNext.toFixed(2)}</span>`:'<span style="color:var(--muted)">cola</span>'}</td>
+    <td class="num">${s.H>0?((s.Lcarga!=null?s.Lcarga:s.L).toFixed(2)+' × '+s.W.toFixed(2)
+      + (s.Lcarga!=null&&s.Lcarga<s.L?`<div style="font-size:9px;color:var(--muted)">bastidor ${s.L.toFixed(2)}</div>`:''))
+      :'<span style="color:var(--muted)">sin carga</span>'}</td></tr>`;
+  }).join('');
+
+  $('#tblCert').querySelector('tbody').innerHTML = CERTIFICADOS.map(c=>{
+    const v = certVigente(c);
+    return `<tr><td style="color:var(--cyan);font-weight:700">${c.placa}</td>
+      <td style="color:var(--txt)">${c.nro}</td><td style="font-size:10.5px">${c.tipo}</td>
+      <td class="num" style="color:var(--ok)">+${kg(c.pbmExtra)}</td>
+      <td class="num">${c.ejeExtra.map(v=>v?'+'+kg(v):'—').join(' / ')}</td>
+      <td>${c.vence}</td>
+      <td><span class="pill ${v?'p-ok':'p-bad'}">${v?'Vigente':'Vencido'}</span></td></tr>`;
+  }).join('');
+}
+
+/* ---------- BARRA DE ESTADO DE LA OLA ---------- */
+function renderWaveState(){
+  const kgPend = POOL.reduce((a,p)=>a+p.kg,0);
+  const venc = POOL.filter(p => urgencia(p, OLA_ACTUAL).vencido).length;
+  const desp = ORDENES.reduce((a,o)=>a+o.pallets.length,0);
+  $('#waveState').innerHTML = `
+    <div class="ws big"><div class="k">Ola en curso</div>
+      <div class="v">${String(OLA_ACTUAL).padStart(2,'0')}</div>
+      <div class="d">corte ${hhmm(horaDeOla(OLA_ACTUAL))}</div></div>
+    <div class="ws"><div class="k">Pool pendiente</div>
+      <div class="v">${POOL.length}<em>palés</em></div>
+      <div class="d">${kg(kgPend)} kg</div></div>
+    <div class="ws ${venc?'bad':'ok'}"><div class="k">Fuera de ventana</div>
+      <div class="v">${venc}</div><div class="d">cierre vencido</div></div>
+    <div class="ws"><div class="k">Ya despachado</div>
+      <div class="v">${desp}<em>palés</em></div>
+      <div class="d">${ORDENES.length} orden(es)</div></div>
+    <div class="ws"><div class="k">Flota de esta ola</div>
+      <div class="v">${DISPONIBLES.length}<em>und</em></div>
+      <div class="d">declaradas disponibles</div></div>`;
+}
+
+/* ---------- FLOTA DISPONIBLE ---------- */
+let RIGCACHE = {};
+function rigDe(id){
+  const k = id+'|'+PARAMS.usarCert;
+  if(!RIGCACHE[k]){ const u = UNI_IDX[id]; RIGCACHE[k] = u ? resolveRig(u.placas, PARAMS.usarCert) : {err:'—'}; }
+  return RIGCACHE[k];
+}
+function renderFlota(){
+  $('#flotaBox').innerHTML = UNIDADES.map(u=>{
+    const r = rigDe(u.id), on = DISPONIBLES.includes(u.id);
+    const cap = r.err ? null : ceiling(r, PARAMS.margin);
+    return `<div class="uni-row ${on?'on':''}" data-uni="${u.id}">
+      <input type="checkbox" ${on?'checked':''} ${r.err?'disabled':''}>
+      <div class="id">${u.id}</div>
+      <div class="meta"><b>${r.err?'—':r.code}</b> · ${u.placas.join(' + ')}
+        <br>${(TRANS_IDX[u.trans]||{}).nombre||''} · ${u.chofer}</div>
+      ${r.err ? `<div class="cap" style="color:var(--bad);font-size:9.5px;max-width:130px;white-space:normal">${r.err}</div>`
+              : `<div class="cap">${t1(cap.wMax)} t<em>${r.capPos} pos · ${cap.bind}</em></div>`}
+    </div>`;
+  }).join('');
+  $$('.uni-row').forEach(el => el.onclick = e => {
+    const id = el.dataset.uni;
+    if(rigDe(id).err) return;
+    const i = DISPONIBLES.indexOf(id);
+    if(i>=0) DISPONIBLES.splice(i,1); else DISPONIBLES.push(id);
+    renderFlota(); renderWaveState(); stdHint();
+  });
+  $('#flotaCount').textContent = DISPONIBLES.length;
+  $('#flotaSub').textContent = 'ola ' + String(OLA_ACTUAL).padStart(2,'0') + ' · ' + hhmm(horaDeOla(OLA_ACTUAL));
+}
+
+/* ---------- RANKING DE URGENCIA ---------- */
+function renderRanking(){
+  const rk = rankingOrdenes(OLA_ACTUAL);
+  $('#tblRank').querySelector('tbody').innerHTML = rk.map((g,i)=>{
+    const u = g.u;
+    return `<tr>
+      <td style="color:var(--muted)">${String(i+1).padStart(2,'0')}</td>
+      <td><span style="display:inline-block;width:8px;height:8px;background:${cliColor(g.cli)};margin-right:6px"></span>
+        <span style="color:var(--txt)">${g.cliNom}</span></td>
+      <td style="color:var(--cyan)">${g.oc}</td>
+      <td class="num" style="color:var(--txt)">${g.pales}</td>
+      <td class="num">${kg(g.kg)}</td>
+      <td><span class="pill p-${g.prio.toLowerCase()}">${g.prio}</span></td>
+      <td class="num">${g.cierre}</td>
+      <td class="num" style="color:${u.rest<=0?'var(--bad)':u.rest<3?'var(--warn)':'var(--txt-2)'}">
+        ${u.rest<=0?'vencido':u.rest.toFixed(1)+' h'}</td>
+      <td class="num" style="color:${u.espera?'var(--warn)':'var(--muted)'}">${u.espera||'—'}</td>
+      <td class="num" style="color:var(--cyan);font-weight:700">${Math.round(g.score)}</td>
+      <td>${u.vencido?'<span class="pill p-bad">Fuera de ventana</span>'
+        : u.espera?'<span class="pill p-media">Rezagado</span>'
+        : '<span class="pill p-baja">En plazo</span>'}</td></tr>`;
+  }).join('') || `<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--muted)">
+    Pool vacío: todos los requerimientos ya tienen orden de carga.</td></tr>`;
+}
+
+/* ---------- HISTORIAL ---------- */
+function renderHistorial(){
+  $('#tblOlas').querySelector('tbody').innerHTML = OLAS.map(o=>`
+    <tr><td style="color:var(--cyan);font-weight:700">Ola ${String(o.ola).padStart(2,'0')}</td>
+    <td class="num">${o.hora}</td><td class="num">${o.unidades}</td>
+    <td class="num" style="color:var(--txt)">${o.ordenes}</td>
+    <td class="num" style="color:${o.vacias?'var(--warn)':'var(--muted)'}">${o.vacias||'—'}</td>
+    <td class="num" style="color:var(--txt)">${o.pales}</td><td class="num">${kg(o.kg)}</td>
+    <td class="num" style="color:${o.pendientes?'var(--warn)':'var(--ok)'}">${o.pendientes}</td></tr>`).join('')
+    || `<tr><td colspan="8" style="text-align:center;padding:22px;color:var(--muted)">
+      Aún no se ha cerrado ninguna ola.</td></tr>`;
+}
+
+function stdHint(){
+  const h = $('#stdHint'); if(!h) return;
+  const rigs = DISPONIBLES.map(rigDe).filter(r=>!r.err);
+  if(!rigs.length || PARAMS.modoStd==='libre'){ h.innerHTML = '&nbsp;'; return; }
+  const topes = [...new Set(rigs.map(r => Math.min(PARAMS.stdPales*r.nUnits, r.capPos)))].sort((a,b)=>a-b);
+  h.innerHTML = `tope efectivo en la flota: <b style="color:var(--cyan)">${topes.join(' · ')}</b> parihuelas`;
+}
+
+/* ==================================================================
+   IMPORTACIÓN DE PEDIDOS
+   ================================================================== */
+const EJEMPLO_CSV = `origen;cliente;orden_compra;sku;pales;prioridad;cierre
+PL-HUA;C-1001;OC-885001;BC-2250;18;Alta;09:30
+PL-HUA;C-1001;OC-885001;CI-0625;10;Alta;09:30
+PL-HUA;C-2050;OC-885007;VO-0300;14;Media;16:00
+PL-TRU;C-2077;OC-885012;CI-0625;22;Alta;15:00
+PL-TRU;C-2077;OC-885012;BC-2250;12;Media;15:00
+PL-AQP;C-1003;OC-885020;SP-0500;16;Alta;13:00
+PL-AQP;C-1003;OC-885020;BC-3000;10;Baja;13:00`;
+
+// Normaliza lo que venga: acepta código o nombre de planta, con o sin acentos
+const sinTilde = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+function resolverPlanta(v){
+  const t = sinTilde(v);
+  const p = PLANTAS.find(x => sinTilde(x.cod) === t || sinTilde(x.nombre) === t
+                           || sinTilde(x.nombre).replace('planta ','') === t
+                           || sinTilde(x.ciudad) === t);
+  return p ? p.cod : null;
+}
+function resolverCliente(v){
+  const t = sinTilde(v);
+  const c = CLIENTES.find(x => sinTilde(x.cod) === t || sinTilde(x.nombre) === t
+                            || sinTilde(x.cedi) === t);
+  return c ? c.cod : null;
+}
+function resolverPrio(v){
+  const t = sinTilde(v);
+  return ['alta','media','baja'].includes(t) ? t[0].toUpperCase()+t.slice(1) : null;
+}
+function resolverHora(v){
+  const m = String(v).trim().match(/^(\d{1,2})[:h.]?(\d{2})?$/);
+  if(!m) return null;
+  const h = +m[1], mi = +(m[2]||0);
+  return (h<24 && mi<60) ? String(h).padStart(2,'0')+':'+String(mi).padStart(2,'0') : null;
+}
+
+function parseImport(txt){
+  const filas = txt.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  if(!filas.length) return {ok:[], mal:[]};
+  // separador dominante
+  const sep = [';','\t',','].map(s => ({s, n: filas[0].split(s).length}))
+                            .sort((a,b)=>b.n-a.n)[0].s;
+  // cabecera opcional
+  const primera = sinTilde(filas[0]);
+  if(primera.includes('origen') && primera.includes('sku')) filas.shift();
+
+  const ok = [], mal = [];
+  filas.forEach((linea, n) => {
+    const c = linea.split(sep).map(x=>x.trim().replace(/^["']|["']$/g,''));
+    const errs = [];
+    if(c.length < 5){ mal.push({n:n+1, linea, errs:['La fila tiene '+c.length+' campos; se esperan al menos 5']}); return; }
+    const [o, cl, oc, sku, pal, pr, ci] = c;
+
+    const origen = resolverPlanta(o);        if(!origen) errs.push(`Planta desconocida: "${o}"`);
+    const cliente = resolverCliente(cl);     if(!cliente) errs.push(`Cliente desconocido: "${cl}"`);
+    const skuU = String(sku).toUpperCase();
+    if(!PROD_IDX[skuU]) errs.push(`SKU no está en el maestro: "${sku}"`);
+    const pales = parseInt(pal, 10);
+    if(!(pales > 0)) errs.push(`Cantidad inválida: "${pal}"`);
+    const prio = resolverPrio(pr || 'Media'); if(!prio) errs.push(`Prioridad inválida: "${pr}"`);
+    const cierre = resolverHora(ci || '23:59'); if(!cierre) errs.push(`Hora de cierre inválida: "${ci}"`);
+    // aviso, no error: la planta existe pero no fabrica ese SKU
+    let aviso = null;
+    if(!errs.length && stockDe(origen, skuU) === 0)
+      aviso = `${PL_IDX[origen].nombre} no produce ${skuU}: quedará sin asignar`;
+
+    if(errs.length) mal.push({n:n+1, linea, errs});
+    else ok.push({origen, cli:cliente, oc:oc||'SIN-OC', sku:skuU, pales, prio, cierre, aviso});
+  });
+  return {ok, mal, sep};
+}
+
+function renderImport(){
+  const txt = $('#impText').value;
+  const box = $('#impPrev');
+  if(!txt.trim()){ box.innerHTML = ''; return; }
+  const r = parseImport(txt);
+  const avisos = r.ok.filter(x=>x.aviso);
+  const pales = r.ok.reduce((a,x)=>a+x.pales,0);
+  const kgT = r.ok.reduce((a,x)=>a+x.pales*(PROD_IDX[x.sku]?.kg||0),0);
+  box.innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:11px">
+      <div class="kpi ${r.ok.length?'ok':'bad'}" style="flex:1;min-width:150px;padding:9px 13px">
+        <div class="k">Líneas válidas</div><div class="v" style="font-size:24px">${r.ok.length}</div>
+        <div class="d">${pales} palés · ${kg(kgT)} kg</div></div>
+      <div class="kpi ${r.mal.length?'bad':''}" style="flex:1;min-width:150px;padding:9px 13px">
+        <div class="k">Con error</div><div class="v" style="font-size:24px">${r.mal.length}</div>
+        <div class="d">no se importan</div></div>
+      <div class="kpi ${avisos.length?'warn':''}" style="flex:1;min-width:150px;padding:9px 13px">
+        <div class="k">Con aviso</div><div class="v" style="font-size:24px">${avisos.length}</div>
+        <div class="d">planta sin ese SKU</div></div>
+    </div>
+    ${r.mal.length ? `<div class="t-wrap" style="max-height:150px;margin-bottom:11px">
+      <table><thead><tr><th style="width:44px">Fila</th><th>Contenido</th><th>Motivo</th></tr></thead>
+      <tbody>${r.mal.map(m=>`<tr><td style="color:var(--bad)">${m.n}</td>
+        <td style="font-size:10px;color:var(--muted)">${m.linea.slice(0,60)}</td>
+        <td style="color:var(--bad)">${m.errs.join(' · ')}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    ${avisos.length ? `<div class="note" style="margin-top:0;margin-bottom:11px">
+      ${avisos.map(a=>a.aviso).join('<br>')}</div>` : ''}
+    ${r.ok.length ? `<div class="t-wrap" style="max-height:210px">
+      <table><thead><tr><th>Origen</th><th>Cliente</th><th>OC</th><th>SKU</th>
+      <th class="num">Palés</th><th>Prioridad</th><th class="num">Cierre</th></tr></thead>
+      <tbody>${r.ok.map(x=>`<tr>
+        <td><span style="display:inline-block;width:8px;height:8px;background:${plColor(x.origen)};margin-right:6px"></span>${x.origen}</td>
+        <td>${CLI_IDX[x.cli].nombre}</td><td style="color:var(--cyan)">${x.oc}</td>
+        <td><span style="display:inline-block;width:8px;height:8px;background:${skuColor(x.sku)};margin-right:6px"></span>${x.sku}</td>
+        <td class="num" style="color:var(--txt)">${x.pales}</td>
+        <td><span class="pill p-${x.prio.toLowerCase()}">${x.prio}</span></td>
+        <td class="num">${x.cierre}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    <button class="btn primary" id="btnImportOk" style="margin-top:12px;width:100%"
+      ${r.ok.length?'':'disabled'}>Importar ${r.ok.length} línea(s)</button>`;
+
+  const b = $('#btnImportOk');
+  if(b) b.onclick = () => {
+    if($('#impReemplaza').checked){ REQS = []; REQ_SEQ = 1; }
+    r.ok.forEach(x => REQS.push({id:REQ_SEQ++, origen:x.origen, cli:x.cli, oc:x.oc,
+                                 sku:x.sku, pales:x.pales, prio:x.prio, cierre:x.cierre,
+                                 fuente:'importado'}));
+    $('#importBox').style.display = 'none'; $('#impText').value = ''; $('#impPrev').innerHTML = '';
+    resetPool(); OLARES = null; refrescar();
+    toast(`${r.ok.length} línea(s) importadas · pool reconstruido`);
+  };
+}
+
+/* ==================================================================
+   ARMADO DE UNIDADES · identificación de placas
+   ================================================================== */
+let ARMA = ['', ''];      // placas en el constructor
+let ARMA_ALTA = null;     // índice de la placa que se está dando de alta
+
+function renderArma(){
+  const box = $('#armaBox');
+  box.innerHTML = ARMA.map((p,i)=>`
+    ${i ? '<div class="combo-arrow" style="padding-top:22px">+</div>' : ''}
+    <div class="plate-field">
+      <label>${i===0 ? 'Placa tracto' : 'Placa arrastre '+i}</label>
+      <input class="plate-in" data-ai="${i}" value="${p}" maxlength="10" placeholder="ABC-123">
+    </div>`).join('')
+    + `<div class="plate-stack" style="padding-top:21px">
+        <button class="btn sm" id="btnArmaMas" ${ARMA.length>=4?'disabled':''}>+ unidad</button>
+        <button class="btn sm danger" id="btnArmaMenos" ${ARMA.length<=2?'disabled':''}>− unidad</button>
+      </div>`;
+  $$('#armaBox input[data-ai]').forEach(el => el.addEventListener('input', e => {
+    ARMA[+el.dataset.ai] = e.target.value.toUpperCase(); ARMA_ALTA = null; evaluarArma();
+  }));
+  $('#btnArmaMas').onclick   = () => { ARMA.push(''); renderArma(); evaluarArma(); };
+  $('#btnArmaMenos').onclick = () => { ARMA.pop();    renderArma(); evaluarArma(); };
+  evaluarArma();
+}
+
+function evaluarArma(){
+  const res = $('#armaRes');
+  const placas = ARMA.map(x=>x.trim()).filter(Boolean);
+
+  // 1. Identificar cada placa contra el maestro
+  const ident = ARMA.map((p,i) => {
+    const v = p.trim().toUpperCase();
+    if(!v) return {i, placa:'', estado:'vacio'};
+    const t = TRACTORES.find(x=>x.placa.toUpperCase()===v);
+    const s = SEMIS.find(x=>x.placa.toUpperCase()===v);
+    if(i===0) return t ? {i, placa:v, estado:'ok', tipo:t.tipo, marca:t.marca, clase:'tracto'}
+                       : {i, placa:v, estado:'nueva', clase:'tracto'};
+    return s ? {i, placa:v, estado:'ok', tipo:s.tipo, marca:s.marca, clase:'carroza'}
+             : {i, placa:v, estado:'nueva', clase:'carroza'};
+  });
+
+  const tabla = `<table style="font-size:11px;margin-bottom:12px"><thead><tr>
+      <th style="width:60px">Pos.</th><th style="width:110px">Placa</th><th style="width:70px">Tipo</th>
+      <th>Identificación</th><th style="width:150px">Estado</th></tr></thead><tbody>
+    ${ident.map(d=>{
+      if(d.estado==='vacio') return `<tr><td>${d.i===0?'Tracto':'Arrastre '+d.i}</td>
+        <td colspan="4" style="color:var(--muted)">sin placa</td></tr>`;
+      if(d.estado==='nueva') return `<tr><td>${d.i===0?'Tracto':'Arrastre '+d.i}</td>
+        <td style="color:var(--warn);font-weight:700">${d.placa}</td>
+        <td style="color:var(--bad)">?</td>
+        <td style="color:var(--warn)">No está en el maestro de vehículos</td>
+        <td><button class="btn sm" data-alta="${d.i}" style="padding:3px 9px">Dar de alta</button></td></tr>`;
+      return `<tr><td>${d.i===0?'Tracto':'Arrastre '+d.i}</td>
+        <td style="color:var(--cyan);font-weight:700">${d.placa}</td>
+        <td style="color:var(--txt);font-weight:700">${d.tipo}</td>
+        <td style="color:var(--muted)">${d.marca}</td>
+        <td><span class="pill p-ok">Identificada</span></td></tr>`;
+    }).join('')}</tbody></table>`;
+
+  let cuerpo = '';
+  if(ident.some(d=>d.estado==='nueva')){
+    cuerpo = `<div class="note" style="margin-top:0">
+      <strong>Hay placas sin identificar.</strong> Sin el tipo de vehículo no se puede
+      resolver la configuración del MTC ni derivar los límites por eje. Dala de alta con
+      su tipo: los valores de tara y geometría se prellenan por plantilla y se corrigen
+      después con la ficha técnica real.</div>`;
+  } else if(placas.length >= 2){
+    const r = resolveRig(placas, PARAMS.usarCert);
+    if(r.err){
+      cuerpo = `<div class="note" style="margin-top:0;border-left-color:var(--bad);background:rgba(255,75,107,.07)">
+        <strong style="color:var(--bad)">No se puede armar.</strong> ${r.err}</div>`;
+    } else {
+      const c = ceiling(r, PARAMS.margin);
+      cuerpo = `<div style="display:flex;gap:11px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+          <div class="combo-badge" style="margin:0"><div class="code">${r.code}</div>
+            <div class="pbm">${ident.filter(d=>d.tipo).map(d=>d.tipo).join(' + ')}</div></div>
+          <div class="chip"><span class="k">Peso bruto máx.</span><span class="v">${t1(r.pbm)}<em> t</em></span></div>
+          <div class="chip"><span class="k">Tara</span><span class="v">${t1(r.taraTotal)}<em> t</em></span></div>
+          <div class="chip" style="border-left-color:var(--ok)"><span class="k">Carga útil real</span>
+            <span class="v" style="color:var(--ok)">${t1(c.wMax)}<em> t · ${c.bind}</em></span></div>
+          <div class="chip"><span class="k">Posiciones</span><span class="v">${r.capPos}</span></div>
+          <div class="chip" style="border-left-color:${r.largoOk?'var(--cyan-dim)':'var(--bad)'}">
+            <span class="k">Largo</span><span class="v" style="color:${r.largoOk?'var(--txt)':'var(--bad)'}">
+            ${r.largo.toFixed(1)}<em> / ${r.largoMax} m</em></span></div>
+        </div>
+        <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
+          <input class="f" id="armaChofer" placeholder="Nombre del chofer" style="width:200px">
+          <select class="f" id="armaTrans" style="width:230px">
+            ${TRANSPORTISTAS.map(t=>`<option value="${t.cod}">${t.nombre}</option>`).join('')}</select>
+          <button class="btn primary" id="btnArmaGuardar">Guardar como unidad</button>
+        </div>`;
+    }
+  } else {
+    cuerpo = `<div style="color:var(--muted);font-size:12px">
+      Escribe al menos dos placas: tracto y una unidad de arrastre.</div>`;
+  }
+
+  res.innerHTML = tabla + cuerpo + (ARMA_ALTA !== null ? formAlta(ARMA_ALTA) : '');
+
+  $$('[data-alta]').forEach(b => b.onclick = () => { ARMA_ALTA = +b.dataset.alta; evaluarArma(); });
+  const g = $('#btnArmaGuardar');
+  if(g) g.onclick = () => {
+    const id = 'UT-' + String(UNIDADES.length+1).padStart(2,'0');
+    UNIDADES.push({id, placas: ARMA.map(x=>x.trim().toUpperCase()).filter(Boolean),
+                   trans: $('#armaTrans').value,
+                   chofer: $('#armaChofer').value.trim() || 'Por asignar'});
+    UNI_IDX[id] = UNIDADES[UNIDADES.length-1];
+    ARMA = ['','']; RIGCACHE = {};
+    renderMaestros(); renderArma(); renderFlota(); renderWaveState();
+    toast(`Unidad ${id} creada y disponible para la próxima ola`);
+  };
+  bindAlta();
+}
+
+// Alta rápida de una placa nueva, con plantilla por tipo
+function formAlta(i){
+  const esTracto = i === 0;
+  const tipos = esTracto ? TIPOS_TRACTO : TIPOS_CARROZA;
+  const placa = ARMA[i].trim().toUpperCase();
+  return `<div class="card" style="margin-top:14px;border-top-color:var(--warn)">
+    <header><div><h3>Alta rápida · ${placa}</h3>
+      <div class="sub">${esTracto?'Tracto':'Unidad de arrastre'} · los valores se prellenan por tipo</div></div>
+      <button class="btn sm" id="altaCancel">✕</button></header>
+    <div class="body">
+      <div class="frow" style="grid-template-columns:repeat(4,1fr)">
+        <div class="fld"><label class="f">Tipo (define la config. MTC)</label>
+          <select class="f" id="altaTipo">${tipos.map(t=>`<option>${t}</option>`).join('')}</select></div>
+        <div class="fld"><label class="f">Marca / modelo</label>
+          <input class="f" id="altaMarca"></div>
+        <div class="fld"><label class="f">Transportista</label>
+          <select class="f" id="altaTrans">${TRANSPORTISTAS.map(t=>`<option value="${t.cod}">${t.nombre}</option>`).join('')}</select></div>
+        <div class="fld" style="display:flex;align-items:flex-end">
+          <button class="btn primary" id="altaGuardar" style="width:100%">Dar de alta</button></div>
+      </div>
+      <div id="altaCampos"></div>
+      <div class="note" style="font-size:11px">
+        <strong>Estos valores son una plantilla, no la ficha real.</strong> Sirven para que la
+        unidad se pueda planificar hoy. Antes de usarla en producción hay que reemplazarlos con
+        la tara de balanza y las medidas del certificado del vehículo.</div>
+    </div></div>`;
+}
+
+function camposAlta(){
+  const i = ARMA_ALTA; if(i === null) return;
+  const esTracto = i === 0, tipo = $('#altaTipo').value;
+  const p = esTracto ? PLANTILLA_TRACTO[tipo] : PLANTILLA_CARROZA[tipo];
+  $('#altaMarca').value = p.marca;
+  const num = (id,l,v,step='1') =>
+    `<div class="fld"><label class="f">${l}</label>
+     <input class="f" id="${id}" type="number" step="${step}" value="${v}"></div>`;
+  $('#altaCampos').innerHTML = esTracto
+    ? `<div class="frow" style="grid-template-columns:repeat(4,1fr)">
+        ${num('aTaraF','Tara eje delantero (kg)', p.taraF)}
+        ${num('aTaraD','Tara eje motriz (kg)', p.taraD)}
+        ${num('aWb','Distancia entre ejes (m)', p.wb, '0.01')}
+        ${num('aKp','Avance del kingpin (m)', p.kpAdv, '0.01')}</div>`
+    : `<div class="frow" style="grid-template-columns:repeat(4,1fr)">
+        ${num('aTaraKp','Tara sobre kingpin (kg)', p.taraKp)}
+        ${num('aTaraR','Tara ejes posteriores (kg)', p.rear.reduce((a,g)=>a+g.tara,0))}
+        ${num('aXkp','Kingpin desde pared frontal (m)', p.xKp, '0.01')}
+        ${num('aL','Largo de caja (m)', p.L, '0.1')}</div>`;
+}
+
+function bindAlta(){
+  const t = $('#altaTipo'); if(!t) return;
+  camposAlta();
+  t.onchange = camposAlta;
+  $('#altaCancel').onclick = () => { ARMA_ALTA = null; evaluarArma(); };
+  $('#altaGuardar').onclick = () => {
+    const i = ARMA_ALTA, placa = ARMA[i].trim().toUpperCase(), tipo = $('#altaTipo').value;
+    if(i === 0){
+      TRACTORES.push({placa, tipo, marca:$('#altaMarca').value || 'Sin especificar',
+        trans:$('#altaTrans').value, taraF:+$('#aTaraF').value, taraD:+$('#aTaraD').value,
+        wb:+$('#aWb').value, kpAdv:+$('#aKp').value});
+    } else {
+      const p = PLANTILLA_CARROZA[tipo];
+      const totR = +$('#aTaraR').value;
+      const tot0 = p.rear.reduce((a,g)=>a+g.tara,0);
+      SEMIS.push({placa, tipo, marca:$('#altaMarca').value || 'Sin especificar',
+        trans:$('#altaTrans').value, taraKp:+$('#aTaraKp').value, xKp:+$('#aXkp').value,
+        rear:p.rear.map(g=>({...g, tara: Math.round(g.tara/tot0*totR)})),
+        L:+$('#aL').value, W:p.W, H:p.H, xNext:p.xNext});
+    }
+    ARMA_ALTA = null; RIGCACHE = {};
+    renderMaestros(); evaluarArma(); renderFlota();
+    toast(`${placa} dada de alta como ${tipo}`);
+  };
+}
+
+/* ---------- SOLICITUD DE REABASTECIMIENTO ---------- */
+function renderSolicitudes(){
+  const s = solicitudes();
+  const tb = $('#tblSolic').querySelector('tbody');
+  const badge = {quiebre:['p-bad','Quiebre'], critico:['p-media','Crítico'],
+                 reponer:['p-cyan','Reponer'], solicitado:['p-cyan','Solicitado'],
+                 despachado:['p-ok','En camino'], cubierto:['p-baja','Cubierto']};
+  tb.innerHTML = s.map(x=>{
+    const [cls, txt] = badge[x.estado];
+    const colCob = x.cobertura < 1 ? 'var(--bad)' : x.cobertura < 2 ? 'var(--warn)' : 'var(--txt-2)';
+    return `<tr>
+      <td><span style="display:inline-block;width:8px;height:8px;background:${cliColor(x.cli.cod)};margin-right:6px"></span>
+        <span style="color:var(--txt)">${x.cliNom}</span></td>
+      <td><span style="display:inline-block;width:8px;height:8px;background:${skuColor(x.sku)};margin-right:6px"></span>${x.sku}</td>
+      <td class="num" style="color:var(--txt)">${x.stock}</td>
+      <td class="num">${x.venta.toFixed(1)}</td>
+      <td class="num" style="color:${colCob};font-weight:700">${x.cobertura.toFixed(1)} d
+        ${x.transito?`<div style="font-size:8.5px;color:var(--ok)">→ ${x.covProyectada.toFixed(1)} d</div>`:''}</td>
+      <td class="num">${x.objDias} d</td>
+      <td class="num" style="color:${x.sol?'var(--cyan)':'var(--muted)'}">${x.sol||'—'}</td>
+      <td class="num" style="color:${x.desp?'var(--ok)':'var(--muted)'}">${x.desp||'—'}</td>
+      <td class="num">${x.objetivo}</td>
+      <td class="num" style="color:${x.faltan?'var(--cyan)':'var(--muted)'};font-weight:700">${x.faltan||'—'}</td>
+      <td style="font-size:10.5px">${x.faltan
+        ? (x.planta.cod
+            ? `<span style="display:inline-block;width:8px;height:8px;background:${plColor(x.planta.cod)};margin-right:5px"></span>
+               <span style="color:var(--txt)">${(PL_IDX[x.planta.cod]||{}).nombre}</span>
+               <div style="color:var(--muted);font-size:9px">${x.planta.motivo}</div>`
+            : `<span style="color:var(--bad)">sin origen: ${x.planta.motivo}</span>`)
+        : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${x.faltan?`<span class="pill p-${x.prio.toLowerCase()}">${x.prio}</span>`:'—'}</td>
+      <td><span class="pill ${cls}">${txt}</span></td></tr>`;
+  }).join('');
+
+  const q = s.filter(x=>x.cobertura<1).length;
+  const cr = s.filter(x=>x.cobertura>=1 && x.cobertura<2).length;
+  const tot = s.reduce((a,x)=>a+x.faltan,0);
+  const sinOrigen = s.filter(x=>x.faltan>0 && !x.planta.cod);
+  $('#solicPie').innerHTML =
+    `<span><b style="color:var(--bad)">${q}</b> en quiebre (menos de 1 día)</span>
+     <span><b style="color:var(--warn)">${cr}</b> críticos (menos de 2 días)</span>
+     <span>Falta solicitar: <b style="color:var(--cyan)">${tot}</b> parihuelas</span>
+     <span>Ya en el pool: <b style="color:var(--txt-2)">${s.reduce((a,x)=>a+x.sol,0)}</b> ·
+       despachadas: <b style="color:var(--ok)">${s.reduce((a,x)=>a+x.desp,0)}</b></span>
+     ${sinOrigen.length?`<span style="color:var(--bad)">${sinOrigen.length} sin planta que los produzca:
+       ${sinOrigen.map(x=>x.sku+'→'+x.cedi).join(', ')}</span>`:''}
+     <span style="color:var(--muted)">La prioridad sale de la cobertura, no se declara a mano</span>`;
+}
+
+/* ---------- REQUERIMIENTOS ---------- */
+function renderReq(){
+  const asig = reqAsignados();
+  $('#tblReq').querySelector('tbody').innerHTML = REQS.map((r,i)=>{
+    const p = PROD_IDX[r.sku] || {desc:'—', kg:0};
+    const st = stockDe(r.origen, r.sku), a = asig[r.id]||0, falta = r.pales - a;
+    const c = CLI_IDX[r.cli] || {nombre:'?', tipo:'?'};
+    const sel = (k, opts, val) => `<select class="f" data-i="${i}" data-k="${k}"
+      style="font-size:10.5px;padding:4px 5px">${opts.map(o=>
+      `<option value="${o.v}" ${o.v===val?'selected':''}>${o.t}</option>`).join('')}</select>`;
+    return `<tr>
+      <td>${sel('origen', PLANTAS.map(v=>({v:v.cod,t:v.nombre.replace('Planta ','')})), r.origen)}
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">
+        <span style="display:inline-block;width:7px;height:7px;background:${plColor(r.origen)};margin-right:4px"></span>${r.origen}</div></td>
+      <td>${sel('cli', CLIENTES.map(c=>({v:c.cod,t:c.cod})), r.cli)}
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">
+        <span style="display:inline-block;width:7px;height:7px;background:${cliColor(r.cli)};margin-right:4px"></span>${c.nombre}</div></td>
+      <td><input class="f" value="${r.oc}" data-i="${i}" data-k="oc" style="font-size:10.5px;padding:4px 5px"></td>
+      <td>${sel('sku', PRODUCTOS.map(p=>({v:p.sku,t:p.sku})), r.sku)}</td>
+      <td style="color:var(--txt)"><span style="display:inline-block;width:8px;height:8px;background:${skuColor(r.sku)};margin-right:6px"></span>${p.desc}</td>
+      <td class="num"><input class="f" type="number" min="0" max="200" value="${r.pales}" data-i="${i}" data-k="pales"
+        style="width:58px;text-align:right;font-size:11px;padding:4px 5px"></td>
+      <td class="num" style="color:${st===0?'var(--bad)':st<r.pales?'var(--warn)':'var(--txt-2)'}"
+        title="stock en ${r.origen}">${st===0?'no produce':st}</td>
+      <td class="num" style="color:var(--txt);font-weight:700">${a}${falta>0?` <span class="pill p-media">−${falta}</span>`:''}</td>
+      <td class="num" style="color:var(--txt)">${kg(a*p.kg)}</td>
+      <td>${r.fuente==='reabastecimiento'
+        ? `<span class="pill p-cyan" title="${r.just||''}">Reabast.</span>`
+        : r.fuente==='importado'
+        ? '<span class="pill p-baja">Importado</span>'
+        : '<span class="pill p-baja">Manual</span>'}
+        ${r.just?`<div style="font-size:8.5px;color:var(--muted);margin-top:2px">${r.just}</div>`:''}</td>
+      <td><input class="f" value="${r.cierre||'23:59'}" data-i="${i}" data-k="cierre"
+        style="font-size:10.5px;padding:4px 5px;text-align:center"></td>
+      <td>${sel('prio', ['Alta','Media','Baja'].map(v=>({v,t:v})), r.prio)}</td>
+      <td><button class="btn sm danger" data-del="${i}" style="padding:3px 7px">✕</button></td></tr>`;
+  }).join('') || `<tr><td colspan="13" style="text-align:center;padding:34px;color:var(--muted)">
+      No hay requerimientos cargados para hoy.</td></tr>`;
+
+  // consolidado por planta de origen
+  const porPl = {};
+  REQS.forEach(r=>{ const a = asig[r.id]||0; if(!a) return;
+    const g = porPl[r.origen] = porPl[r.origen] || {pales:0, kg:0, cli:new Set(), skus:new Set()};
+    g.pales += a; g.kg += a*(PROD_IDX[r.sku]?.kg||0); g.cli.add(r.cli); g.skus.add(r.sku); });
+  $('#origBox').innerHTML = PLANTAS.filter(p=>porPl[p.cod]).map(p=>{
+    const g = porPl[p.cod];
+    return `<div class="card" style="border-top-color:${plColor(p.cod)}">
+      <header><div><h3 style="font-size:14px">${p.nombre}</h3>
+        <div class="sub">${p.cod} · ${p.ciudad} · ${p.rampas} rampas · ${p.carga}</div></div></header>
+      <div class="body"><div style="display:flex;gap:18px;font-family:var(--mono);flex-wrap:wrap">
+        <div><div style="font-size:8.5px;color:var(--muted);letter-spacing:.15em">PALÉS</div>
+          <div style="font-size:22px;color:var(--txt);font-weight:700">${g.pales}</div></div>
+        <div><div style="font-size:8.5px;color:var(--muted);letter-spacing:.15em">PESO</div>
+          <div style="font-size:22px;color:var(--txt);font-weight:700">${kg(g.kg)}</div></div>
+        <div><div style="font-size:8.5px;color:var(--muted);letter-spacing:.15em">DESTINOS</div>
+          <div style="font-size:22px;color:${plColor(p.cod)};font-weight:700">${g.cli.size}</div></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:10px">
+        ${g.skus.size} SKU · recojo independiente</div></div></div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:12px">Sin orígenes asignables.</div>';
+
+  // consolidado por destino
+  const porCli = {};
+  REQS.forEach(r=>{ const a = asig[r.id]||0; if(!a) return;
+    const g = porCli[r.cli] = porCli[r.cli] || {pales:0, kg:0, ocs:new Set(), skus:new Set()};
+    g.pales += a; g.kg += a*(PROD_IDX[r.sku]?.kg||0); g.ocs.add(r.oc); g.skus.add(r.sku); });
+  const rigs = DISPONIBLES.map(rigDe).filter(r=>!r.err);
+  const cap = rigs.length
+    ? Math.round(rigs.reduce((a,r)=>a+(PARAMS.modoStd==='libre'?r.capPos:Math.min(PARAMS.stdPales*r.nUnits,r.capPos)),0)/rigs.length)
+    : PARAMS.stdPales;
+  $('#destBox').innerHTML = Object.keys(porCli).map(cod=>{
+    const c = CLI_IDX[cod], g = porCli[cod];
+    const viajes = Math.max(1, Math.ceil(g.pales / Math.max(cap,1)));
+    return `<div class="card" style="border-top-color:${cliColor(cod)}">
+      <header><div><h3 style="font-size:14px">${c.nombre}</h3>
+        <div class="sub">${cod} · CEDI ${c.cedi} · ${c.ventana}</div></div>
+        <span class="pill ${c.tipo==='Propio'?'p-cyan':'p-media'}">${c.tipo}</span></header>
+      <div class="body">
+        <div style="display:flex;gap:18px;font-family:var(--mono);flex-wrap:wrap">
+          <div><div style="font-size:8.5px;color:var(--muted);letter-spacing:.15em">PALÉS</div>
+            <div style="font-size:22px;color:var(--txt);font-weight:700">${g.pales}</div></div>
+          <div><div style="font-size:8.5px;color:var(--muted);letter-spacing:.15em">PESO</div>
+            <div style="font-size:22px;color:var(--txt);font-weight:700">${kg(g.kg)}</div></div>
+          <div><div style="font-size:8.5px;color:var(--muted);letter-spacing:.15em">VIAJES MÍN.</div>
+            <div style="font-size:22px;color:${cliColor(cod)};font-weight:700">${viajes}</div></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:10px">
+          ${g.ocs.size} orden(es) de compra · ${g.skus.size} SKU</div>
+      </div></div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:12px">Sin destinos asignables.</div>';
+
+  const totP = REQS.reduce((a,r)=>a+(asig[r.id]||0),0);
+  const totPed = REQS.reduce((a,r)=>a+r.pales,0);
+  const totKg = REQS.reduce((a,r)=>a+(asig[r.id]||0)*(PROD_IDX[r.sku]?.kg||0),0);
+  const cob = totPed ? totP/totPed : 0;
+  const ocs = new Set(REQS.map(reqKey));
+  $('#kOrdenes').textContent = ocs.size;
+  $('#kOrdenesD').textContent = Object.keys(porPl).length + ' planta(s) · '
+    + Object.keys(porCli).length + ' destino(s) · ' + REQS.length + ' líneas';
+  $('#kPales').textContent = totP;
+  $('#kPalesD').textContent = '~' + cap + ' parihuelas por unidad';
+  $('#kPeso').innerHTML = kg(totKg)+'<em>kg</em>';
+  const capKg = rigs.length ? rigs.reduce((a,r)=>a+ceiling(r,PARAMS.margin).wMax,0)/rigs.length : 0;
+  $('#kPesoD').textContent = capKg ? Math.ceil(totKg/capKg)+' unidad(es) mínimo por peso' : '—';
+  $('#kStock').textContent = pct(cob)+'%';
+  $('#kStockD').textContent = totP+' de '+totPed+' palés cubiertos';
+  $('#kStockCard').className = 'kpi ' + (cob>=1?'ok':cob>=.8?'warn':'bad');
+}
+</script>
+<script>
+/* ---------- SVG: vista lateral del conjunto (N unidades) ---------- */
+function truckSVG(rig, trip, step){
+  const t = rig.t, U = rig.units;
+  const u0 = U[0];
+  const frontAxleX = u0.xKp + t.kpAdv - t.wb;
+  const cabFront = frontAxleX - 1.55;
+  const last = U[U.length-1];
+  const wA = cabFront - 0.45, wB = last.off + last.L + 0.7;
+  const W = 1240, H = 436, padL = 30;
+  const sc = (W - 60) / (wB - wA);
+  const X  = x => padL + (x - wA) * sc;
+  const GY = 344, deck = GY - 1.35*sc, wr = 0.50*sc, wcy = GY - wr;
+  const wheel = x => `<circle cx="${X(x)}" cy="${wcy}" r="${wr}" fill="#05161f" stroke="#1d5468" stroke-width="2.5"/>
+    <circle cx="${X(x)}" cy="${wcy}" r="${wr*0.42}" fill="#0b2733" stroke="#2a6d84" stroke-width="1.5"/>`;
+
+  const driveX = u0.xKp + t.kpAdv;
+  const tractorWheels = t.tipo==='T3' ? [frontAxleX, driveX-0.675, driveX+0.675] : [frontAxleX, driveX];
+  let ruedas = tractorWheels.map(wheel).join('');
+  U.forEach(u => u.rear.forEach(g => {
+    for(let i=0;i<g.ejes;i++) ruedas += wheel(u.off + g.x - (g.ejes-1)*0.675 + i*1.35);
+  }));
+
+  const vis = trip ? trip.placement.placed.filter(p => p.seq <= step) : [];
+  const bySlot = {};
+  vis.forEach(p => { (bySlot[p.u+':'+p.slot] = bySlot[p.u+':'+p.slot] || []).push(p); });
+
+  // cajas de cada unidad
+  let cajas = '', pallets = '';
+  U.forEach((u,ui) => {
+    const x0 = u.off, boxTop = deck - (u.H||0.5)*sc;
+    if(u.cargable){
+      cajas += `<rect x="${X(x0)}" y="${deck}" width="${u.L*sc}" height="9" fill="#0e3040" stroke="#1d5468" stroke-width="1"/>
+        <rect x="${X(x0)}" y="${boxTop}" width="${u.Lc*sc}" height="${deck-boxTop}" fill="#061c26"
+          fill-opacity="0.65" stroke="#1d5468" stroke-width="1.5"/>
+        <line x1="${X(x0)}" y1="${boxTop}" x2="${X(x0+u.Lc)}" y2="${boxTop}" stroke="#2a6d84" stroke-width="3"/>
+        <text x="${X(x0)+6}" y="${boxTop+14}" font-family="JetBrains Mono,monospace" font-size="8"
+          fill="#5f8593" letter-spacing="1.2">U${ui+1} · ${u.placa}</text>
+        <text x="${X(x0)+6}" y="${boxTop+25}" font-family="JetBrains Mono,monospace"
+          font-size="7.5" fill="#3f6675">caja ${u.Lc.toFixed(2)} m · ${u.nSlots}×${u.nRows}${u.Lc<u.L?` · bastidor ${u.L.toFixed(2)}`:''}</text>`;
+    } else {
+      cajas += `<rect x="${X(x0)}" y="${deck}" width="${u.L*sc}" height="9" fill="#0e3040" stroke="#1d5468" stroke-width="1"/>
+        <text x="${X(x0+u.L/2)}" y="${deck-9}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+          font-size="8" fill="#5f8593">DOLLY</text>`;
+    }
+  });
+  const kingpins = U.map((u,ui)=>`
+    <path d="M ${X(u.off+u.xKp)-7} ${deck+9} L ${X(u.off+u.xKp)+7} ${deck+9} L ${X(u.off+u.xKp)} ${deck+23} Z"
+      fill="#ffb020" stroke="#04121a" stroke-width="1"/>
+    <rect x="${X(u.off+u.xKp)-19}" y="${deck+25}" width="38" height="14" fill="#04121a" stroke="#ffb020" stroke-width="1"/>
+    <text x="${X(u.off+u.xKp)}" y="${deck+35}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+      font-size="8" fill="#ffb020" letter-spacing=".5">KP${ui+1}</text>`).join('');
+
+  Object.keys(bySlot).forEach(k=>{
+    const arr = bySlot[k], p0 = arr[0], u = U[p0.u];
+    const prod = PROD_IDX[p0.p.sku];
+    const ph = Math.min(prod.h, u.H-0.05)*sc, boxTop = deck - u.H*sc;
+    const px = X(p0.gx - u.pd/2), pwpx = u.pd*sc - 2;
+    const col = skuColor(p0.p.sku), ccol = cliColor(p0.p.cli);
+    const full = arr.length >= u.nRows;
+    pallets += `<g class="pal" style="--d:${p0.seq*20}ms">
+      <rect x="${px+1}" y="${deck-ph}" width="${pwpx}" height="${ph}" fill="${col}" fill-opacity="${full?0.42:0.24}"
+        stroke="${col}" stroke-width="1.5"/>
+      <rect x="${px+1}" y="${deck-ph-4}" width="${pwpx}" height="3.5" fill="${ccol}"/>
+      <text x="${px+pwpx/2+1}" y="${deck-ph/2}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+        font-size="9" fill="${col}" font-weight="700">${arr.map(a=>a.seq).join('·')}</text>
+      ${!full?`<text x="${px+pwpx/2+1}" y="${deck-ph/2+12}" text-anchor="middle"
+        font-family="JetBrains Mono,monospace" font-size="7" fill="#5f8593">½</text>`:''}</g>`;
+  });
+
+  // bandas por parada (LIFO global)
+  let bandas = '';
+  if(trip && trip.paradas && trip.paradas.length > 1 && trip.placement.rangos){
+    const ord = trip.placement.ord;
+    bandas = trip.placement.rangos.map((rg,i)=>{
+      const g = ord[i], c = cliColor(g.cli);
+      const cs = rig.cells.filter(x => x.gi >= rg[0] && x.gi < rg[1]);
+      if(!cs.length) return '';
+      const a = X(Math.min(...cs.map(x=>x.gx))-0.5), b = X(Math.max(...cs.map(x=>x.gx))+0.5);
+      return `<rect x="${a}" y="10" width="${Math.max(b-a-4,4)}" height="4" fill="${c}"/>
+        <text x="${(a+b)/2}" y="25" text-anchor="middle" font-family="JetBrains Mono,monospace"
+          font-size="8.5" fill="${c}" letter-spacing="1">PARADA ${g.parada} · ${g.cedi}</text>`;
+    }).join('');
+  }
+
+  // Xcg por unidad
+  let cgMarks = '';
+  U.forEach((u,ui) => {
+    const ps = vis.filter(p => p.u === ui);
+    if(!ps.length) return;
+    const w = ps.reduce((a,p)=>a+p.p.kg,0);
+    const cx = X(ps.reduce((a,p)=>a+p.p.kg*p.gx,0)/w);
+    const boxTop = deck - u.H*sc;
+    const e = trip ? trip.axles.ejes.filter(x=>x.u===ui) : [];
+    const c = e.length && e.every(x=>x.ok) ? '#12e0a2' : e.length ? '#ff4b6b' : '#12e0a2';
+    cgMarks += `<line x1="${cx}" y1="${boxTop-29}" x2="${cx}" y2="${deck}" stroke="${c}" stroke-width="2" stroke-dasharray="6 3"/>
+      <rect x="${cx-40}" y="${boxTop-46}" width="80" height="16" fill="#04121a" stroke="${c}" stroke-width="1.3"/>
+      <text x="${cx}" y="${boxTop-34}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+        font-size="9" fill="${c}" font-weight="700">U${ui+1} ${(ps.reduce((a,p)=>a+p.p.kg*p.x,0)/w).toFixed(2)} m</text>
+      <circle cx="${cx}" cy="${deck-6}" r="5.5" fill="${c}"/><circle cx="${cx}" cy="${deck-6}" r="2.2" fill="#04121a"/>`;
+  });
+
+  // cotas de eje con carga
+  const ejePos = [{x:frontAxleX},{x:driveX}];
+  U.forEach(u => u.rear.forEach(g => ejePos.push({x:u.off + g.x})));
+  const axW = trip ? trip.axles.ejes : null;
+  const cotas = ejePos.map((a,i)=>{
+    const e = axW && axW[i], col = !e ? '#5f8593' : (e.ok ? '#12e0a2' : '#ff4b6b');
+    return `<line x1="${X(a.x)}" y1="${GY+4}" x2="${X(a.x)}" y2="${GY+24}" stroke="#164254" stroke-width="1"/>
+      <text x="${X(a.x)}" y="${GY+38}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+        font-size="10.5" fill="#00d9e8" font-weight="700">E${i+1}</text>
+      ${e?`<text x="${X(a.x)}" y="${GY+51}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+        font-size="9" fill="${col}" font-weight="700">${kg(e.w)}</text>
+      <text x="${X(a.x)}" y="${GY+62}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+        font-size="7.5" fill="#5f8593">de ${kg(e.lim)}</text>`:''}`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img"
+    aria-label="Vista lateral del conjunto ${rig.code}">
+    <defs><style>.pal{animation:pop .32s cubic-bezier(.22,1.4,.4,1) backwards;animation-delay:var(--d)}
+      @keyframes pop{from{opacity:0;transform:translateY(12px)}to{opacity:1}}
+      @media(prefers-reduced-motion:reduce){.pal{animation:none}}</style></defs>
+    <line x1="0" y1="${GY}" x2="${W}" y2="${GY}" stroke="#164254" stroke-width="2"/>
+    <line x1="0" y1="${GY+3}" x2="${W}" y2="${GY+3}" stroke="#0d2430" stroke-width="4" stroke-dasharray="12 9"/>
+    ${cajas}
+    ${pallets}
+    <rect x="${X(cabFront)}" y="${deck-0.15*sc}" width="${(driveX+1.2-cabFront)*sc}" height="8"
+      fill="#0e3040" stroke="#1d5468" stroke-width="1"/>
+    <path d="M ${X(cabFront)} ${deck-0.1*sc} L ${X(cabFront)} ${GY-3.25*sc}
+      L ${X(cabFront+0.35)} ${GY-3.45*sc} L ${X(frontAxleX+1.45)} ${GY-3.45*sc}
+      L ${X(frontAxleX+1.6)} ${deck-0.1*sc} Z" fill="#0b2733" stroke="#2a6d84" stroke-width="1.8"/>
+    <rect x="${X(cabFront+0.18)}" y="${GY-3.28*sc}" width="${1.1*sc}" height="${0.85*sc}"
+      fill="#00d9e8" fill-opacity="0.13" stroke="#0a8f9b" stroke-width="1"/>
+    ${ruedas}${kingpins}${bandas}${cgMarks}${cotas}
+  </svg>`;
+}
+
+/* ---------- SVG: vista superior (todas las unidades) ---------- */
+function topSVG(rig, trip, step){
+  const W = 1240, maxRows = Math.max(...rig.units.map(u=>u.nRows||1));
+  const totalSlots = rig.units.reduce((a,u)=>a+(u.nSlots||0),0) + (rig.units.length-1);
+  const cell = (W-70)/Math.max(totalSlots,1), rowH = 38, H = maxRows*rowH + 40;
+  const vis = trip ? new Map(trip.placement.placed.filter(p=>p.seq<=step).map(p=>[p.u+':'+p.slot+':'+p.row,p])) : new Map();
+  let out = '', col = 35;
+  rig.units.forEach((u,ui)=>{
+    if(!u.nSlots){ 
+      out += `<text x="${col+cell/2}" y="${30+rowH/2}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+        font-size="8" fill="#5f8593">dolly</text>`; col += cell; return; }
+    out += `<rect x="${col}" y="30" width="${u.nSlots*cell}" height="${u.nRows*rowH}" fill="none"
+      stroke="#1d5468" stroke-width="1.5"/>
+      <text x="${col+2}" y="22" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#00d9e8"
+        letter-spacing="1">U${ui+1} · ${u.placa}</text>`;
+    for(let k=0;k<u.nSlots;k++) for(let r=0;r<u.nRows;r++){
+      const x = col + k*cell, y = 30 + r*rowH, p = vis.get(ui+':'+k+':'+r);
+      if(p){
+        const c = skuColor(p.p.sku), cc = cliColor(p.p.cli);
+        out += `<g class="pal" style="--d:${p.seq*20}ms">
+          <rect x="${x+1.5}" y="${y+1.5}" width="${cell-3}" height="${rowH-4}" fill="${c}" fill-opacity="0.26"
+            stroke="${c}" stroke-width="1.4"/>
+          <rect x="${x+1.5}" y="${y+1.5}" width="${cell-3}" height="3.5" fill="${cc}"/>
+          <text x="${x+cell/2}" y="${y+rowH/2+1}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+            font-size="10" font-weight="700" fill="${c}">${p.seq}</text>
+          <text x="${x+cell/2}" y="${y+rowH/2+12}" text-anchor="middle" font-family="JetBrains Mono,monospace"
+            font-size="6.5" fill="#9fc2ce">${p.p.sku}</text></g>`;
+      } else {
+        out += `<rect x="${x+1.5}" y="${y+1.5}" width="${cell-3}" height="${rowH-4}" fill="none"
+          stroke="#123243" stroke-width="1" stroke-dasharray="3 3"/>`;
+      }
+    }
+    col += u.nSlots*cell + (ui<rig.units.length-1 ? cell*0.5 : 0);
+  });
+  const rowLbl = Array.from({length:maxRows},(_,r)=>
+    `<text x="30" y="${30+r*rowH+rowH/2+3}" text-anchor="end" font-family="JetBrains Mono,monospace"
+      font-size="8" fill="#5f8593">${r===0?'IZQ':'DER'}</text>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img"
+    aria-label="Vista superior de las plataformas">
+    <defs><style>.pal{animation:pop2 .28s ease backwards;animation-delay:var(--d)}
+    @keyframes pop2{from{opacity:0}to{opacity:1}}
+    @media(prefers-reduced-motion:reduce){.pal{animation:none}}</style></defs>
+    ${rowLbl}${out}</svg>`;
+}
+
+/* ---------- Gauges por eje ---------- */
+function gaugesHTML(ax, rig){
+  const taras = [rig.t.taraF, rig.t.taraD];
+  rig.units.forEach(u => u.rear.forEach(g => taras.push(g.tara)));
+  const taraOf = k => taras[k];
+  const row = (name, w, lim, ok, tara, base) => {
+    const p = w/lim, cls = w>lim ? 'bad' : p>0.95 ? 'warn' : 'ok';
+    // cada barra se escala a su propio límite: el borde derecho ES el límite legal
+    const full = Math.min(100, p*100), over = p>1 ? Math.min(100,(p-1)*100) : 0;
+    const tp = tara!=null ? Math.min(100, tara/lim*100) : 0;
+    const bp = (base!=null && base < lim) ? base/lim*100 : 0;
+    return `<div class="gauge">
+      <div class="gauge-head"><span class="name">${name}</span>
+        <span class="val">${kg(w)} kg <em>/ ${kg(lim)}</em>
+          <span class="pill ${ok?'p-ok':'p-bad'}" style="margin-left:7px">${ok?'OK':'EXCEDE'}</span></span></div>
+      <div class="bar">
+        <div class="fill ${cls}" style="width:${full}%"></div>
+        ${tp?`<div class="tara" style="width:${tp}%"></div>`:''}
+        ${bp?`<div class="mark" style="left:${bp}%;background:var(--warn);opacity:.9"></div>`:''}
+        <div class="lbl">${pct(p)}%${over?' · +'+kg(w-lim)+' kg':''}</div>
+      </div></div>`;
+  };
+  const anyBon = ax.ejes.some(e=>e.lim>e.base) || rig.pbm > rig.base.pbm;
+  const uLbl = k => { const e = ax.ejes[k]; return e && e.u >= 0 && rig.nUnits > 1 ? ' <span style="color:var(--muted)">·U'+(e.u+1)+'</span>' : ''; };
+  return ax.ejes.map((e,k) => row(e.n + uLbl(k), e.w, e.lim, e.ok, taraOf(k), e.base)).join('')
+    + `<div style="font-family:var(--mono);font-size:8.5px;color:var(--muted);letter-spacing:.1em;margin:-4px 0 12px">
+         El borde derecho de cada barra es el límite legal de ese eje · el rayado es tara${anyBon?' · la marca ámbar es el límite sin bonificación':''}
+       </div>`
+    + `<div style="padding-top:12px;border-top:1px solid var(--line-soft)">
+         ${row('Peso bruto vehicular', ax.pbv, rig.pbm, ax.pbvOk, rig.taraTotal, rig.base.pbm)}
+         ${ax.dependeCert?`<div class="note" style="margin-top:6px;font-size:11px">
+           <strong>Esta carga depende del certificado ${rig.certs.filter(c=>c.aplica).map(c=>c.nro).join(', ')}.</strong> Sin la bonificación
+           vigente el vehículo quedaría fuera de norma.</div>`:''}
+       </div>`;
+}
+
+/* ---------- Detalle de una orden de carga ---------- */
+function ordenHTML(o, i, abierta){
+  const rig = o.rig;
+  return `<div class="orden ${abierta?'open':''}" data-orden="${i}">
+    <header>
+      <div class="nro">${o.nro}<em>Orden de carga</em></div>
+      <div class="trip-meta">
+        <div>Unidad<b>${o.unidad} · ${o.code}</b></div>
+        <div>Parihuelas<b>${o.pallets.length} / ${o.capPales}</b></div>
+        <div>Carga útil<b>${kg(o.W)} kg</b></div>
+        <div>Recojo<b>${o.recojos.map(r=>r.cod.replace('PL-','')).join(' + ')}</b></div>
+        <div>Destinos<b>${o.paradas.map(p=>p.cedi).join(' → ')}</b></div>
+        <div>Restricción activa<b style="color:var(--warn)">${o.limitante}</b></div>
+      </div>
+      <span class="pill ${o.axles.ok?'p-ok':'p-bad'}">${o.axles.ok?'Apto':'Excede'}</span>
+      ${o.axles.dependeCert?'<span class="pill p-cyan">Usa bonificación</span>':''}
+      <span class="caret">▶</span>
+    </header>
+    <div class="inner">
+      <table style="margin-bottom:14px;font-size:11px"><tbody>
+        <tr><td style="color:var(--muted);width:118px">Placas</td>
+            <td style="color:var(--txt)">${o.placas.join('  +  ')}</td>
+            <td style="color:var(--muted);width:118px">Transportista</td>
+            <td style="color:var(--txt)">${(TRANS_IDX[o.trans]||{}).nombre||'—'}</td></tr>
+        <tr><td style="color:var(--muted)">Punto de recojo</td>
+            <td style="color:var(--txt)">${o.recojos.map(r=>
+              `<span style="display:inline-block;width:8px;height:8px;background:${plColor(r.cod)};margin-right:6px"></span>${r.nombre} <span style="color:var(--muted)">(${r.pales} palés · ${kg(r.kg)} kg)</span>`).join('<br>')}</td>
+            <td style="color:var(--muted)">Chofer</td><td style="color:var(--txt)">${o.chofer}</td>
+            <td style="color:var(--muted)">Emitida</td>
+            <td style="color:var(--txt)">Ola ${String(o.ola).padStart(2,'0')} · ${o.emitida}</td></tr>
+      </tbody></table>
+      <div class="grid g2" style="align-items:start">
+        <div>${gaugesHTML(o.axles, rig)}</div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.18em;
+            text-transform:uppercase;margin-bottom:8px">Paradas y órdenes de compra</div>
+          ${o.paradas.map(p=>{
+            const porOc = {}; p.pallets.forEach(x=>{ (porOc[x.oc]=porOc[x.oc]||[]).push(x); });
+            const kgP = p.pallets.reduce((a,x)=>a+x.kg,0);
+            return `<div style="border-left:3px solid ${cliColor(p.cli)};padding:8px 11px;margin-bottom:9px;background:var(--deep)">
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <div><span class="pill p-cyan">Parada ${p.parada}</span>
+                  <span style="color:var(--txt);margin-left:8px;font-weight:600">${p.cliNom}</span></div>
+                <div style="font-family:var(--mono);font-size:11px;color:var(--txt)">${p.pallets.length} palés · ${kg(kgP)} kg</div></div>
+              <table style="margin-top:7px"><tbody>${Object.keys(porOc).map(oc=>{
+                const g = porOc[oc], ps = {};
+                g.forEach(x=>{ ps[x.sku]=(ps[x.sku]||0)+1; });
+                return `<tr><td style="color:var(--cyan)">${oc}</td>
+                  <td>${Object.keys(ps).map(sk=>`<span style="display:inline-block;width:8px;height:8px;background:${skuColor(sk)};margin:0 5px 0 9px"></span>${sk}×${ps[sk]}`).join('')}</td>
+                  <td class="num" style="color:var(--txt)">${kg(g.reduce((a,x)=>a+x.kg,0))}</td></tr>`;
+              }).join('')}</tbody></table></div>`;
+          }).join('')}
+          <button class="btn sm" style="margin-top:4px;width:100%" data-goman="${o.nro}">Ver plano de estiba →</button>
+        </div>
+      </div>
+    </div></div>`;
+}
+function bindOrdenes(){
+  $$('.orden header').forEach(h => h.onclick = () => h.parentElement.classList.toggle('open'));
+  $$('[data-goman]').forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    switchView('manif');
+    const sel = $('#manifTrip');
+    renderManifest();
+    sel.value = b.dataset.goman; renderManifest();
+  });
+}
+
+/* ---------- Resultado de la ola en curso ---------- */
+let OLARES = null;
+function renderOla(){
+  const box = $('#olaBox');
+  const set = (id,v,d,cls) => { const el=$(id); el.className='kpi '+(cls||'');
+    el.querySelector('.v').innerHTML=v; el.querySelector('.d').innerHTML=d; };
+  if(!OLARES){
+    ['#kcOrd','#kcAsig','#kcPend','#kcEstado'].forEach(i=>set(i,'—','&nbsp;'));
+    box.innerHTML = `<div class="empty"><div class="big">Ola sin planificar</div>
+      <p>Declara qué unidades están disponibles y pulsa «Planificar ola».</p></div>`;
+    return;
+  }
+  const R = OLARES;
+  set('#kcOrd', R.ordenes.length + '<em>/' + R.flota.length + '</em>',
+      R.vacias.length ? R.vacias.length + ' unidad(es) sin carga' : 'toda la flota cargada',
+      R.vacias.length ? 'warn' : 'ok');
+  set('#kcAsig', R.asignados, kg(R.kgAsignado) + ' kg de ' + kg(R.kgInicial), 'ok');
+  set('#kcPend', R.pendientes.length,
+      R.pendientes.length ? kg(R.kgPend)+' kg · faltan ~'+R.unidadesFaltantes+' unidad(es)' : 'pool agotado',
+      R.pendientes.length ? 'warn' : 'ok');
+  set('#kcEstado', R.cumple?'APTO':'REVISAR',
+      R.cumple?'todas las órdenes dentro de norma':'hay ejes fuera de límite', R.cumple?'ok':'bad');
+
+  box.innerHTML =
+    R.ordenes.map((o,i)=>ordenHTML(o,i,i===0)).join('')
+    + (R.vacias.length ? `<div class="sec-title" style="margin-top:20px">Unidades sin asignación</div>`
+        + R.vacias.map(v=>`<div class="vacia"><div class="id">${v.id}</div>
+            <div class="txt">${v.rig.code} · ${t1(v.cap)} t · ${v.motivo}</div>
+            <span class="pill p-baja">Queda libre</span></div>`).join('') : '')
+    + (R.rechazadas.length ? R.rechazadas.map(v=>`<div class="vacia" style="border-left-color:var(--bad)">
+        <div class="id" style="color:var(--bad)">${v.id}</div>
+        <div class="txt" style="color:var(--bad)">${v.motivo}</div></div>`).join('') : '')
+    + (R.pendientes.length ? `
+      <div class="card" style="border-top-color:var(--warn);margin-top:18px">
+        <header><h3 style="color:var(--warn)">Saldo para la ola ${String(R.ola+1).padStart(2,'0')}</h3>
+          <span class="sub">${R.pendientes.length} palés · ${kg(R.kgPend)} kg · se necesitan ~${R.unidadesFaltantes} unidad(es) más</span></header>
+        <div class="body">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+            ${R.pendPorOrigen.map(g=>`<div style="border-left:3px solid ${plColor(g.cod)};
+              background:var(--deep);padding:7px 12px;font-family:var(--mono);font-size:10.5px">
+              <div style="color:var(--muted);font-size:8.5px;letter-spacing:.15em">${g.nombre}</div>
+              <div style="color:var(--txt);font-size:15px;font-weight:700">${g.pales} palés
+                <span style="color:var(--muted);font-size:10px">· ${kg(g.kg)} kg</span></div></div>`).join('')}
+          </div>
+          <table>
+          <thead><tr><th>Origen</th><th>Destino</th><th>Orden compra</th><th>SKU</th><th class="num">Palés</th>
+          <th class="num">kg</th><th class="num">Urgencia<br>en ola ${R.ola+1}</th><th>Estado</th></tr></thead>
+          <tbody>${Object.values(R.pendientes.reduce((a,p)=>{
+            const k=p.origen+'|'+p.cli+'|'+p.oc+'|'+p.sku;
+            a[k]=a[k]||{origen:p.origen,plantaNom:p.plantaNom,cli:p.cli,cliNom:p.cliNom,oc:p.oc,sku:p.sku,n:0,kg:0,p};
+            a[k].n++; a[k].kg+=p.kg; return a;},{}))
+            .map(g=>{ const nu = urgencia(g.p, R.ola+1);
+              return `<tr>
+              <td><span style="display:inline-block;width:8px;height:8px;background:${plColor(g.origen)};margin-right:6px"></span>${(g.plantaNom||'').replace('Planta ','')}</td>
+              <td><span style="display:inline-block;width:8px;height:8px;background:${cliColor(g.cli)};margin-right:6px"></span>${g.cliNom}</td>
+              <td style="color:var(--cyan)">${g.oc}</td><td>${g.sku}</td>
+              <td class="num" style="color:var(--txt)">${g.n}</td><td class="num">${kg(g.kg)}</td>
+              <td class="num" style="color:var(--warn);font-weight:700">${Math.round(nu.score)}</td>
+              <td>${nu.vencido?'<span class="pill p-bad">Fuera de ventana</span>':'<span class="pill p-media">Sube de prioridad</span>'}</td>
+              </tr>`;}).join('')}</tbody></table></div></div>` : '');
+  bindOrdenes();
+}
+
+/* ---------- Órdenes emitidas (todas las olas) ---------- */
+function renderOrdenes(){
+  const box = $('#ordenesBox');
+  if(!ORDENES.length){
+    box.innerHTML = `<div class="empty"><div class="big">Sin órdenes emitidas</div>
+      <p>Las órdenes se emiten al confirmar una ola.</p></div>`;
+    return;
+  }
+  const porOla = {};
+  ORDENES.forEach(o => (porOla[o.ola] = porOla[o.ola] || []).push(o));
+  box.innerHTML = Object.keys(porOla).sort((a,b)=>a-b).map(k=>`
+    <div class="sec-title" style="margin-top:${k=='1'?'0':'26px'}">Ola ${String(k).padStart(2,'0')} · ${porOla[k].length} orden(es)</div>
+    ${porOla[k].map((o,i)=>ordenHTML(o,i,false)).join('')}`).join('');
+  bindOrdenes();
+}
+</script>
+<script>
+/* ---------- Manifiesto + reproductor de estiba ---------- */
+let PLAY = null;
+
+function renderManifest(){
+  const box = $('#manifBox'), sel = $('#manifTrip');
+  if(!ORDENES.length){
+    sel.innerHTML = ''; 
+    box.innerHTML = `<div class="empty"><div class="big">Nada que mostrar</div>
+      <p>Ejecuta una simulación para ver el plano de estiba paso a paso y el manifiesto de pesos por eje.</p></div>`;
+    return;
+  }
+  const prev = sel.value;
+  sel.innerHTML = ORDENES.map(o=>`<option value="${o.nro}">${o.nro} · ${o.unidad} · ${o.code} · ${o.pallets.length} palés · ${kg(o.W)} kg</option>`).join('');
+  if(prev && ORDENES.some(o=>o.nro===prev)) sel.value = prev;
+  const tr = ORDENES.find(o=>o.nro===sel.value) || ORDENES[0];
+  sel.value = tr.nro;
+  const RIG = tr.rig, total = tr.placement.placed.length;
+
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <header>
+        <div><h3>Plano de estiba · ${tr.nro}</h3>
+        <div class="sub">${tr.unidad} · ${RIG.code} · ${tr.origenNom} →
+          ${[RIG.t.placa, ...RIG.units.map(u=>u.placa)].join(' + ')} ·
+          ${tr.chofer} ·
+          ${tr.paradas.map(p=>'P'+p.parada+' '+p.cliNom).join('  →  ')}</div></div>
+        <span class="pill ${tr.axles.ok?'p-ok':'p-bad'}">${tr.axles.ok?'Apto para balanza':'No apto'}</span>
+      </header>
+      <div class="truck-wrap">
+        <div id="svgSide">${truckSVG(RIG, tr, total)}</div>
+        <div class="cg-readout" id="cgLive">${tr.placement.porUnidad.map((u,i)=>
+          u.n?`U${i+1} <b>${u.xcg.toFixed(2)}</b> m · ${kg(u.W)} kg`:'').filter(Boolean).join('<br>')}</div>
+      </div>
+      <div class="playbar">
+        <button class="btn sm" id="btnPlay">▶ Reproducir estiba</button>
+        <input type="range" id="stepRange" min="0" max="${total}" value="${total}">
+        <div class="step-txt" id="stepTxt">Estiba completa · ${total} palés</div>
+      </div>
+      <div style="border-top:1px solid var(--line-soft);padding:11px 13px 4px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.18em;
+          text-transform:uppercase;margin-bottom:7px">Vista superior · ${RIG.nUnits} unidad(es) · ${RIG.capPos} posiciones</div>
+        <div id="svgTop">${topSVG(RIG, tr, total)}</div>
+      </div>
+      <div class="legend">
+        ${tr.paradas.map(p=>`<span><i style="background:${cliColor(p.cli)}"></i>Parada ${p.parada} · ${p.cliNom}</span>`).join('')}
+        ${[...new Set(tr.pallets.map(p=>p.sku))].map(s=>
+          `<span><i style="background:${skuColor(s)}"></i>${s}</span>`).join('')}
+        <span><i style="background:#ffb020"></i>Kingpin</span>
+        <span><i style="background:rgba(0,217,232,.25)"></i>Ventana admisible de X<sub>cg</sub></span>
+      </div>
+    </div>
+
+    <div class="grid g2" style="align-items:start">
+      <div class="card">
+        <header><h3>Manifiesto de pesos por eje</h3><span class="sub">certificado pre-despacho</span></header>
+        <div class="body">${gaugesHTML(tr.axles, RIG)}
+          <table style="margin-top:15px">
+            <thead><tr><th>Conjunto</th><th class="num">Tara</th><th class="num">Carga</th>
+            <th class="num">Total</th><th class="num">Límite</th><th>Estado</th></tr></thead>
+            <tbody>${(()=>{ const taras=[RIG.t.taraF, RIG.t.taraD];
+              RIG.units.forEach(u=>u.rear.forEach(g=>taras.push(g.tara)));
+              return tr.axles.ejes.map((e,k)=>{
+              const tara = taras[k];
+              return `<tr><td style="color:var(--txt)">${e.n}${e.u>=0&&RIG.nUnits>1?` <span style="color:var(--muted)">U${e.u+1}</span>`:''}</td>
+                <td class="num">${kg(tara)}</td><td class="num">${kg(e.w-tara)}</td>
+                <td class="num" style="color:var(--txt);font-weight:700">${kg(e.w)}</td>
+                <td class="num">${kg(e.lim)}</td>
+                <td><span class="pill ${e.ok?'p-ok':'p-bad'}">${e.ok?'OK':'EXCEDE'}</span></td></tr>`;
+            }).join(''); })()}
+            <tr style="border-top:2px solid var(--line)"><td style="color:var(--cyan);font-weight:700">PBV total</td>
+              <td class="num">${kg(RIG.taraTotal)}</td><td class="num">${kg(tr.W)}</td>
+              <td class="num" style="color:var(--cyan);font-weight:700">${kg(tr.axles.pbv)}</td>
+              <td class="num">${kg(RIG.pbm)}</td>
+              <td><span class="pill ${tr.axles.pbvOk?'p-ok':'p-bad'}">${tr.axles.pbvOk?'OK':'EXCEDE'}</span></td></tr>
+            </tbody></table>
+          <div class="note cy" style="font-size:11px">
+            Reparto de la quinta rueda ${(RIG.kf*100).toFixed(1)}% al direccional / ${(100-RIG.kf*100).toFixed(1)}% al motriz,
+            derivado del avance ${RIG.t.kpAdv.toFixed(2)} m sobre distancia entre ejes ${RIG.t.wb.toFixed(2)} m.
+            ${RIG.nUnits>1?`Cadena de ${RIG.nUnits} unidades: cada kingpin transfiere a la unidad de adelante
+            (Q = ${RIG.units.map((u,i)=>kg(tr.axles.Qs[i])).join(' → ')} kg).`:''}
+            Suma de ejes ${kg(tr.axles.ejes.reduce((a,e)=>a+e.w,0))} kg = PBV ${kg(tr.axles.pbv)} kg.
+            Ocupación: ${tr.pallets.length} de ${tr.capPales} parihuelas (${pct(tr.usoStd)}%)
+            · restricción activa: <strong>${tr.limitante}</strong>
+            · emitida en la ola ${String(tr.ola).padStart(2,'0')} a las ${tr.emitida}.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <header><h3>Secuencia de carga</h3><span class="sub">pared frontal → puerta</span></header>
+        <div class="body" style="padding:0">
+          <div class="t-wrap" style="max-height:520px;border:none">
+            <table><thead><tr><th>#</th><th>Parada</th><th>SKU</th><th>Orden</th>
+              <th>Unidad</th><th class="num">Pos. x</th><th>Fila</th><th class="num">kg</th></tr></thead>
+            <tbody>${tr.placement.placed.sort((a,b)=>a.seq-b.seq).map(p=>`
+              <tr><td style="color:var(--cyan);font-weight:700">${String(p.seq).padStart(2,'0')}</td>
+              <td><span style="display:inline-block;width:8px;height:8px;background:${cliColor(p.p.cli)};margin-right:5px"></span>${p.parada||1} · ${p.p.cedi}</td>
+              <td><span style="display:inline-block;width:8px;height:8px;background:${skuColor(p.p.sku)};margin-right:5px"></span>${p.p.sku}</td>
+              <td style="font-size:10px;color:var(--muted)">${p.p.oc}</td>
+              <td style="color:var(--cyan)">U${p.u+1}</td>
+              <td class="num">${p.x.toFixed(2)} m</td><td>${p.row===0?'Izq.':'Der.'}</td>
+              <td class="num" style="color:var(--txt)">${kg(p.p.kg)}</td></tr>`).join('')}</tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  const range = $('#stepRange');
+  const paint = v => {
+    $('#svgSide').innerHTML = truckSVG(RIG, tr, v);
+    $('#svgTop').innerHTML  = topSVG(RIG, tr, v);
+    const vis = tr.placement.placed.filter(p=>p.seq<=v);
+    let w=0; vis.forEach(p=> w+=p.p.kg);
+    $('#cgLive').innerHTML = RIG.units.map((u,i)=>{
+      const ps = vis.filter(p=>p.u===i); if(!ps.length) return '';
+      const ww = ps.reduce((a,p)=>a+p.p.kg,0);
+      return `U${i+1} <b>${(ps.reduce((a,p)=>a+p.p.kg*p.x,0)/ww).toFixed(2)}</b> m · ${kg(ww)} kg`;
+    }).filter(Boolean).join('<br>') || 'Plataformas vacías';
+    $('#stepTxt').innerHTML = v===0 ? 'Plataforma vacía'
+      : v===total ? `Estiba completa · <b>${total}</b> palés · <b>${kg(w)}</b> kg`
+      : `Palé <b>${v}</b> de ${total} · ${vis[vis.length-1].p.sku} en U${vis[vis.length-1].u+1} x=<b>${vis[vis.length-1].x.toFixed(2)}</b> m · acumulado <b>${kg(w)}</b> kg`;
+  };
+  range.oninput = e => { clearInterval(PLAY); PLAY=null; $('#btnPlay').textContent='▶ Reproducir estiba'; paint(+e.target.value); };
+  $('#btnPlay').onclick = () => {
+    if(PLAY){ clearInterval(PLAY); PLAY=null; $('#btnPlay').textContent='▶ Reproducir estiba'; return; }
+    let v = (+range.value >= total) ? 0 : +range.value;
+    $('#btnPlay').textContent='❚❚ Pausar';
+    PLAY = setInterval(()=>{
+      v++; range.value = v; paint(v);
+      if(v >= total){ clearInterval(PLAY); PLAY=null; $('#btnPlay').textContent='▶ Reproducir estiba'; }
+    }, 190);
+  };
+  sel.onchange = renderManifest;
+}
+
+/* ---------- Navegación ---------- */
+function switchView(v){
+  $$('.tab').forEach(t => t.classList.toggle('on', t.dataset.v === v));
+  $$('.view').forEach(x => x.classList.toggle('on', x.id === 'v-'+v));
+}
+
+/* ==================================================================
+   EVENTOS
+   ================================================================== */
+$$('.tab').forEach(t => t.onclick = () => switchView(t.dataset.v));
+
+function refrescar(){
+  RIGCACHE = {};
+  renderWaveState(); renderFlota(); renderRanking(); renderHistorial();
+  renderSolicitudes(); renderReq(); renderOla(); renderOrdenes(); renderManifest(); stdHint();
+}
+
+$('#optMargin').addEventListener('input', e => { PARAMS.margin = +e.target.value||0; renderFlota(); renderReq(); });
+$('#optHoras').addEventListener('input', e => { PARAMS.horasOla = +e.target.value||2.5; renderWaveState(); renderRanking(); });
+$('#optCert').onchange = e => { PARAMS.usarCert = e.target.checked; RIGCACHE = {}; renderFlota(); stdHint();
+  toast(e.target.checked ? 'Bonificaciones MTC aplicadas' : 'Bonificaciones MTC desactivadas'); };
+$('#optModoStd').onchange = e => { PARAMS.modoStd = e.target.value;
+  $('#optStd').disabled = e.target.value === 'libre'; stdHint(); renderReq(); };
+$('#optStd').oninput = e => { PARAMS.stdPales = Math.max(1, +e.target.value|0); stdHint(); renderReq(); };
+$('#optDest').onchange = e => { PARAMS.maxDestinos = +e.target.value; };
+$('#optOrig').onchange = e => { PARAMS.maxOrigenes = +e.target.value;
+  toast(+e.target.value === 1 ? 'Un solo punto de recojo por vehículo'
+                              : 'Se autorizan hasta dos plantas por vehículo'); };
+
+$('#btnAllUnits').onclick = () => { DISPONIBLES = UNIDADES.filter(u=>!rigDe(u.id).err).map(u=>u.id);
+  renderFlota(); renderWaveState(); stdHint(); };
+$('#btnNoUnits').onclick = () => { DISPONIBLES = []; renderFlota(); renderWaveState(); stdHint(); };
+
+/* ---------- generación desde inventario ---------- */
+$('#btnGenerar').onclick = () => {
+  const r = generarRequerimientos($('#genReemplaza').checked);
+  if(!r.lineas){ toast('Ningún CEDI está por debajo de su cobertura objetivo', true); return; }
+  resetPool(); OLARES = null; refrescar();
+  toast(`${r.lineas} línea(s) generadas · ${r.pales} parihuelas`
+    + (r.sin.length ? ` · ${r.sin.length} sin planta que las produzca` : ''), !!r.sin.length);
+};
+
+/* ---------- importación de pedidos ---------- */
+$('#btnImport').onclick = () => {
+  const b = $('#importBox');
+  b.style.display = b.style.display === 'none' ? '' : 'none';
+  if(b.style.display === '') b.scrollIntoView({behavior:'smooth', block:'nearest'});
+};
+$('#btnImportClose').onclick = () => { $('#importBox').style.display = 'none'; };
+$('#impText').addEventListener('input', renderImport);
+$('#btnEjemplo').onclick = () => { $('#impText').value = EJEMPLO_CSV; renderImport(); };
+$('#btnFile').onclick = () => $('#impFile').click();
+$('#impFile').onchange = ev => {
+  const f = ev.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { $('#impText').value = r.result; renderImport(); };
+  r.onerror = () => toast('No se pudo leer el archivo', true);
+  r.readAsText(f, 'utf-8');
+};
+
+$('#btnSyncStock').onclick = () => { syncBigMagic(); resetPool(); OLARES = null; refrescar();
+  toast('Stock actualizado y pool reconstruido'); };
+
+$('#btnAddReq').onclick = () => {
+  const ult = REQS[REQS.length-1] || {origen:PLANTAS[0].cod, cli:CLIENTES[0].cod, oc:'OC-000000', cierre:'14:00'};
+  REQS.push({id:REQ_SEQ++, origen:ult.origen, cli:ult.cli, oc:ult.oc, sku:PRODUCTOS[0].sku,
+             pales:8, prio:'Media', cierre:ult.cierre});
+  resetPool(); OLARES = null; refrescar();
+};
+
+function editarReq(el){
+  const r = REQS[+el.dataset.i]; if(!r || !el.dataset.k) return;
+  r[el.dataset.k] = el.dataset.k === 'pales' ? Math.max(0, +el.value|0) : el.value;
+  resetPool(); OLARES = null; refrescar();
+}
+$('#tblReq').addEventListener('change', e => { if(e.target.dataset.k) editarReq(e.target); });
+$('#tblReq').addEventListener('click', e => {
+  if(e.target.dataset.del != null){ REQS.splice(+e.target.dataset.del,1); resetPool(); OLARES=null; refrescar(); }
+});
+
+$('#btnRun').onclick = () => {
+  if(!DISPONIBLES.length){ toast('Declara al menos una unidad disponible', true); return; }
+  if(!POOL.length){ toast('El pool está vacío: no queda nada por despachar', true); return; }
+  const btn = $('#btnRun'); btn.disabled = true; btn.textContent = '⟳ Planificando…';
+  setTimeout(() => {
+    OLARES = planificarOla(DISPONIBLES, {margin: PARAMS.margin});
+    renderOla(); $('#btnConfirm').disabled = !OLARES.ordenes.length;
+    btn.disabled = false; btn.textContent = '▶ Planificar ola';
+    switchView('ola');
+    toast(`Ola ${String(OLARES.ola).padStart(2,'0')}: ${OLARES.ordenes.length} orden(es) sobre ${OLARES.flota.length} unidad(es)`
+      + (OLARES.pendientes.length ? ` · quedan ${OLARES.pendientes.length} palés` : ' · pool agotado'),
+      !OLARES.cumple);
+  }, 240);
+};
+
+$('#btnConfirm').onclick = () => {
+  if(!OLARES || !OLARES.ordenes.length) return;
+  const n = OLARES.ordenes.length, quedan = OLARES.pendientes.length;
+  confirmarOla(OLARES);
+  OLARES = null; $('#btnConfirm').disabled = true;
+  refrescar();
+  toast(quedan ? `${n} orden(es) emitidas · ola ${String(OLA_ACTUAL).padStart(2,'0')}: declara la nueva flota`
+                : `${n} orden(es) emitidas · plan del día completo`);
+  if(!quedan) switchView('ordenes');
+};
+
+$('#btnReset').onclick = () => {
+  resetPool(); OLARES = null; DISPONIBLES = ['UT-01','UT-02','UT-03','UT-04','UT-05'];
+  $('#btnConfirm').disabled = true; refrescar(); toast('Planificación reiniciada desde la ola 01');
+};
+
+/* ---------- INIT ---------- */
+renderMaestros();
+renderArma();
+// El día arranca con la solicitud de reabastecimiento ya calculada
+generarRequerimientos(true);
+resetPool();
+refrescar();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qubo — Simulador de cubicaje y distribución de carga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* paleta tomada de efletexia.dtdevops.com */
+  --bg:    #0A0A0A;   /* dark-900 */
+  --bg2:   #111111;   /* dark-800 */
+  --bg3:   #1A1A1A;   /* dark-700 */
+  --card:  #111111;
+  --card2: #1A1A1A;
+  --b1:    rgba(249,115,22,.20);
+  --b2:    rgba(249,115,22,.08);
+  --b3:    #262626;   /* neutral-800 */
+  --orange:#F97316;   /* brand-500 */
+  --amber: #FB923C;   /* brand-400 */
+  --deep:  #EA580C;   /* brand-600 */
+  --purple:#a855f7;
+  --blue:  #00D4FF;
+  --green: #00FF94;
+  --red:   #ef4444;
+  --grad:  linear-gradient(135deg,#F97316,#FB923C);
+  --text:  #FFFFFF;
+  --muted: #A3A3A3;   /* neutral-400 */
+  --muted2:#737373;   /* neutral-500 */
+  --mono:  'Inter', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;overflow-x:hidden}
+img{max-width:100%}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 56px}
+
+.rev{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.rev-l{opacity:0;transform:translateX(-28px);transition:opacity .7s ease,transform .7s ease}
+.rev-r{opacity:0;transform:translateX(28px);transition:opacity .7s ease,transform .7s ease}
+.rev.on,.rev-l.on,.rev-r.on{opacity:1;transform:none}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:16px 56px;background:rgba(10,10,10,.85);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--b1);flex-wrap:wrap}
+.logo{display:flex;align-items:baseline;gap:7px;font-family:var(--mono);font-weight:800;font-size:16px;letter-spacing:2px}
+.logo b{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo span{font-size:10px;letter-spacing:3px;color:var(--muted)}
+.nav-links{display:flex;gap:26px;list-style:none}
+.nav-links a{font-size:13px;font-weight:600;color:var(--muted);transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn-ghost{padding:8px 18px;border:1px solid var(--b1);border-radius:10px;color:var(--text);
+  font-size:12px;font-weight:700;transition:all .2s;display:inline-block}
+.btn-ghost:hover{border-color:var(--orange);box-shadow:0 0 18px rgba(249,115,22,.2)}
+.btn-primary{padding:9px 22px;border-radius:10px;background:var(--grad);color:#fff;font-size:12px;
+  font-weight:800;transition:all .2s;display:inline-block}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(249,115,22,.55)}
+.btn-lg{padding:14px 30px;font-size:13px}
+
+/* ── HERO ── */
+.hero{position:relative;padding:96px 0 80px;overflow:hidden;
+  background:radial-gradient(1100px 500px at 80% 6%,rgba(168,85,247,.10),transparent 60%),
+             radial-gradient(900px 480px at 6% 0%,rgba(249,115,22,.13),transparent 62%),var(--bg)}
+.hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(249,115,22,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(249,115,22,.05) 1px,transparent 1px);
+  background-size:52px 52px;mask-image:linear-gradient(180deg,#000,transparent 72%)}
+.hgrid{display:grid;grid-template-columns:1.02fr .98fr;gap:52px;align-items:center;position:relative;z-index:2}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;
+  letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:20px}
+.eyebrow i{display:block;width:34px;height:1px;background:var(--grad)}
+h1{font-size:clamp(34px,5.4vw,60px);font-weight:800;color:#fff;letter-spacing:-1.8px;line-height:1.02;margin-bottom:20px}
+h1 span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:16px;color:var(--muted);line-height:1.7;max-width:500px;margin-bottom:30px}
+.hbtns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.hstats{display:grid;grid-template-columns:repeat(3,auto);gap:34px;justify-content:start}
+.sn{font-family:var(--mono);font-size:26px;font-weight:800;line-height:1;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sl{font-family:var(--mono);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-top:7px}
+
+/* ── MOCK ── */
+.pan{border-radius:16px;overflow:hidden;border:1px solid var(--b1);
+  background:linear-gradient(165deg,#111111,#0A0A0A);box-shadow:0 28px 70px rgba(0,0,0,.6)}
+.pan-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 15px;
+  border-bottom:1px solid var(--b1);background:rgba(255,255,255,.02)}
+.pan-logo{font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:2px;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:8.5px;letter-spacing:1.1px;color:var(--muted);
+  border:1px solid var(--b1);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.chip.ok{border-color:rgba(0,255,148,.4);color:#66FFC0}
+.pan-body{padding:16px;display:flex;flex-direction:column;gap:13px}
+.mini4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mini{background:rgba(249,115,22,.05);border:1px solid var(--b2);border-radius:12px;padding:11px}
+.minin{font-family:var(--mono);font-size:17px;font-weight:800;color:#fff;line-height:1}
+.minil{font-family:var(--mono);font-size:7.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin-top:6px}
+
+/* relleno de la unidad */
+.fill{border:1px solid var(--b3);border-radius:14px;overflow:hidden}
+.fill-h{font-family:var(--mono);font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);
+  padding:9px 12px;border-bottom:1px solid var(--b3);background:rgba(255,255,255,.02);
+  display:flex;justify-content:space-between;gap:8px}
+.deck{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;padding:12px}
+.slot{aspect-ratio:1;border-radius:2px;background:rgba(255,255,255,.04);border:1px solid var(--b3)}
+.slot.f{background:rgba(249,115,22,.35);border-color:rgba(249,115,22,.5)}
+.slot.f2{background:rgba(251,146,60,.32);border-color:rgba(251,146,60,.48)}
+.slot.f3{background:rgba(168,85,247,.3);border-color:rgba(168,85,247,.45)}
+
+/* ejes */
+.axles{border:1px solid var(--b3);border-radius:14px;overflow:hidden}
+.ax-h{font-family:var(--mono);font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);
+  padding:9px 12px;border-bottom:1px solid var(--b3);background:rgba(255,255,255,.02)}
+.ax-r{display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:11.5px}
+.ax-n{width:78px;color:var(--text);font-weight:600;flex-shrink:0}
+.bar{flex:1;height:5px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;position:relative}
+.bar i{display:block;height:100%;background:var(--grad)}
+.bar i.warn{background:linear-gradient(135deg,#FB923C,#ef4444)}
+.ax-v{font-family:var(--mono);font-size:9.5px;color:var(--muted);width:76px;text-align:right;flex-shrink:0}
+.okline{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:12px;font-size:11.5px;
+  background:rgba(0,255,148,.07);border:1px solid rgba(0,255,148,.28);color:#66FFC0}
+.okline::before{content:'✓';font-family:var(--mono);font-weight:800;width:16px;height:16px;flex-shrink:0;
+  border-radius:50%;border:1px solid rgba(0,255,148,.5);display:flex;align-items:center;justify-content:center;font-size:9px}
+
+/* ── SECCIONES ── */
+section.blk{padding:92px 0}
+.alt{background:var(--bg2);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.sec-head{margin-bottom:52px;max-width:690px}
+.slabel{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);
+  margin-bottom:14px}
+.stitle{font-size:clamp(26px,4vw,48px);font-weight:800;color:#fff;letter-spacing:-1px;line-height:1.06}
+.stitle span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ssub{font-size:15px;color:var(--muted);line-height:1.7;margin-top:16px}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.step{background:var(--card);border:1px solid var(--b1);border-radius:14px;padding:28px 24px;position:relative;overflow:hidden}
+.step::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);
+  transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.step:hover::after{transform:scaleX(1)}
+.step-n{font-family:var(--mono);font-size:30px;font-weight:800;color:rgba(249,115,22,.22);line-height:1;margin-bottom:13px}
+.step h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:9px}
+.step p{font-size:13px;color:var(--muted);line-height:1.7}
+
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1);
+  border:1px solid var(--b1);border-radius:14px;overflow:hidden}
+.mc{background:var(--card);padding:32px 28px;transition:background .25s,transform .25s}
+.mc:hover{background:var(--card2);transform:translateY(-3px)}
+.mc-num{font-family:var(--mono);font-size:9.5px;letter-spacing:2px;color:var(--orange);margin-bottom:16px}
+.mc h3{font-size:18px;font-weight:800;color:#fff;margin-bottom:10px}
+.mc p{font-size:13.5px;color:var(--muted);line-height:1.7}
+.mc-tag{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:8.5px;letter-spacing:1.3px;
+  text-transform:uppercase;padding:3px 9px;border-radius:999px;
+  background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:#66E2FF}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.bens{list-style:none;display:flex;flex-direction:column;gap:9px;margin:22px 0 26px}
+.bens li{display:flex;align-items:flex-start;gap:9px;font-size:14px;font-weight:500}
+.chk{width:17px;height:17px;border-radius:999px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;
+  justify-content:center;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.35);color:var(--orange)}
+
+/* maestros */
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:34px}
+.ccard{background:var(--card);border:1px solid var(--b1);border-radius:14px;padding:22px;transition:transform .25s}
+.ccard:hover{transform:translateY(-3px)}
+.cnum{font-family:var(--mono);font-size:9px;letter-spacing:1.6px;color:var(--muted);margin-bottom:9px}
+.ccard h4{font-size:15px;font-weight:800;color:#fff;margin-bottom:7px}
+.ccard p{font-size:12.5px;color:var(--muted);line-height:1.65}
+
+.note{font-family:var(--mono);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);
+  border:1px dashed var(--b1);border-radius:10px;padding:9px 15px;display:inline-block;margin-top:26px}
+
+.cta{padding:100px 0;text-align:center;position:relative;overflow:hidden;
+  background:radial-gradient(760px 340px at 50% 0%,rgba(249,115,22,.13),transparent 66%),var(--bg)}
+.cta h2{font-size:clamp(28px,5vw,54px);font-weight:800;color:#fff;letter-spacing:-1.4px;line-height:1.05;margin-bottom:16px}
+.cta h2 span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cta p{font-size:15px;color:var(--muted);max-width:470px;margin:0 auto 32px;line-height:1.65}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+footer{border-top:1px solid var(--b1);padding:52px 0 30px;background:var(--bg2)}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:44px;margin-bottom:34px}
+.fgrid p{font-size:13px;color:var(--muted);line-height:1.7;margin-top:14px;max-width:330px}
+.fcol h5{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text);margin-bottom:16px}
+.fcol ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.fcol a{font-size:13px;color:var(--muted);transition:color .2s}
+.fcol a:hover{color:var(--orange)}
+.fbot{border-top:1px solid var(--b3);padding-top:22px;display:flex;justify-content:space-between;gap:14px;
+  flex-wrap:wrap;font-family:var(--mono);font-size:10px;letter-spacing:1.2px;color:var(--muted)}
+
+@media(max-width:1020px){
+  .wrap,nav{padding-left:28px;padding-right:28px}
+  .hgrid,.split{grid-template-columns:1fr;gap:38px}
+  .mgrid,.steps{grid-template-columns:1fr}
+  .cgrid{grid-template-columns:1fr 1fr}
+  .fgrid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .hstats{gap:24px}
+}
+@media(max-width:560px){.cgrid,.mini4{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#top" class="logo"><b>QUBO</b><span>CUBICAJE</span></a>
+  <ul class="nav-links">
+    <li><a href="#como">Cómo funciona</a></li>
+    <li><a href="#modulos">Qué incluye</a></li>
+    <li><a href="#legal">Pesos y medidas</a></li>
+    <li><a href="#maestros">Configuración</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-ghost">Iniciar sesión</a>
+    <a href="#contacto" class="btn-primary">Solicitar información</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="wrap hgrid">
+    <div class="rev-l">
+      <div class="eyebrow"><i></i>Simulador de cubicaje y distribución de carga</div>
+      <h1>Cada unidad sale llena<br><span>y dentro de la ley.</span></h1>
+      <p class="hero-sub">Qubo toma los pedidos del día y la flota disponible, y arma las órdenes de carga: qué sube a cada unidad, en qué orden se estiba y cuánto pesa cada eje. Con la capacidad real de cada vehículo y los límites de peso siempre a la vista.</p>
+      <div class="hbtns">
+        <a href="#contacto" class="btn-primary btn-lg">SOLICITAR INFORMACIÓN</a>
+        <a href="#modulos" class="btn-ghost btn-lg">VER QUÉ INCLUYE</a>
+      </div>
+      <div class="hstats">
+        <div><div class="sn">4</div><div class="sl">Pasos del despacho</div></div>
+        <div><div class="sn">6</div><div class="sl">Maestros, una vez</div></div>
+        <div><div class="sn">100%</div><div class="sl">Pesos verificados</div></div>
+      </div>
+    </div>
+
+    <div class="pan rev-r">
+      <div class="pan-bar">
+        <span class="pan-logo">PLANIFICADOR DE DESPACHO</span>
+        <div class="chips"><span class="chip">OLA 2</span><span class="chip ok">SUTRAN OK</span></div>
+      </div>
+      <div class="pan-body">
+        <div class="mini4">
+          <div class="mini"><div class="minin">12</div><div class="minil">Órdenes</div></div>
+          <div class="mini"><div class="minin">276</div><div class="minil">Palés</div></div>
+          <div class="mini"><div class="minin">94%</div><div class="minil">Ocupación</div></div>
+          <div class="mini"><div class="minin">38</div><div class="minil">Saldo</div></div>
+        </div>
+        <div class="fill">
+          <div class="fill-h"><span>Plataforma · 24 posiciones</span><span>23 / 24</span></div>
+          <div class="deck">
+            <div class="slot f"></div><div class="slot f"></div><div class="slot f"></div><div class="slot f2"></div>
+            <div class="slot f2"></div><div class="slot f"></div><div class="slot f3"></div><div class="slot f"></div>
+            <div class="slot f"></div><div class="slot f2"></div><div class="slot f"></div><div class="slot f3"></div>
+            <div class="slot f"></div><div class="slot f3"></div><div class="slot f"></div><div class="slot f"></div>
+            <div class="slot f2"></div><div class="slot f"></div><div class="slot f"></div><div class="slot f2"></div>
+            <div class="slot f3"></div><div class="slot f"></div><div class="slot f"></div><div class="slot"></div>
+          </div>
+        </div>
+        <div class="axles">
+          <div class="ax-h">Manifiesto de pesos por eje</div>
+          <div class="ax-r"><span class="ax-n">Delantero</span><span class="bar"><i style="width:72%"></i></span><span class="ax-v">6.5 / 9 t</span></div>
+          <div class="ax-r"><span class="ax-n">1º conjunto</span><span class="bar"><i style="width:86%"></i></span><span class="ax-v">15.5 / 18 t</span></div>
+          <div class="ax-r"><span class="ax-n">2º conjunto</span><span class="bar"><i class="warn" style="width:93%"></i></span><span class="ax-v">22.3 / 24 t</span></div>
+        </div>
+        <div class="okline">Peso bruto 44.3 t de 48 t · dentro de la tabla MTC</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMA / COMO FUNCIONA -->
+<section class="blk alt" id="como">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <p class="slabel">El reto de cada día</p>
+      <h2 class="stitle">Armar el despacho <span>es un rompecabezas.</span></h2>
+      <p class="ssub">Los pedidos cambian durante la jornada, la flota llega por partes y cada unidad tiene su propio límite de peso y de espacio. Resolver ese cruce a mano toma tiempo y obliga a decidir rápido con información incompleta. Qubo calcula el reparto con la física real de cada palé y la tabla de pesos y medidas vigente, y entrega la orden lista para operar.</p>
+    </div>
+    <div class="steps">
+      <div class="step rev">
+        <div class="step-n">01</div>
+        <h3>Requerimientos</h3>
+        <p>Los pedidos del día: origen, cliente, orden de compra, SKU, palés, prioridad y hora de cierre. Importados de Excel o traídos del sistema.</p>
+      </div>
+      <div class="step rev">
+        <div class="step-n">02</div>
+        <h3>Ola de despacho</h3>
+        <p>Declaras qué unidades llegaron. El sistema toma lo más urgente que quepa y el resto vuelve al pool con más prioridad para la siguiente ola.</p>
+      </div>
+      <div class="step rev">
+        <div class="step-n">03</div>
+        <h3>Órdenes de carga</h3>
+        <p>Cada orden queda ligada a una unidad, un chofer y una secuencia de estiba. Se emite y la ola se cierra.</p>
+      </div>
+      <div class="step rev">
+        <div class="step-n">04</div>
+        <h3>Estiba y manifiesto</h3>
+        <p>El plano paso a paso de cómo se acomoda la carga y el manifiesto de pesos por eje, listo para presentar.</p>
+      </div>
+    </div>
+    <p class="note">La flota llega por olas y el sistema planifica por olas: se adapta a cómo opera tu patio</p>
+  </div>
+</section>
+
+<!-- MODULOS -->
+<section class="blk" id="modulos">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <p class="slabel">Qué incluye</p>
+      <h2 class="stitle">De la necesidad de reponer <span>al plano de estiba.</span></h2>
+    </div>
+    <div class="mgrid rev">
+      <div class="mc">
+        <div class="mc-num">01</div>
+        <h3>Reposición por cobertura</h3>
+        <p>Mira el stock de cada centro de distribución contra su venta diaria y propone qué pedir: cobertura de hoy, cobertura objetivo y palés a solicitar. Así cada solicitud sale respaldada por el dato de inventario.</p>
+        <span class="mc-tag">Origen del pedido</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">02</div>
+        <h3>Pedidos del día</h3>
+        <p>Carga los requerimientos pegando desde Excel, subiendo un CSV o sincronizando con el sistema comercial. Una línea por requerimiento, con su prioridad y su hora límite de recepción.</p>
+        <span class="mc-tag">Captura</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">03</div>
+        <h3>Ranking de urgencia</h3>
+        <p>Qué sube primero se calcula con una fórmula transparente: la prioridad declarada, la presión de la ventana de recepción y las olas que ese pedido ya esperó.</p>
+        <span class="mc-tag">Asignación</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">04</div>
+        <h3>Reglas de la corrida</h3>
+        <p>Tú fijas el marco: cuántas parihuelas por unidad de arrastre, si un vehículo puede recoger en dos plantas o entregar en dos destinos, y qué margen dejas sobre el límite de eje.</p>
+        <span class="mc-tag">Control</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">05</div>
+        <h3>Plano de estiba</h3>
+        <p>La secuencia de acomodo posición por posición, respetando si el producto es apilable y si admite volteo. El personal de patio recibe el plano listo para ejecutar.</p>
+        <span class="mc-tag">Operación</span>
+      </div>
+      <div class="mc">
+        <div class="mc-num">06</div>
+        <h3>Manifiesto por ejes</h3>
+        <p>El peso que queda sobre cada eje y el peso bruto del conjunto, contrastados contra la tabla vigente. La unidad sale con el documento listo para presentar.</p>
+        <span class="mc-tag">Cumplimiento</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CUMPLIMIENTO -->
+<section class="blk alt" id="legal">
+  <div class="wrap split">
+    <div class="rev-l">
+      <p class="slabel">Pesos y medidas</p>
+      <h2 class="stitle">Los límites de peso, <span>siempre a la vista.</span></h2>
+      <p class="ssub">El catálogo normativo de pesos y medidas está cargado en el sistema: longitud máxima, peso permitido por eje delantero y por cada conjunto, y peso bruto máximo según la configuración del vehículo. Cada orden se valida contra esa tabla antes de emitirse.</p>
+      <ul class="bens">
+        <li><span class="chk">✓</span>Validación por eje y por peso bruto en cada orden</li>
+        <li><span class="chk">✓</span>Configuraciones de dos a cuatro placas, hasta bitrén</li>
+        <li><span class="chk">✓</span>Certificados de bonificación que amplían la capacidad legal</li>
+        <li><span class="chk">✓</span>Margen de seguridad configurable sobre el límite</li>
+      </ul>
+      <a href="#contacto" class="btn-primary btn-lg">QUIERO VERLO</a>
+    </div>
+    <div class="pan rev-r">
+      <div class="pan-bar">
+        <span class="pan-logo">CATÁLOGO NORMATIVO</span>
+        <div class="chips"><span class="chip">T3S3</span><span class="chip ok">VIGENTE</span></div>
+      </div>
+      <div class="pan-body">
+        <div class="axles">
+          <div class="ax-h">Límites de la configuración</div>
+          <div class="ax-r"><span class="ax-n">Longitud</span><span class="bar"><i style="width:88%"></i></span><span class="ax-v">20.5 / 23 m</span></div>
+          <div class="ax-r"><span class="ax-n">Eje delantero</span><span class="bar"><i style="width:72%"></i></span><span class="ax-v">6.5 / 9 t</span></div>
+          <div class="ax-r"><span class="ax-n">1º conjunto</span><span class="bar"><i style="width:86%"></i></span><span class="ax-v">15.5 / 18 t</span></div>
+          <div class="ax-r"><span class="ax-n">2º conjunto</span><span class="bar"><i class="warn" style="width:93%"></i></span><span class="ax-v">22.3 / 24 t</span></div>
+          <div class="ax-r"><span class="ax-n">Peso bruto</span><span class="bar"><i style="width:92%"></i></span><span class="ax-v">44.3 / 48 t</span></div>
+        </div>
+        <div class="okline">Certificado de bonificación aplicado: +2 t sobre el peso bruto</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAESTROS -->
+<section class="blk" id="maestros">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <p class="slabel">Configuración</p>
+      <h2 class="stitle">Se configura una vez. <span>Después solo se despacha.</span></h2>
+      <p class="ssub">Seis maestros de carga única. En la operación diaria nadie vuelve a capturar dimensiones de palé ni tamaños de vehículo: solo entran los requerimientos del día y el sistema ya sabe todo lo demás.</p>
+    </div>
+    <div class="cgrid rev">
+      <div class="ccard"><div class="cnum">01</div><h4>Normativa</h4><p>La tabla de pesos y medidas por configuración vehicular, con sus límites por eje.</p></div>
+      <div class="ccard"><div class="cnum">02</div><h4>Productos</h4><p>Cada SKU con su palé: medidas, camas de producto, altura total, peso, si apila y si admite volteo.</p></div>
+      <div class="ccard"><div class="cnum">03</div><h4>Clientes</h4><p>Propios y terceros, con su centro de distribución y su ventana de recepción.</p></div>
+      <div class="ccard"><div class="cnum">04</div><h4>Transportistas</h4><p>La cadena completa de operador logístico a transportista, con sus unidades asignadas.</p></div>
+      <div class="ccard"><div class="cnum">05</div><h4>Vehículos</h4><p>Tractos y carrozas por placa: tara, geometría y plataforma útil. La unidad se arma escribiendo las placas.</p></div>
+      <div class="ccard"><div class="cnum">06</div><h4>Certificados</h4><p>Los certificados de bonificación vigentes por placa, con su incremento y su fecha de vencimiento.</p></div>
+    </div>
+    <p class="note">Plantas de origen con sus rampas, ventana de carga y stock propio por planta</p>
+  </div>
+</section>
+
+<!-- RESULTADO -->
+<section class="blk alt">
+  <div class="wrap split">
+    <div class="rev-l">
+      <p class="slabel">Lo que cambia</p>
+      <h2 class="stitle">Menos viajes <span>para la misma carga.</span></h2>
+      <p class="ssub">Cuando el reparto se calcula con la física real de cada palé y el límite legal de cada unidad, el mismo pedido se mueve en menos viajes y cada unidad pasa la balanza sin sobresaltos. Y el criterio queda en el sistema, al alcance de todo el equipo.</p>
+      <ul class="bens">
+        <li><span class="chk">✓</span>Se aprovecha la unidad hasta donde la física y la ley permiten</li>
+        <li><span class="chk">✓</span>El pedido urgente sube primero, con una regla clara y auditable</li>
+        <li><span class="chk">✓</span>Cada orden sale con su plano de estiba y su manifiesto</li>
+        <li><span class="chk">✓</span>Queda el historial de cada ola: qué se despachó y qué quedó pendiente</li>
+      </ul>
+    </div>
+    <div class="pan rev-r">
+      <div class="pan-bar">
+        <span class="pan-logo">HISTORIAL DE OLAS</span>
+        <div class="chips"><span class="chip">HOY</span></div>
+      </div>
+      <div class="pan-body">
+        <div class="axles">
+          <div class="ax-h">Avance del día</div>
+          <div class="ax-r"><span class="ax-n">Ola 1 · 06:00</span><span class="bar"><i style="width:40%"></i></span><span class="ax-v">8 unid · 184 p</span></div>
+          <div class="ax-r"><span class="ax-n">Ola 2 · 11:00</span><span class="bar"><i style="width:62%"></i></span><span class="ax-v">12 unid · 276 p</span></div>
+          <div class="ax-r"><span class="ax-n">Ola 3 · 16:00</span><span class="bar"><i style="width:22%"></i></span><span class="ax-v">4 unid · 96 p</span></div>
+        </div>
+        <div class="mini4">
+          <div class="mini"><div class="minin">24</div><div class="minil">Unidades</div></div>
+          <div class="mini"><div class="minin">556</div><div class="minil">Palés</div></div>
+          <div class="mini"><div class="minin">0</div><div class="minil">Vacías</div></div>
+          <div class="mini"><div class="minin">38</div><div class="minil">Saldo</div></div>
+        </div>
+        <div class="okline">Ninguna unidad salió vacía ni fuera de norma</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="contacto">
+  <div class="wrap">
+    <h2 class="rev">Cada despacho,<br><span>al detalle.</span></h2>
+    <p class="rev">Cuéntanos cómo despachas hoy y te mostramos Qubo con tus productos, tus unidades y tus rutas. Sin compromiso.</p>
+    <div class="cta-btns rev">
+      <a href="index.html#solicitar" class="btn-primary btn-lg">SOLICITAR INFORMACIÓN</a>
+      <a href="https://wa.me/+522223284900" class="btn-ghost btn-lg">HABLAR CON UN ASESOR</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <a href="#top" class="logo"><b>QUBO</b><span>CUBICAJE</span></a>
+        <p>Simulador de cubicaje y distribución de carga: de la necesidad de reposición al plano de estiba y el manifiesto de pesos por eje, dentro de la norma vigente.</p>
+      </div>
+      <div class="fcol">
+        <h5>PRODUCTO</h5>
+        <ul>
+          <li><a href="#como">Cómo funciona</a></li>
+          <li><a href="#modulos">Qué incluye</a></li>
+          <li><a href="#legal">Pesos y medidas</a></li>
+          <li><a href="#maestros">Configuración</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h5>EFLETEXIA</h5>
+        <ul>
+          <li><a href="index.html">Todas las soluciones</a></li>
+          <li><a href="index.html#referencias">Referencias</a></li>
+          <li><a href="index.html#solicitar">Solicitar información</a></li>
+          <li><a href="login.html">Iniciar sesión</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 EFLETEXIA · QUBO SIMULADOR DE CUBICAJE</span>
+      <span>UNA SOLUCIÓN DE EFLETEXIA</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); } });
+}, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rev,.rev-l,.rev-r').forEach((el, i) => {
+  el.style.transitionDelay = (i % 4) * 80 + 'ms';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
