@@ -194,10 +194,7 @@ h1{font-size:30px;font-weight:700;letter-spacing:-1px;margin-bottom:10px}
         <h1 id="tituloPaso1">Acceder</h1>
         <p class="lead" id="leadPaso1">Elige a dónde quieres entrar.</p>
 
-        <div class="plat" id="destinoSolucion"></div>
-        <div class="sep" id="sep" style="display:none">o entra a tu plataforma</div>
-
-        <div class="plat">
+                <div class="plat">
           <a class="pcard" href="https://efletexia.com/login/inicio">
             <span class="pico t1">T1</span>
             <span class="pinfo">
@@ -291,61 +288,10 @@ h1{font-size:30px;font-weight:700;letter-spacing:-1px;margin-bottom:10px}
 </div>
 
 <script>
-// Cada solución corre en su propio sistema y ahí mismo administra sus usuarios.
-var SOLUCIONES = {
-  eflexy: { nombre: 'Eflexy',       desc: 'Panel de robots: recorridos, mapas y publicaciones.',             url: '' },
-  viax:   { nombre: 'Viax',         desc: 'Viajes, evidencias y programa de millas de tus conductores.',     url: 'viax-login.html' },
-  fletex: { nombre: 'Fletex',       desc: 'Simulador de tarifas, maestro de unidades y tarifario.',          url: '' },
-  qubo:   { nombre: 'Qubo',         desc: 'Planificador de despacho, estiba y manifiesto por ejes.',         url: 'app-qubo.html' },
-  bi:     { nombre: 'Efletexia BI', desc: 'Seguimiento, alertas, reportes y el tablero eFletexia Total.',    url: 'app-bi.html' }
-};
-
 var ADMIN = { correo: 'juan.ramirez@gmail.com', clave: '123456', destino: 'administrador.html' };
 
 var intentos = 0;
 function $(id) { return document.getElementById(id); }
-
-// ¿viene desde una solución?
-var slug = new URLSearchParams(location.search).get('s');
-if (slug && SOLUCIONES[slug]) {
-  var s = SOLUCIONES[slug];
-  $('tituloPaso1').textContent = 'Acceder a ' + s.nombre;
-  $('leadPaso1').textContent = 'Entra a tu solución o a la plataforma donde operas.';
-  $('sep').style.display = 'flex';
-
-  var card = document.createElement(s.url ? 'a' : 'div');
-  card.className = 'pcard destacada' + (s.url ? '' : ' off');
-  if (s.url) card.setAttribute('href', s.url);
-
-  var ico = document.createElement('span');
-  ico.className = 'pico ' + (s.url ? 'sol' : 'esp');
-  ico.textContent = s.nombre.substring(0, 2).toUpperCase();
-
-  var info = document.createElement('span');
-  info.className = 'pinfo';
-  var nom = document.createElement('span');
-  nom.className = 'pnom';
-  nom.textContent = s.nombre + ' ';
-  var tag = document.createElement('span');
-  tag.className = 'tag ' + (s.url ? 'tag-sol' : 'tag-soon');
-  tag.textContent = s.url ? 'Tu solución' : 'En habilitación';
-  nom.appendChild(tag);
-  var des = document.createElement('span');
-  des.className = 'pdesc';
-  des.textContent = s.desc + (s.url ? ' Los accesos de tu equipo se administran ahí mismo.' : ' El acceso web estará disponible en breve.');
-  info.appendChild(nom);
-  info.appendChild(des);
-
-  card.appendChild(ico);
-  card.appendChild(info);
-  if (s.url) {
-    var fl = document.createElement('span');
-    fl.className = 'flecha';
-    fl.textContent = '→';
-    card.appendChild(fl);
-  }
-  $('destinoSolucion').appendChild(card);
-}
 
 function accesoInterno() {
   $('paso1').style.display = 'none';
