@@ -454,6 +454,11 @@ table.trel td.n{text-align:right;font-family:var(--mono);color:var(--muted);whit
   border:1px solid var(--line);border-radius:9px;color:var(--muted);
   font-family:var(--mono);font-size:11px;letter-spacing:.06em;transition:all .2s}
 .salir-qubo:hover{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.07)}
+
+/* la barra lateral se desplaza y el pie queda siempre visible */
+.side{overflow:hidden}
+.side nav{flex:1;min-height:0;overflow-y:auto}
+.who{padding-bottom:14px}
 </style></head><body>
 
 
@@ -478,7 +483,7 @@ table.trel td.n{text-align:right;font-family:var(--mono);color:var(--muted);whit
     <button data-v="vCfg"><em>&#9881;</em>Configs</button>
     <button data-v="vHis"><em>&#9200;</em>Historial</button>
   </nav>
-  <div class="who"><b>roxana.peralta</b>Efletexia<div class="pro">PRO</div><button class="salir-qubo" onclick="location.href='qubo-engine.html'" title="Volver al inicio de sesión"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="m16 8 4 4-4 4M20 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Cerrar sesión</button></div>
+  <div class="who"><b>carlos.lopez</b>Transportes Colón<div class="pro">PRO</div><button class="salir-qubo" onclick="location.href='qubo-engine.html'" title="Volver al inicio de sesión"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="m16 8 4 4-4 4M20 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Cerrar sesión</button></div>
 </aside>
 
 <main>
