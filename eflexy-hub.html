@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eflexy Hub — Control de Robots Autónomos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --turquesa:#12B5A5;
+  --turquesa2:#15A8AF;
+  --azul:#1A7FC1;
+  --azul2:#1468A8;
+  --texto:#16222e;
+  --gris:#7c8b99;
+  --borde:#dde5ec;
+  --campo:#f7fafc;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;
+  display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;
+  background:linear-gradient(110deg,var(--turquesa) 0%,var(--turquesa2) 28%,var(--azul) 72%,var(--azul2) 100%)}
+
+/* polígonos del fondo */
+.poli{position:absolute;opacity:.10;background:#fff;pointer-events:none}
+.p1{width:520px;height:560px;left:-90px;top:-80px;clip-path:polygon(0 0,100% 18%,62% 100%,0 72%)}
+.p2{width:420px;height:620px;left:46%;top:-140px;clip-path:polygon(50% 0,100% 62%,22% 100%)}
+.p3{width:560px;height:420px;right:-120px;bottom:-110px;clip-path:polygon(0 36%,100% 0,100% 100%,18% 100%)}
+.p4{width:300px;height:300px;left:18%;bottom:-60px;clip-path:polygon(0 0,100% 42%,40% 100%)}
+
+/* círculos */
+.burbujas{position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle at 12% 22%,rgba(255,255,255,.18) 0 9px,transparent 10px),
+    radial-gradient(circle at 23% 64%,rgba(255,255,255,.14) 0 6px,transparent 7px),
+    radial-gradient(circle at 7% 82%,rgba(255,255,255,.16) 0 12px,transparent 13px),
+    radial-gradient(circle at 37% 14%,rgba(255,255,255,.12) 0 5px,transparent 6px),
+    radial-gradient(circle at 46% 88%,rgba(255,255,255,.15) 0 8px,transparent 9px),
+    radial-gradient(circle at 63% 26%,rgba(255,255,255,.12) 0 6px,transparent 7px),
+    radial-gradient(circle at 78% 70%,rgba(255,255,255,.16) 0 10px,transparent 11px),
+    radial-gradient(circle at 88% 30%,rgba(255,255,255,.13) 0 7px,transparent 8px),
+    radial-gradient(circle at 94% 86%,rgba(255,255,255,.15) 0 9px,transparent 10px),
+    radial-gradient(circle at 57% 52%,rgba(255,255,255,.10) 0 5px,transparent 6px)}
+
+/* idioma */
+.idioma{position:absolute;top:26px;right:30px;z-index:5}
+.idioma select{appearance:none;background:#fff;border:1px solid rgba(255,255,255,.7);border-radius:7px;
+  padding:7px 30px 7px 12px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+  color:var(--azul);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.idioma::after{content:'▾';position:absolute;right:11px;top:50%;transform:translateY(-50%);
+  color:var(--azul);font-size:11px;pointer-events:none}
+
+/* tarjeta */
+.tarjeta{position:relative;z-index:4;width:100%;max-width:420px;background:#fff;
+  border-radius:18px;padding:40px 44px 26px;box-shadow:0 24px 60px rgba(0,40,70,.22);text-align:center}
+.escudo{width:78px;height:78px;margin:0 auto 20px;border-radius:22px;position:relative;
+  background:linear-gradient(140deg,var(--turquesa),var(--azul));
+  display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(20,130,160,.3)}
+.escudo::after{content:'';position:absolute;top:4px;right:4px;width:11px;height:11px;
+  border-radius:50%;background:var(--azul);border:2px solid #fff}
+h1{font-size:27px;font-weight:700;color:var(--texto);letter-spacing:-.5px}
+.lema{font-size:15px;color:var(--azul);margin:8px 0 28px}
+
+.campo{text-align:left;margin-bottom:18px}
+label{display:block;font-size:13.5px;font-weight:600;color:var(--texto);margin-bottom:8px}
+.envoltura{position:relative}
+.envoltura svg.ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--gris)}
+input{width:100%;background:var(--campo);border:1px solid var(--borde);border-radius:9px;
+  padding:13px 14px 13px 42px;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--texto);
+  transition:border-color .2s,box-shadow .2s}
+input:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(26,127,193,.14);background:#fff}
+input::placeholder{color:#a9b6c2}
+.ojo{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;
+  cursor:pointer;color:var(--gris);padding:5px;border-radius:6px;display:flex}
+.ojo:hover{color:var(--azul);background:rgba(26,127,193,.08)}
+
+.entrar{width:100%;border:none;border-radius:11px;padding:15px;margin-top:10px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:700;color:#fff;
+  background:linear-gradient(100deg,var(--turquesa),var(--azul));
+  box-shadow:0 8px 20px rgba(21,130,170,.28);transition:all .25s}
+.entrar:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}
+.entrar:disabled{opacity:.6;cursor:not-allowed}
+
+.aviso{display:none;margin-top:16px;padding:12px 14px;border-radius:9px;font-size:13.5px;line-height:1.55;text-align:left}
+.aviso.on{display:block}
+.aviso.mal{background:#fdecec;border:1px solid #f6c6c6;color:#b4393a}
+.aviso.bien{background:#e9f8f3;border:1px solid #b6e6d5;color:#12795f}
+.demo{margin-top:14px;font-size:12px;color:var(--gris);text-align:left;line-height:1.7}
+.demo code{background:var(--campo);border:1px solid var(--borde);border-radius:6px;
+  padding:2px 7px;cursor:pointer;color:var(--azul);font-size:11.5px}
+.demo code:hover{background:#eef5fa}
+
+.pie{margin-top:26px;padding-top:18px;border-top:1px solid #eef2f6;font-size:12px;color:#9aa8b5}
+.volver{position:absolute;top:26px;left:30px;z-index:5;font-size:13px;color:#fff;text-decoration:none;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:8px 15px}
+.volver:hover{background:rgba(255,255,255,.26)}
+
+@media(max-width:520px){
+  .tarjeta{padding:32px 26px 22px}
+  .volver{top:16px;left:16px}
+  .idioma{top:16px;right:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="poli p1"></div>
+<div class="poli p2"></div>
+<div class="poli p3"></div>
+<div class="poli p4"></div>
+<div class="burbujas"></div>
+
+<a class="volver" href="eflexy.html">← Volver</a>
+
+<div class="idioma">
+  <select aria-label="Idioma">
+    <option>ES</option>
+    <option>EN</option>
+  </select>
+</div>
+
+<main class="tarjeta">
+  <div class="escudo">
+    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 2.6 5 5.4v5.3c0 4.4 2.9 8.5 7 9.7 4.1-1.2 7-5.3 7-9.7V5.4L12 2.6Z"
+            stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <h1>Eflexy Hub</h1>
+  <p class="lema">Control de Robots Autónomos</p>
+
+  <form onsubmit="entrar(event)">
+    <div class="campo">
+      <label for="correo">Correo electrónico</label>
+      <div class="envoltura">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="2.5" y="5" width="19" height="14" rx="2.2" stroke="currentColor" stroke-width="1.7"/>
+          <path d="m3.4 6.5 8.6 6 8.6-6" stroke="currentColor" stroke-width="1.7"/>
+        </svg>
+        <input id="correo" type="email" placeholder="usuario@eflexy.com" autocomplete="username">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="clave">Contraseña</label>
+      <div class="envoltura">
+        <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="4.5" y="10.5" width="15" height="10" rx="2.2" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7" stroke="currentColor" stroke-width="1.7"/>
+        </svg>
+        <input id="clave" type="password" placeholder="Contraseña" autocomplete="current-password" style="padding-right:42px">
+        <button type="button" class="ojo" onclick="verClave(this)" aria-label="Mostrar contraseña">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12Z" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="12" cy="12" r="3.1" stroke="currentColor" stroke-width="1.7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="entrar" id="btn">Iniciar sesión</button>
+
+    <div class="aviso" id="aviso"></div>
+
+    <p class="demo">Demo: <code onclick="poner('correo',this.textContent)">usuario@eflexy.com</code>
+      · <code onclick="poner('clave',this.textContent)">123456</code></p>
+  </form>
+
+  <p class="pie">© 2026 Eflexy. Todos los derechos reservados.</p>
+</main>
+
+<script>
+var USUARIO = 'usuario@eflexy.com';
+var CLAVE = '123456';
+var intentos = 0;
+function $(id) { return document.getElementById(id); }
+
+function poner(id, txt) { $(id).value = txt.trim(); }
+
+function verClave(b) {
+  var c = $('clave');
+  c.type = c.type === 'password' ? 'text' : 'password';
+}
+
+function aviso(texto, clase) {
+  var a = $('aviso');
+  a.className = 'aviso' + (texto ? ' on ' + clase : '');
+  a.textContent = texto;
+}
+
+function entrar(e) {
+  e.preventDefault();
+  var correo = $('correo').value.trim().toLowerCase();
+  var clave = $('clave').value;
+
+  if (!correo || !clave) { aviso('Completa tu correo y tu contraseña.', 'mal'); return; }
+
+  if (correo === USUARIO && clave === CLAVE) {
+    aviso('Credenciales correctas. El panel de Eflexy Hub no forma parte de esta maqueta todavía.', 'bien');
+    $('btn').disabled = true;
+    return;
+  }
+
+  intentos++;
+  if (intentos >= 3) {
+    aviso('Demasiados intentos. Por seguridad, espera un momento antes de volver a intentarlo.', 'mal');
+    $('btn').disabled = true;
+    setTimeout(function () { $('btn').disabled = false; intentos = 0; aviso('', ''); }, 4000);
+    return;
+  }
+  var quedan = 3 - intentos;
+  aviso('Correo o contraseña incorrectos. Te queda' + (quedan === 1 ? ' 1 intento' : 'n ' + quedan + ' intentos') + '.', 'mal');
+}
+</script>
+</body>
+</html>
