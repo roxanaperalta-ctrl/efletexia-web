@@ -210,6 +210,17 @@ footer{border-top:1px solid var(--b1);padding:52px 0 30px;background:var(--bg2)}
 .volver-inicio:hover{color:#fff;border-color:#F97316;background:rgba(249,115,22,.1)}
 .nav-izq{display:flex;align-items:center;gap:14px;min-width:0}
 @media(max-width:560px){.volver-inicio span{display:none}.volver-inicio{padding:7px 10px}}
+
+/* botones de tienda */
+.tiendas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.tienda{display:inline-flex;align-items:center;gap:12px;border:1px solid var(--line);
+  border-radius:14px;padding:12px 22px;background:rgba(255,255,255,.03);cursor:pointer;
+  transition:all .25s;text-align:left;font-family:'Inter',sans-serif;color:inherit}
+.tienda:hover{border-color:rgba(249,115,22,.5);transform:translateY(-2px);background:rgba(249,115,22,.08)}
+.tienda .ic{font-size:24px;line-height:1}
+.tienda .tx small{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--n500)}
+.tienda .tx b{display:block;font-size:15px;font-weight:600;margin-top:2px}
+.tiendas-nota{font-size:12.5px;color:var(--n500);margin-top:16px;text-align:center}
 </style>
 </head>
 <body>
@@ -224,8 +235,8 @@ footer{border-top:1px solid var(--b1);padding:52px 0 30px;background:var(--bg2)}
     <li><a href="#confianza">Confianza</a></li>
   </ul>
   <div class="nav-cta">
-    <a href="login.html" class="btn-ghost">Iniciar sesión</a>
-    <a href="#contacto" class="btn-primary">Solicitar información</a>
+    <a href="viax-login.html" class="btn-ghost">Acceder a mi Viax</a>
+    <a href="#descarga" class="btn-primary">Descargar la app</a>
   </div>
 </nav>
 
@@ -236,10 +247,17 @@ footer{border-top:1px solid var(--b1);padding:52px 0 30px;background:var(--bg2)}
       <div class="eyebrow"><i></i>Navegación y millas para conductores</div>
       <h1>El conductor gana.<br><span>El viaje queda documentado.</span></h1>
       <p class="hero-sub">Viax guía al conductor durante todo el viaje y convierte cada paso confirmado en millas que él canjea por beneficios reales. Tú recibes la trazabilidad completa de la operación, en tiempo real y con evidencia.</p>
-      <div class="hbtns">
-        <a href="#contacto" class="btn-primary btn-lg">SOLICITAR INFORMACIÓN</a>
-        <a href="#modulos" class="btn-ghost btn-lg">VER QUÉ INCLUYE</a>
-      </div>
+      <div class="hbtns" id="descarga" style="justify-content:center"><div class="tiendas">
+          <button class="tienda" onclick="descargar('Google Play')">
+            <span class="ic">🤖</span>
+            <span class="tx"><small>Descárgala en</small><b>Google Play</b></span>
+          </button>
+          <button class="tienda" onclick="descargar('App Store')">
+            <span class="ic">🍎</span>
+            <span class="tx"><small>Descárgala en</small><b>App Store</b></span>
+          </button>
+        </div>
+        <p class="tiendas-nota">Disponible para Android y iOS</p></div>
       <div class="hstats">
         <div><div class="sn">13</div><div class="sl">Pasos del viaje</div></div>
         <div><div class="sn">4</div><div class="sl">Categorías</div></div>
@@ -448,10 +466,17 @@ footer{border-top:1px solid var(--b1);padding:52px 0 30px;background:var(--bg2)}
   <div class="wrap">
     <h2 class="rev">Documentar el viaje,<br><span>con algo a cambio.</span></h2>
     <p class="rev">Cuéntanos cómo opera tu flota y te mostramos Viax con tus rutas y tus conductores. Sin compromiso.</p>
-    <div class="cta-btns rev">
-      <a href="index.html#contacto" class="btn-primary btn-lg">SOLICITAR INFORMACIÓN</a>
-      <a href="https://wa.me/+522223284900" class="btn-ghost btn-lg">HABLAR CON UN ASESOR</a>
-    </div>
+    <div class="cta-btns rev"><div class="tiendas">
+          <button class="tienda" onclick="descargar('Google Play')">
+            <span class="ic">🤖</span>
+            <span class="tx"><small>Descárgala en</small><b>Google Play</b></span>
+          </button>
+          <button class="tienda" onclick="descargar('App Store')">
+            <span class="ic">🍎</span>
+            <span class="tx"><small>Descárgala en</small><b>App Store</b></span>
+          </button>
+        </div>
+        <p class="tiendas-nota">Disponible para Android y iOS</p></div>
   </div>
 </section>
 
@@ -497,6 +522,10 @@ document.querySelectorAll('.rev,.rev-l,.rev-r').forEach((el, i) => {
   el.style.transitionDelay = (i % 4) * 80 + 'ms';
   obs.observe(el);
 });
+
+function descargar(tienda) {
+  alert('El enlace de ' + tienda + ' se configura cuando la app esté publicada.');
+}
 </script>
 </body>
 </html>
