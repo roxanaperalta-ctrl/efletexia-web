@@ -449,6 +449,11 @@ table.trel td.n{text-align:right;font-family:var(--mono);color:var(--muted);whit
 
 .rell.alt{border-color:rgba(127,255,94,.32);background:rgba(127,255,94,.05);color:var(--lime)}
 .rell.alt.vac{border-color:rgba(245,158,11,.32);background:rgba(245,158,11,.05);color:var(--warn)}
+.salir-qubo{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+  margin:12px 0 14px;padding:10px 12px;cursor:pointer;background:transparent;
+  border:1px solid var(--line);border-radius:9px;color:var(--muted);
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;transition:all .2s}
+.salir-qubo:hover{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.07)}
 </style></head><body>
 
 
@@ -473,7 +478,7 @@ table.trel td.n{text-align:right;font-family:var(--mono);color:var(--muted);whit
     <button data-v="vCfg"><em>&#9881;</em>Configs</button>
     <button data-v="vHis"><em>&#9200;</em>Historial</button>
   </nav>
-  <div class="who"><b>roxana.peralta</b>Efletexia<div class="pro">PRO</div></div>
+  <div class="who"><b>roxana.peralta</b>Efletexia<div class="pro">PRO</div><button class="salir-qubo" onclick="location.href='qubo-engine.html'" title="Volver al inicio de sesión"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="m16 8 4 4-4 4M20 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Cerrar sesión</button></div>
 </aside>
 
 <main>
