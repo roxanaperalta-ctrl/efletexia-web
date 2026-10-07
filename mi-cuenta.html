@@ -203,24 +203,25 @@ tr:last-child td{border-bottom:none}
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <a class="btn btn-o" id="btnApp" href="#" target="_blank" rel="noopener">Entrar a la plataforma ↗</a>
-          <button class="btn btn-p" id="btnInv" onclick="abrir()">+ Invitar persona</button>
+          <a class="btn btn-p" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener">Soporte ↗</a>
+          <button class="btn btn-p" id="btnInv" onclick="abrir()" style="display:none">+ Invitar persona</button>
         </div>
       </div>
 
-      <div class="intbar">
+      <div class="intbar" style="display:none">
         <span class="host" id="host"></span>
         <span class="intxt" id="intxt"></span>
       </div>
 
-      <div class="meter">
+      <div class="meter" style="display:none">
         <div class="mbar"><i id="bar"></i></div>
         <div class="mtxt" id="cnt"></div>
       </div>
 
-      <div id="tabla"></div>
+      <div id="tabla" style="display:none"></div>
 
       <div class="foot">
-        Cada solución permite hasta <b>10 accesos</b>. Las personas que invites entran con su propio correo y su propia contraseña, y solo ven los módulos que les habilites de <b id="fname"></b>. Un acceso de una solución no sirve para las demás: <b id="fname2"></b> es un sistema independiente y cada uno maneja sus propios accesos. Lo que haces aquí —invitar, cambiar permisos, bloquear— se replica allá por la integración, y <b>Entrar a la plataforma</b> te lleva a ese sistema con tu misma cuenta.
+        Los usuarios de tu equipo en <b id="fname"></b> se administran <b>dentro de la plataforma</b>: entra con <b>Entrar a la plataforma</b> y gestiónalos ahí. <span id="fname2" style="display:none"></span>Para cambios de tu propia cuenta (contraseña, desbloqueo o nuevos accesos), escríbenos en <b>Soporte</b>.
       </div>
     </div>
   </main>
@@ -323,7 +324,7 @@ function pintarPanel() {
   $('hname').textContent = s.nombre;
   $('fname').textContent = s.nombre;
   $('fname2').textContent = s.nombre;
-  $('hsub').textContent = 'Personas de tu equipo con acceso a ' + s.nombre + ', cada una con los módulos que le habilites.';
+  $('hsub').textContent = 'Tu acceso a ' + s.nombre + '. Entra a la plataforma para trabajar y administrar a tu equipo.';
   $('btnApp').href = s.app;
   $('btnApp').textContent = 'Entrar a ' + s.nombre + ' ↗';
   $('host').textContent = s.host;

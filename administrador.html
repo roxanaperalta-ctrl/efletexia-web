@@ -116,7 +116,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
 .ph-crumb span{color:var(--orange)}
 .ph-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px}
 .ph-sub{font-size:12px;color:var(--muted);margin-top:3px}
-.ph-actions{display:flex;gap:10px;align-items:center}
+.ph-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:16px}
+.btn-sm{white-space:nowrap}
 .btn-sm{padding:7px 16px;font-size:11px;font-weight:800;border-radius:3px;cursor:pointer;
   font-family:'Nunito',sans-serif;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;border:none}
 .btn-sm-ghost{background:transparent;border:1px solid var(--b1);color:var(--muted)}
@@ -257,6 +258,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
 
 /* acciones por fila */
 .rowact{display:flex;gap:6px}
+.mini{white-space:nowrap}
 .mini{font-family:var(--mono);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;
   padding:4px 9px;border-radius:4px;cursor:pointer;background:transparent;
   border:1px solid var(--b1);color:var(--muted);transition:all .2s}
@@ -297,6 +299,114 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
 .setd{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5}
 .setv{font-family:var(--mono);font-size:13px;color:var(--amber);white-space:nowrap}
 @media(max-width:1100px){.twocol{grid-template-columns:1fr}}
+
+/* ── selects y campos ── */
+.sel{background:var(--bg);border:1px solid var(--b1);border-radius:4px;padding:8px 10px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:12px;cursor:pointer}
+.sel:focus{outline:none;border-color:var(--orange)}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:6px}
+.inp{width:100%;background:var(--bg);border:1px solid var(--b1);border-radius:4px;padding:9px 11px;
+  color:var(--text);font-family:'Nunito',sans-serif;font-size:13px}
+.inp:focus{outline:none;border-color:var(--orange)}
+textarea.inp{min-height:70px;resize:vertical;line-height:1.55}
+.pad{padding:16px 18px}
+.st-blue{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
+.st-purple{background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.25)}
+.ext{font-size:10px;opacity:.6;margin-left:auto}
+
+/* ── embudo ── */
+.funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:16px 18px;border-bottom:1px solid var(--b3)}
+.fstage{background:var(--bg3);border:1px solid var(--b1);border-radius:4px;padding:12px 14px;cursor:pointer;
+  transition:all .2s;position:relative}
+.fstage:hover{border-color:rgba(255,107,26,.35)}
+.fstage.on{border-color:var(--orange);background:rgba(255,107,26,.06)}
+.fs-l{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.fs-n{font-family:var(--mono);font-size:24px;color:#fff;margin-top:6px;line-height:1}
+.fs-r{font-size:10.5px;color:var(--amber);margin-top:6px;font-weight:700}
+.fs-bar{height:3px;background:var(--grad);border-radius:2px;margin-top:10px}
+
+/* ── barras horizontales ── */
+.hb{display:grid;grid-template-columns:120px 1fr 44px;gap:12px;align-items:center;padding:7px 18px;font-size:12px}
+.hb-l{color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-t{height:8px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
+.hb-f{height:100%;background:var(--grad);border-radius:4px;transition:width .4s}
+.hb-v{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+.threecol{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.an-filtros{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 28px 6px}
+.an-filtros .lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.mini-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 18px}
+.mk{background:var(--bg3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px}
+.mk-v{font-family:var(--mono);font-size:20px;color:#fff}
+.mk-l{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+@media(max-width:1200px){.threecol{grid-template-columns:1fr}.funnel{grid-template-columns:repeat(3,1fr)}}
+
+/* ── ficha de cliente ── */
+.ficha-hdr{display:flex;align-items:center;gap:16px;padding:18px}
+.ficha-av{width:52px;height:52px;border-radius:50%;background:var(--grad);display:flex;align-items:center;
+  justify-content:center;font-weight:900;font-size:18px;color:#fff;flex-shrink:0}
+.ficha-n{font-size:18px;font-weight:900;color:#fff}
+.ficha-s{font-size:12px;color:var(--muted);margin-top:2px}
+.dato{display:flex;justify-content:space-between;gap:12px;padding:10px 18px;border-top:1px solid var(--b3);font-size:12.5px}
+.dato span:first-child{color:var(--muted)}
+.dato span:last-child{color:var(--text);font-weight:700;text-align:right}
+.uso{height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin-top:6px}
+.uso i{display:block;height:100%;background:var(--grad)}
+.prod-c{background:var(--bg3);border:1px solid var(--b1);border-radius:4px;padding:13px 15px;margin-bottom:10px}
+.prod-c b{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:1px}
+.prod-c .ps{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.5}
+.tl{padding:6px 18px 14px}
+.tl-i{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--b3)}
+.tl-i:last-child{border-bottom:none}
+.tl-d{font-family:var(--mono);font-size:9.5px;color:var(--muted);width:78px;flex-shrink:0;padding-top:2px}
+.tl-t{font-size:12px;color:var(--text);line-height:1.5}
+.tl-t b{color:var(--orange)}
+
+/* ── editor de landing ── */
+.ed-grid{display:grid;grid-template-columns:1fr 360px;gap:14px;padding:0 28px 28px}
+.sec-ed{background:var(--bg3);border:1px solid var(--b1);border-radius:4px;margin-bottom:10px}
+.sec-ed-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--b3);cursor:pointer}
+.sec-ed-h .num{font-family:var(--mono);font-size:10px;color:var(--orange)}
+.sec-ed-h .tit{font-size:12.5px;font-weight:800;flex:1}
+.sec-ed-b{padding:14px;display:none}
+.sec-ed.open .sec-ed-b{display:block}
+.mv{background:transparent;border:1px solid var(--b1);color:var(--muted);border-radius:3px;width:22px;height:22px;
+  cursor:pointer;font-size:11px}
+.mv:hover{color:var(--text);border-color:var(--orange)}
+.img-drop{border:1px dashed rgba(255,107,26,.3);border-radius:4px;padding:16px;text-align:center;font-size:11.5px;
+  color:var(--muted);cursor:pointer}
+.img-drop:hover{border-color:var(--orange);color:var(--text)}
+.prev{background:#0A0A0A;border:1px solid var(--b1);border-radius:6px;overflow:hidden}
+.prev-bar{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid #1d1d1d;align-items:center}
+.prev-bar i{width:7px;height:7px;border-radius:50%;background:#333}
+.prev-bar span{font-family:var(--mono);font-size:9px;color:#666;margin-left:8px}
+.prev-hero{padding:26px 20px;background:radial-gradient(400px 200px at 20% 0%,rgba(249,115,22,.18),transparent 70%)}
+.prev-hero h4{font-family:'Inter',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.5px;line-height:1.15;color:#fff}
+.prev-hero p{font-size:11.5px;color:#a3a3a3;margin-top:8px;line-height:1.6}
+.prev-cta{display:inline-block;margin-top:14px;background:#F97316;color:#0A0A0A;font-size:11px;font-weight:700;
+  padding:8px 14px;border-radius:7px}
+.prev-sec{padding:14px 20px;border-top:1px solid #1d1d1d}
+.prev-sec b{font-size:12px;color:#fff}
+.prev-sec p{font-size:10.5px;color:#8a8a8a;margin-top:4px;line-height:1.5}
+.ed-state{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--b3)}
+@media(max-width:1200px){.ed-grid{grid-template-columns:1fr}}
+
+/* ── switch ── */
+.sw{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);
+  font-size:9.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.sw input{display:none}
+.sw .tr{width:30px;height:16px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--b1);
+  position:relative;transition:all .2s}
+.sw .tr::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;
+  background:var(--muted);transition:all .2s}
+.sw input:checked+.tr{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.45)}
+.sw input:checked+.tr::after{left:16px;background:#22c55e}
+.sw input:checked~.sw-t{color:#22c55e}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--card2);border:1px solid rgba(34,197,94,.35);
+  color:#86efac;font-size:12.5px;padding:11px 16px;border-radius:5px;z-index:600;opacity:0;transform:translateY(10px);
+  transition:all .25s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
 </style>
 </head>
 <body>
@@ -342,6 +452,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="10" y="1" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="10" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="10" y="10" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
         Resumen
       </a>
+      <a class="sb-item" href="#" data-view="analitica" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M2.5 15.5h13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><rect x="3.5" y="9" width="2.6" height="5" rx=".6" stroke="currentColor" stroke-width="1.1"/><rect x="7.7" y="5.5" width="2.6" height="8.5" rx=".6" stroke="currentColor" stroke-width="1.1"/><rect x="11.9" y="2.5" width="2.6" height="11.5" rx=".6" stroke="currentColor" stroke-width="1.1"/></svg>
+        Analítica
+        <span class="sb-pill new">NUEVO</span>
+      </a>
 
       <div class="sb-divider"></div>
       <div class="sb-label">GESTIÓN</div>
@@ -355,15 +470,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
         Accesos y contraseñas
         <span class="sb-pill new">2</span>
       </a>
+      <a class="sb-item" href="#" data-view="solicitudes" onclick="irA(this);return false">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M2.5 3h13l-4.8 5.6v5.2l-3.4 1.7V8.6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        Solicitudes
+        <span class="sb-pill">9</span>
+      </a>
+      <a class="sb-item" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" title="Abre Soporte en otra pestaña">
+        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M3.5 9.5V8a5.5 5.5 0 0 1 11 0v1.5" stroke="currentColor" stroke-width="1.2"/><rect x="2.5" y="9.5" width="3" height="4.5" rx="1" stroke="currentColor" stroke-width="1.1"/><rect x="12.5" y="9.5" width="3" height="4.5" rx="1" stroke="currentColor" stroke-width="1.1"/><path d="M14 14c0 1.3-1.5 2-4 2" stroke="currentColor" stroke-width="1.1"/></svg>
+        Soporte
+        <span class="ext">↗</span>
+      </a>
       <a class="sb-item" href="#" data-view="comentarios" onclick="irA(this);return false">
         <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><path d="M2.5 4.2h13v8H9.5L6 15v-2.8H2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
         Comentarios
         <span class="sb-pill new">4</span>
-      </a>
-      <a class="sb-item" href="#" data-view="solicitudes" onclick="irA(this);return false">
-        <svg class="sb-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M2.6 5l6.4 4.6L15.4 5" stroke="currentColor" stroke-width="1.2"/></svg>
-        Solicitudes
-        <span class="sb-pill">9</span>
       </a>
 
       <div class="sb-divider"></div>
@@ -403,20 +523,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
     <div class="page-hdr">
       <div class="ph-left">
         <div class="ph-crumb">Panel / <span>Resumen</span></div>
-        <div class="ph-title">Clientes y accesos</div>
-        <div class="ph-sub">Quién está registrado, el estado de su contraseña y qué comentarios están por publicar.</div>
+        <div class="ph-title">Lo urgente de hoy</div>
+        <div class="ph-sub">Lo que espera una acción del equipo y los clientes con acceso.</div>
       </div>
-      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button><button class="btn-sm btn-sm-primary">+ Nuevo cliente</button></div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button><a class="btn-sm btn-sm-primary" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Abrir ticket en Soporte ↗</a></div>
     </div>
 
     <div class="kpi-row">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-label">Clientes registrados</div></div>
-        <div class="kpi-val"><span>128</span></div><div class="kpi-delta delta-up">▲ +6 este mes</div><div class="kpi-glow"></div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-label">Solicitudes nuevas</div></div>
-        <div class="kpi-val"><span>9</span></div><div class="kpi-delta delta-up">▲ 3 sin atender</div><div class="kpi-glow"></div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-label">Cuentas bloqueadas</div></div>
-        <div class="kpi-val"><span>2</span></div><div class="kpi-delta delta-dn">▼ requieren desbloqueo</div><div class="kpi-glow"></div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-label">Comentarios por aprobar</div></div>
+      <div class="kpi" style="cursor:pointer" onclick="irAVista('solicitudes')"><div class="kpi-top"><div class="kpi-label">Solicitudes nuevas</div></div>
+        <div class="kpi-val"><span>9</span></div><div class="kpi-delta delta-up">▲ 3 sin responsable</div><div class="kpi-glow"></div></div>
+      <div class="kpi" style="cursor:pointer" onclick="irAVista('accesos')"><div class="kpi-top"><div class="kpi-label">Cuentas bloqueadas</div></div>
+        <div class="kpi-val"><span>2</span></div><div class="kpi-delta delta-dn">▼ desbloqueo vía Soporte</div><div class="kpi-glow"></div></div>
+      <div class="kpi" style="cursor:pointer" onclick="irAVista('clientes')"><div class="kpi-top"><div class="kpi-label">Altas esperando a Soporte</div></div>
+        <div class="kpi-val"><span>2</span></div><div class="kpi-delta delta-dn">▼ clientes con ticket, sin OK de Soporte</div><div class="kpi-glow"></div></div>
+      <div class="kpi" style="cursor:pointer" onclick="irAVista('comentarios')"><div class="kpi-top"><div class="kpi-label">Comentarios por aprobar</div></div>
         <div class="kpi-val"><span>4</span></div><div class="kpi-delta delta-dn">▼ pendientes de revisión</div><div class="kpi-glow"></div></div>
     </div>
 
@@ -434,7 +554,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
                 <td class="tbl-email">carlos.lopez@gmail.com</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
                 <td><span class="status st-active">ACTIVO</span></td>
-                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0090</td>
@@ -442,7 +562,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
                 <td class="tbl-email">m.torres@logco.pe</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
                 <td><span class="status st-active">ACTIVO</span></td>
-                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0089</td>
@@ -450,15 +570,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
                 <td class="tbl-email">d.fuentes@transp.co</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">VIAX</span></td>
                 <td><span class="status st-blocked">BLOQUEADO</span></td>
-                <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0088</td>
                 <td class="tbl-name">Ana Ríos</td>
                 <td class="tbl-email">ana.rios@fletex.ec</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
-                <td><span class="status st-pending">CLAVE PENDIENTE</span></td>
-                <td><div class="rowact"><button class="mini ok">Enviar clave</button><button class="mini warn">Bloquear</button></div></td>
+                <td><span class="status st-pending">ALTA EN SOPORTE</span></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0087</td>
@@ -466,7 +586,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
                 <td class="tbl-email">luis.m@cargo.gt</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLEXY</span></td>
                 <td><span class="status st-inactive">INACTIVO</span></td>
-                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini ok">Activar</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
             </tbody>
           </table>
@@ -501,7 +621,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
               </tr>
             </tbody>
           </table>
-          <div class="hint">Al <b>tercer intento fallido</b> la cuenta se bloquea sola y solo el administrador puede liberarla. El captcha no superado cuenta como intento.</div>
+          <div class="hint">Al <b>tercer intento fallido</b> la cuenta se bloquea sola y solo <b>Soporte</b> puede liberarla, con un ticket. El captcha no superado cuenta como intento.</div>
         </div>
       </div>
 
@@ -512,19 +632,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
           <div class="qrow">
             <div class="quote">“El manifiesto de pesos sale impreso con la orden y dejamos de tener problemas en balanza.”</div>
             <div class="qmeta">ERNESTO CABRERA · QUBO · HACE 2 H</div>
-            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+            <div class="qactions"><button class="mini ok">Aprobar</button><button class="mini warn">Rechazar</button></div>
           </div>
           <div class="qrow">
             <div class="quote">“Entro, filtro por mi compañía y ahí está todo: viajes en ruta, alertas y cierre del mes.”</div>
             <div class="qmeta">SOFÍA HERRERA · EFLETEXIA BI · HACE 5 H</div>
-            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+            <div class="qactions"><button class="mini ok">Aprobar</button><button class="mini warn">Rechazar</button></div>
           </div>
           <div class="qrow">
             <div class="quote">“Cualquiera del equipo cotiza en minutos y con el mismo criterio.”</div>
             <div class="qmeta">PATRICIA NÚÑEZ · FLETEX · AYER</div>
-            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
+            <div class="qactions"><button class="mini ok">Aprobar</button><button class="mini warn">Rechazar</button></div>
           </div>
-          <div class="hint">Solo se pueden publicar comentarios de clientes que ya tienen el producto contratado.</div>
+          <div class="hint">Aprobar no publica: después decides en <b>Comentarios</b> cuáles salen en la web como referencia.</div>
         </div>
 
         <div class="card">
@@ -558,14 +678,179 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
     </div>
     </div>
 
+    <div class="view" id="v-analitica">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <span>Analítica</span></div>
+        <div class="ph-title">Analítica</div>
+        <div class="ph-sub">Cómo va lo comercial, de dónde llega el interés y cuánto usan sus cuentas los clientes.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
+    </div>
+
+    <div class="an-filtros" style="padding-top:18px">
+      <span class="lbl">Rango</span>
+      <div class="toolbar" style="padding:0;border:none" id="anRango">
+        <button class="fbtn" data-r="7">7 días</button>
+        <button class="fbtn on" data-r="30">30 días</button>
+        <button class="fbtn" data-r="90">90 días</button>
+      </div>
+      <span class="lbl" style="margin-left:10px">País</span>
+      <select class="sel" id="anPais"><option value="">Todos</option></select>
+      <span class="lbl" style="margin-left:10px">Producto</span>
+      <select class="sel" id="anProd"><option value="">Todos</option></select>
+    </div>
+
+    <div style="padding:14px 28px 28px">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-hdr"><div class="card-title">Comercial · embudo de solicitudes</div>
+          <button class="card-action" onclick="irAVista('solicitudes')">VER SOLICITUDES →</button></div>
+        <div class="funnel" id="anFunnel" style="grid-template-columns:repeat(4,1fr);border:none"></div>
+        <div class="hint" id="anComNota"></div>
+      </div>
+
+      <div class="threecol">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Marketing · por producto</div></div>
+          <div style="padding:8px 0" id="anProdBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Marketing · por país</div></div>
+          <div style="padding:8px 0" id="anPaisBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Uso de cuentas</div></div>
+          <div class="mini-kpis" id="anUso"></div>
+          <div class="hint">Un cliente <b>activo</b> entró al menos una vez en el rango. Los usuarios de su equipo se administran dentro de cada plataforma.</div>
+        </div>
+      </div>
+      <div class="hint" style="border:none;padding:12px 0 0">Datos de ejemplo de la maqueta. En la plataforma salen de Solicitudes, Clientes y los accesos registrados.</div>
+    </div>
+    </div>
+
+    <div class="view" id="v-ficha">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <a href="#" onclick="irAVista('clientes');return false" style="color:inherit">Clientes</a> / <span>Carlos López</span></div>
+        <div class="ph-title">Ficha del cliente</div>
+        <div class="ph-sub">Todo lo de un cliente en un solo lugar: productos, tickets de alta, último acceso e historial.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost" onclick="irAVista('clientes')">← Volver</button><a class="btn-sm btn-sm-primary" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir cambio a Soporte ↗</a></div>
+    </div>
+
+    <div class="content-grid" style="padding-top:20px">
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-hdr"><div class="card-title">Plataformas con acceso</div><button class="card-action" onclick="abrirPlat('alta')">+ REGISTRAR ACCESO A OTRA PLATAFORMA</button></div>
+          <table class="tbl">
+            <thead><tr><th>Plataforma</th><th>Estado</th><th>Ticket de Soporte</th><th>Desde</th><th>Acciones</th></tr></thead>
+            <tbody id="fPlats"></tbody>
+          </table>
+          <div class="hint">Soporte da y quita los accesos en sus sistemas. Aquí marketing <b>solo registra</b> lo que Soporte ya hizo, siempre con el número de ticket.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Tickets anotados</div><a class="card-action" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">VER EN SOPORTE ↗</a></div>
+          <table class="tbl">
+            <thead><tr><th>Ticket</th><th>Pedido</th><th>Anotó</th><th>Fecha</th></tr></thead>
+            <tbody>
+              <tr><td class="tbl-id">#T-0049</td><td class="tbl-name">Cambio de contraseña</td><td class="tbl-email">Juan Ramírez (desde el aviso del cliente)</td><td class="tbl-email">02 oct</td></tr>
+              <tr><td class="tbl-id">#T-0044</td><td class="tbl-name">Alta en Viax</td><td class="tbl-email">Marta Díaz (marketing)</td><td class="tbl-email">01 sep</td></tr>
+              <tr><td class="tbl-id">#T-0031</td><td class="tbl-name">Alta en Qubo</td><td class="tbl-email">Marta Díaz (marketing)</td><td class="tbl-email">10 ago</td></tr>
+            </tbody>
+          </table>
+          <div class="hint">Soporte <b>no está conectado</b> a esta plataforma: los números de ticket se anotan a mano y el estado de cada uno se ve en Soporte. Las cuentas las crea y cambia <b>Soporte</b> en sus propios sistemas. Los usuarios del equipo del cliente se administran <b>dentro de cada plataforma</b>.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="ficha-hdr">
+            <div class="ficha-av">CL</div>
+            <div><div class="ficha-n">Carlos López</div><div class="ficha-s">Transportes Colón · #C-0091</div></div>
+          </div>
+          <div class="dato"><span>Correo</span><span>carlos.lopez@gmail.com</span></div>
+          <div class="dato"><span>País</span><span>Guatemala</span></div>
+          <div class="dato"><span>Cuenta</span><span id="fEstado"></span></div>
+          <div class="dato"><span>Último acceso</span><span>Hoy · 08:12</span></div>
+          <div class="dato"><span>Cliente desde</span><span>12 ago 2026</span></div>
+          <div class="dato"><span>Vino de</span><span>Solicitud del 05 ago · Qubo</span></div>
+          <div class="pad" style="display:flex;gap:8px;border-top:1px solid var(--b3)"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Historial</div></div>
+          <div class="tl">
+            <div class="tl-i"><div class="tl-d">HOY 08:12</div><div class="tl-t">Entró a <b>Viax</b> desde Mi cuenta</div></div>
+            <div class="tl-i"><div class="tl-d">02 OCT</div><div class="tl-t">Soporte cambió su contraseña · ticket <b>#T-0049</b></div></div>
+            <div class="tl-i"><div class="tl-d">28 SEP</div><div class="tl-t">Dejó un comentario sobre <b>Qubo</b> · aprobado</div></div>
+            <div class="tl-i"><div class="tl-d">03 SEP</div><div class="tl-t">Marta Díaz registró el alta en <b>Viax</b> · ticket #T-0044</div></div>
+            <div class="tl-i"><div class="tl-d">14 AGO</div><div class="tl-t">Soporte creó su usuario de <b>Qubo</b> · ticket #T-0031</div></div>
+            <div class="tl-i"><div class="tl-d">12 AGO</div><div class="tl-t">Marta Díaz pidió el alta en <b>Qubo</b> a Soporte · ticket #T-0031</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="view" id="v-landing">
+    <div class="page-hdr">
+      <div class="ph-left">
+        <div class="ph-crumb">Panel / <a href="#" onclick="irAVista('productos');return false" style="color:inherit">Productos</a> / <span id="edCrumb">Viax</span></div>
+        <div class="ph-title">Contenido de la landing · <span id="edTitulo">Viax</span></div>
+        <div class="ph-sub">Edita los textos e imágenes de la página de la solución. Los cambios quedan en borrador hasta que los publicas.</div>
+      </div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost" onclick="irAVista('productos')">← Volver</button><button class="btn-sm btn-sm-ghost" id="edVer">Ver página ↗</button><button class="btn-sm btn-sm-ghost" onclick="aviso('Borrador guardado')">Guardar borrador</button><button class="btn-sm btn-sm-primary" onclick="publicarLanding()">Publicar cambios</button></div>
+    </div>
+
+    <div class="ed-grid" style="padding-top:20px">
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-hdr"><div class="card-title">Portada (hero)</div></div>
+          <div class="pad">
+            <div class="fld"><label>Título</label><input class="inp" id="edHeroT" oninput="pintarPrev()"></div>
+            <div class="fld"><label>Subtítulo</label><textarea class="inp" id="edHeroS" oninput="pintarPrev()"></textarea></div>
+            <div class="twocol" style="gap:12px">
+              <div class="fld"><label>Texto del botón</label><input class="inp" id="edCta" oninput="pintarPrev()"></div>
+              <div class="fld"><label>El botón lleva a</label><select class="inp" id="edCtaD"><option>Formulario con el producto elegido</option><option>WhatsApp</option><option>Acceso a la solución</option></select></div>
+            </div>
+            <div class="fld" style="margin-bottom:0"><label>Imagen o video de portada</label><div class="img-drop">Arrastra una imagen (JPG, PNG, WebP) o un video MP4 · máx. 15 MB</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Secciones</div><button class="card-action" onclick="agregarSeccion()">+ AGREGAR SECCIÓN</button></div>
+          <div class="pad" id="edSecciones"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="position:sticky;top:12px">
+          <div class="ed-state">
+            <span class="status st-pending" id="edEstado">BORRADOR SIN PUBLICAR</span>
+            <span class="tbl-email" id="edEdit">Última edición: Juan Ramírez · hoy</span>
+          </div>
+          <div class="pad">
+            <div class="prev">
+              <div class="prev-bar"><i></i><i></i><i></i><span id="prevUrl">efletexia.com/soluciones/viax</span></div>
+              <div class="prev-hero"><h4 id="prevT"></h4><p id="prevS"></p><span class="prev-cta" id="prevC"></span></div>
+              <div id="prevSecs"></div>
+            </div>
+          </div>
+          <div class="hint">Vista previa aproximada. Cada publicación queda en la <b>Bitácora</b> y se puede volver a la versión anterior.</div>
+        </div>
+      </div>
+    </div>
+    </div>
+
     <div class="view" id="v-clientes">
     <div class="page-hdr">
       <div class="ph-left">
         <div class="ph-crumb">Panel / <span>Clientes</span></div>
         <div class="ph-title">Clientes</div>
-        <div class="ph-sub">Todos los clientes con acceso a la plataforma y el producto que contrataron.</div>
+        <div class="ph-sub">Los clientes que Soporte ya dio de alta. Aquí solo se registra el alta con su ticket; las cuentas las maneja Soporte.</div>
       </div>
-      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button><button class="btn-sm btn-sm-primary">+ Nuevo cliente</button></div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button><button class="btn-sm btn-sm-primary" onclick="abrirRegistro(-1)">+ Registrar alta</button></div>
     </div>
 
     <div class="card">
@@ -574,94 +859,94 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
         <button class="fbtn on">Todos</button>
         <button class="fbtn">Activos</button>
         <button class="fbtn">Bloqueados</button>
-        <button class="fbtn">Clave pendiente</button>
+        <button class="fbtn">Alta en Soporte</button>
       </div>
       <table class="tbl">
-        <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Producto</th><th>Subcuentas</th><th>Alta</th><th>Acceso</th><th>Acciones</th></tr></thead>
+        <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Plataformas</th><th>Ticket de alta</th><th>Alta</th><th>Último acceso</th><th>Acceso</th><th>Acciones</th></tr></thead>
         <tbody>
               <tr>
                 <td class="tbl-id">#C-0091</td>
                 <td class="tbl-name">Carlos López</td>
                 <td class="tbl-email">carlos.lopez@gmail.com</td>
-                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
-                <td class="tbl-id" style="color:var(--muted)">4 / 10</td>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO · VIAX</span></td>
+                <td class="tbl-id" style="color:var(--amber)">#T-0031</td>
                 <td class="tbl-email">12 ago 2026</td>
                 <td><span class="status st-active">ACTIVO</span></td>
-                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0090</td>
                 <td class="tbl-name">María Torres</td>
                 <td class="tbl-email">m.torres@logco.pe</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
-                <td class="tbl-id" style="color:var(--muted)">2 / 5</td>
+                <td class="tbl-id" style="color:var(--amber)">#T-0029</td>
                 <td class="tbl-email">03 ago 2026</td>
                 <td><span class="status st-active">ACTIVO</span></td>
-                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0089</td>
                 <td class="tbl-name">Diego Fuentes</td>
                 <td class="tbl-email">d.fuentes@transp.co</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">VIAX</span></td>
-                <td class="tbl-id" style="color:var(--muted)">7 / 10</td>
+                <td class="tbl-id" style="color:var(--amber)">#T-0024</td>
                 <td class="tbl-email">28 jul 2026</td>
                 <td><span class="status st-blocked">BLOQUEADO</span></td>
-                <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0088</td>
                 <td class="tbl-name">Ana Ríos</td>
                 <td class="tbl-email">ana.rios@fletex.ec</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
-                <td class="tbl-id" style="color:var(--muted)">1 / 5</td>
+                <td class="tbl-id" style="color:var(--amber)">#T-0052</td>
                 <td class="tbl-email">21 jul 2026</td>
-                <td><span class="status st-pending">CLAVE PENDIENTE</span></td>
-                <td><div class="rowact"><button class="mini ok">Enviar clave</button><button class="mini warn">Bloquear</button></div></td>
+                <td><span class="status st-pending">ALTA EN SOPORTE</span></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0087</td>
                 <td class="tbl-name">Luis Méndez</td>
                 <td class="tbl-email">luis.m@cargo.gt</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLEXY</span></td>
-                <td class="tbl-id" style="color:var(--muted)">0 / 3</td>
+                <td class="tbl-id" style="color:var(--amber)">#T-0019</td>
                 <td class="tbl-email">14 jul 2026</td>
                 <td><span class="status st-inactive">INACTIVO</span></td>
-                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini ok">Activar</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0086</td>
                 <td class="tbl-name">Rosa Delgado</td>
-                <td class="tbl-id" style="color:var(--muted)">3 / 10</td>
                 <td class="tbl-email">r.delgado@andina.pe</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
+                <td class="tbl-id" style="color:var(--amber)">#T-0017</td>
                 <td class="tbl-email">02 jul 2026</td>
                 <td><span class="status st-active">ACTIVO</span></td>
-                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0085</td>
                 <td class="tbl-name">Iván Guzmán</td>
-                <td class="tbl-id" style="color:#ef4444">5 / 5</td>
                 <td class="tbl-email">ivan.g@nortecarga.mx</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
+                <td class="tbl-id" style="color:var(--amber)">#T-0015</td>
                 <td class="tbl-email">27 jun 2026</td>
                 <td><span class="status st-active">ACTIVO</span></td>
-                <td><div class="rowact"><button class="mini">Resetear</button><button class="mini warn">Bloquear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
               <tr>
                 <td class="tbl-id">#C-0084</td>
                 <td class="tbl-name">Nadia Ocampo</td>
-                <td class="tbl-id" style="color:var(--muted)">2 / 10</td>
                 <td class="tbl-email">n.ocampo@surlog.cr</td>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
+                <td class="tbl-id" style="color:var(--amber)">#T-0012</td>
                 <td class="tbl-email">15 jun 2026</td>
                 <td><span class="status st-blocked">BLOQUEADO</span></td>
-                <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td>
+                <td><div class="rowact"><a class="mini" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a></div></td>
               </tr>
         </tbody>
       </table>
-      <div class="hint">128 clientes registrados · se muestran los 8 más recientes. La columna <b>Subcuentas</b> es solo informativa: cada cliente crea y administra las suyas dentro de la solución que contrató.</div>
+      <div class="hint">128 clientes registrados · se muestran los 8 más recientes. Clic en un nombre o en <b>Ficha</b> para ver productos e historial. <b>Marketing no da de alta ni cambia cuentas</b>: lo pide a Soporte con un ticket y, cuando Soporte da el OK, registra aquí el alta. Los usuarios del equipo de cada cliente se administran dentro de cada plataforma.</div>
     </div>
     </div>
 
@@ -670,26 +955,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
       <div class="ph-left">
         <div class="ph-crumb">Panel / <span>Accesos y contraseñas</span></div>
         <div class="ph-title">Accesos y contraseñas</div>
-        <div class="ph-sub">Intentos fallidos, cuentas bloqueadas y las reglas de seguridad del ingreso.</div>
+        <div class="ph-sub">Solo consulta: intentos fallidos, cuentas bloqueadas y las reglas del ingreso. Desbloqueos y cambios de contraseña los hace Soporte.</div>
       </div>
-      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
+      <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button><a class="btn-sm btn-sm-primary" href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="text-decoration:none">Pedir desbloqueo a Soporte ↗</a></div>
     </div>
 
     <div class="twocol" style="margin-bottom:18px">
       <div class="card">
-        <div class="card-hdr"><div class="card-title">Cuentas bloqueadas</div></div>
+        <div class="card-hdr"><div class="card-title">Cuentas bloqueadas</div><button class="card-action" onclick="abrirCta('bloqueo')">+ REGISTRAR BLOQUEO</button></div>
         <table class="tbl">
-          <thead><tr><th>Cliente</th><th>Motivo</th><th>Desde</th><th>Acciones</th></tr></thead>
-          <tbody>
-            <tr><td class="tbl-name">Diego Fuentes</td><td class="tbl-email">3 intentos fallidos</td>
-              <td class="tbl-email">Hoy · 09:42</td>
-              <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td></tr>
-            <tr><td class="tbl-name">Nadia Ocampo</td><td class="tbl-email">Captcha no superado</td>
-              <td class="tbl-email">Hoy · 09:10</td>
-              <td><div class="rowact"><button class="mini ok">Desbloquear</button><button class="mini">Resetear</button></div></td></tr>
-          </tbody>
+          <thead><tr><th>Cliente</th><th>Motivo</th><th>Desde</th><th>Registró</th><th>Acciones</th></tr></thead>
+          <tbody id="bloqLista"></tbody>
         </table>
-        <div class="hint">Al desbloquear se envía una contraseña temporal al correo del cliente.</div>
+        <div class="hint">Los bloqueos por <b>3 intentos fallidos</b> los registra solo el sistema. Los que hace <b>Soporte</b> (pedido del cliente, falta de pago, seguridad) y todos los desbloqueos los registra marketing con el número de ticket.</div>
       </div>
 
       <div class="card">
@@ -703,12 +981,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
           <div class="setv">ACTIVO</div>
         </div>
         <div class="setrow">
-          <div><div class="setl">Vigencia de la clave temporal</div><div class="setd">Tiempo para que el cliente cambie la contraseña que se le envió.</div></div>
-          <div class="setv">24 H</div>
+          <div><div class="setl">Olvidé mi contraseña</div><div class="setd">El enlace del login lleva a Soporte.</div></div>
+          <div class="setv">SOPORTE</div>
         </div>
         <div class="setrow">
-          <div><div class="setl">Quién puede desbloquear</div><div class="setd">El cliente no puede liberarse solo.</div></div>
-          <div class="setv">ADMIN</div>
+          <div><div class="setl">Quién desbloquea y cambia contraseñas</div><div class="setd">Ni el cliente ni marketing: siempre con ticket.</div></div>
+          <div class="setv">SOPORTE</div>
         </div>
       </div>
     </div>
@@ -771,38 +1049,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
     </div>
 
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar" id="comFiltros">
         <input class="search" placeholder="Buscar por cliente o producto…">
-        <button class="fbtn on">Por aprobar</button>
-        <button class="fbtn">Publicados</button>
-        <button class="fbtn">Rechazados</button>
+        <button class="fbtn on" data-f="pend">Por aprobar</button>
+        <button class="fbtn" data-f="apro">Aprobados</button>
+        <button class="fbtn" data-f="web">En la web</button>
+        <button class="fbtn" data-f="rech">Rechazados</button>
       </div>
-          <div class="qrow">
-            <div class="quote">“El manifiesto de pesos sale impreso con la orden y dejamos de tener problemas en balanza.”</div>
-            <div class="qmeta">ERNESTO CABRERA · QUBO · HACE 2 H</div>
-            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
-          </div>
-          <div class="qrow">
-            <div class="quote">“Entro, filtro por mi compañía y ahí está todo: viajes en ruta, alertas y cierre del mes.”</div>
-            <div class="qmeta">SOFÍA HERRERA · EFLETEXIA BI · HACE 5 H</div>
-            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
-          </div>
-          <div class="qrow">
-            <div class="quote">“Cualquiera del equipo cotiza en minutos y con el mismo criterio.”</div>
-            <div class="qmeta">PATRICIA NÚÑEZ · FLETEX · AYER</div>
-            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
-          </div>
-          <div class="qrow">
-            <div class="quote">“Las restricciones de altura y horario vienen cargadas, y eso nos quitó dos o tres sustos por semana.”</div>
-            <div class="qmeta">JULIO BENÍTEZ · VIAX · AYER</div>
-            <div class="qactions"><button class="mini ok">Publicar</button><button class="mini warn">Rechazar</button></div>
-          </div>
-          <div class="qrow">
-            <div class="quote">“El agente recibe, orienta y deja registro a cualquier hora.”</div>
-            <div class="qmeta">MARCELA RÍOS · EFLEXY · 12 SEP · PUBLICADO</div>
-            <div class="qactions"><span class="status st-active">PUBLICADO</span></div>
-          </div>
-      <div class="hint">Solo puede comentar un cliente que ya tiene el producto contratado. Lo que se publica aparece en la sección de referencias de la web.</div>
+      <div id="comLista"></div>
+      <div class="hint">Dos pasos: <b>Aprobar</b> valida que el comentario es real y adecuado; <b>Publicar en web</b> lo muestra en la sección de referencias del home (máximo 6 a la vez, según la configuración). Solo comenta quien tiene el producto contratado.</div>
     </div>
     </div>
 
@@ -811,84 +1066,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
       <div class="ph-left">
         <div class="ph-crumb">Panel / <span>Solicitudes</span></div>
         <div class="ph-title">Solicitudes de información</div>
-        <div class="ph-sub">Lo que llega del formulario de la web. Todavía no son clientes.</div>
+        <div class="ph-sub">El embudo comercial: de lo que llega por el formulario hasta el cierre, cada una con su responsable.</div>
       </div>
       <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
     </div>
 
     <div class="card">
+      <div class="funnel" id="solFunnel"></div>
       <div class="toolbar">
         <input class="search" placeholder="Buscar por nombre, empresa o país…">
-        <button class="fbtn on">Todas</button>
-        <button class="fbtn">Nuevas</button>
-        <button class="fbtn">Contactadas</button>
+        <select class="sel" id="solResp"><option value="">Todos los responsables</option><option>Marta Díaz</option><option>Juan Ramírez</option><option>Sin asignar</option></select>
+        <select class="sel" id="solProd"><option value="">Todos los productos</option><option>VIAX</option><option>QUBO</option><option>FLETEX</option><option>EFLETEXIA BI</option><option>EFLEXY</option><option>PLATAFORMA T2</option></select>
       </div>
       <table class="tbl">
-        <thead><tr><th>Fecha</th><th>Nombre</th><th>Empresa</th><th>Correo</th><th>País</th><th>Interés</th><th>Estado</th><th>Acciones</th></tr></thead>
-        <tbody>
-              <tr>
-                <td class="tbl-email">Hoy · 09:20</td>
-                <td class="tbl-name">Jorge Lazo</td>
-                <td class="tbl-email">Andina Cargo</td>
-                <td class="tbl-email">j.lazo@andinacargo.pe</td>
-                <td class="tbl-email">Perú</td>
-                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
-                <td><span class="status st-pending">NUEVA</span></td>
-                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
-              </tr>
-              <tr>
-                <td class="tbl-email">Hoy · 08:05</td>
-                <td class="tbl-name">Rocío Paredes</td>
-                <td class="tbl-email">Distribuidora Sur</td>
-                <td class="tbl-email">rocio@dsur.ec</td>
-                <td class="tbl-email">Ecuador</td>
-                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
-                <td><span class="status st-pending">NUEVA</span></td>
-                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
-              </tr>
-              <tr>
-                <td class="tbl-email">Hoy · 06:41</td>
-                <td class="tbl-name">Hugo Ramírez</td>
-                <td class="tbl-email">Transportes Colón</td>
-                <td class="tbl-email">hugo.r@tcolon.gt</td>
-                <td class="tbl-email">Guatemala</td>
-                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
-                <td><span class="status st-pending">NUEVA</span></td>
-                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
-              </tr>
-              <tr>
-                <td class="tbl-email">Ayer · 16:12</td>
-                <td class="tbl-name">Elena Ruiz</td>
-                <td class="tbl-email">Log Andes</td>
-                <td class="tbl-email">e.ruiz@logandes.pe</td>
-                <td class="tbl-email">Perú</td>
-                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">ASESORÍA</span></td>
-                <td><span class="status st-active">CONTACTADA</span></td>
-                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
-              </tr>
-              <tr>
-                <td class="tbl-email">Ayer · 11:30</td>
-                <td class="tbl-name">Pablo Sierra</td>
-                <td class="tbl-email">Cargo Norte</td>
-                <td class="tbl-email">p.sierra@cargonorte.mx</td>
-                <td class="tbl-email">México</td>
-                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">VIAX</span></td>
-                <td><span class="status st-active">CONTACTADA</span></td>
-                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
-              </tr>
-              <tr>
-                <td class="tbl-email">12 sep</td>
-                <td class="tbl-name">Lucía Barrios</td>
-                <td class="tbl-email">Frío Express</td>
-                <td class="tbl-email">lucia@frioexpress.cr</td>
-                <td class="tbl-email">Costa Rica</td>
-                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
-                <td><span class="status st-inactive">SIN INTERÉS</span></td>
-                <td><div class="rowact"><button class="mini ok">Contactar</button><button class="mini">Ver</button></div></td>
-              </tr>
-        </tbody>
+        <thead><tr><th>Fecha</th><th>Nombre</th><th>Empresa</th><th>País</th><th>Producto</th><th>Responsable</th><th>Etapa</th><th>Acciones</th></tr></thead>
+        <tbody id="solTabla"></tbody>
       </table>
-      <div class="hint">Una solicitud <b>no crea usuario ni contraseña</b>. Si la persona contrata, ventas la da de alta como cliente y ahí se le genera el acceso.</div>
+      <div class="hint">Una solicitud <b>no crea usuario ni contraseña</b>. La etapa <b>Dada de alta</b> se registra en <b>Clientes → Registrar alta</b>: elegirla te lleva allí y la solicitud solo cambia si el registro se guarda. Si Soporte aún no da el OK, el cliente queda en Clientes como <b>Alta en Soporte</b>.</div>
     </div>
     </div>
 
@@ -903,53 +1097,48 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
     </div>
 
     <div class="card" style="margin-bottom:18px">
-      <div class="card-hdr"><div class="card-title">Catálogo</div></div>
+      <div class="card-hdr"><div class="card-title">Catálogo y landings</div></div>
       <table class="tbl">
-        <thead><tr><th>Producto</th><th>Descripción corta</th><th>En la web</th><th>Admite subcuentas</th><th>Tope de subcuentas</th><th>Acciones</th></tr></thead>
+        <thead><tr><th>Producto</th><th>Descripción corta</th><th>En la web</th><th>Landing</th><th>Acciones</th></tr></thead>
         <tbody>
-              <tr>
-                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLEXY</span></td>
-                <td class="tbl-name">Robots de última milla</td>
-                <td><span class="status st-active">VISIBLE</span></td>
-                <td class="tbl-email">Sí</td>
-                <td class="tbl-id">10</td>
-                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
-              </tr>
               <tr>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">VIAX</span></td>
                 <td class="tbl-name">Navegación y millas</td>
                 <td><span class="status st-active">VISIBLE</span></td>
-                <td class="tbl-email">Sí</td>
-                <td class="tbl-id">10</td>
-                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+                <td><span class="status st-active">PUBLICADA</span></td>
+                <td><div class="rowact"><button class="mini ok" onclick="editarLanding('viax')">Editar landing</button><button class="mini">Datos</button><button class="mini warn">Ocultar</button></div></td>
+              </tr>
+              <tr>
+                <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLEXY</span></td>
+                <td class="tbl-name">Robots de última milla</td>
+                <td><span class="status st-inactive">OCULTO</span></td>
+                <td><span class="status st-pending">EN CONSTRUCCIÓN</span></td>
+                <td><div class="rowact"><button class="mini ok" onclick="editarLanding('eflexy')">Editar landing</button><button class="mini">Datos</button><button class="mini ok">Mostrar</button></div></td>
               </tr>
               <tr>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">FLETEX</span></td>
                 <td class="tbl-name">Simulador de tarifas</td>
-                <td><span class="status st-active">VISIBLE</span></td>
-                <td class="tbl-email">Sí</td>
-                <td class="tbl-id">10</td>
-                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+                <td><span class="status st-inactive">OCULTO</span></td>
+                <td><span class="status st-pending">EN CONSTRUCCIÓN</span></td>
+                <td><div class="rowact"><button class="mini ok" onclick="editarLanding('fletex')">Editar landing</button><button class="mini">Datos</button><button class="mini ok">Mostrar</button></div></td>
               </tr>
               <tr>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">QUBO</span></td>
                 <td class="tbl-name">Simulador de cubicaje</td>
-                <td><span class="status st-active">VISIBLE</span></td>
-                <td class="tbl-email">Sí</td>
-                <td class="tbl-id">10</td>
-                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+                <td><span class="status st-inactive">OCULTO</span></td>
+                <td><span class="status st-pending">EN CONSTRUCCIÓN</span></td>
+                <td><div class="rowact"><button class="mini ok" onclick="editarLanding('qubo')">Editar landing</button><button class="mini">Datos</button><button class="mini ok">Mostrar</button></div></td>
               </tr>
               <tr>
                 <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">EFLETEXIA BI</span></td>
                 <td class="tbl-name">Centro de control</td>
-                <td><span class="status st-active">VISIBLE</span></td>
-                <td class="tbl-email">Sí</td>
-                <td class="tbl-id">10</td>
-                <td><div class="rowact"><button class="mini">Editar</button><button class="mini warn">Ocultar</button></div></td>
+                <td><span class="status st-inactive">OCULTO</span></td>
+                <td><span class="status st-pending">EN CONSTRUCCIÓN</span></td>
+                <td><div class="rowact"><button class="mini ok" onclick="editarLanding('bi')">Editar landing</button><button class="mini">Datos</button><button class="mini ok">Mostrar</button></div></td>
               </tr>
         </tbody>
       </table>
-      <div class="hint">Este catálogo alimenta las tarjetas de la web y el selector de <b>producto de interés</b> del formulario. El tope es el máximo de accesos que el cliente puede crear dentro de esa solución.</div>
+      <div class="hint">Hoy solo opera <b>Viax</b>; las otras cuatro se construyen ocultas. <b>Editar landing</b> cambia los textos e imágenes de su página; <b>Mostrar</b> la publica en el home, el menú y el formulario sin tocar código.</div>
     </div>
 
     <div class="card">
@@ -978,7 +1167,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
       <div class="ph-left">
         <div class="ph-crumb">Panel / <span>Bitácora</span></div>
         <div class="ph-title">Bitácora</div>
-        <div class="ph-sub">Quién hizo qué y cuándo. Toda acción sobre una contraseña o un comentario queda registrada.</div>
+        <div class="ph-sub">Quién hizo qué y cuándo. Toda acción sobre una contraseña, un comentario o el contenido de la web queda registrada.</div>
       </div>
       <div class="ph-actions"><button class="btn-sm btn-sm-ghost">Exportar</button></div>
     </div>
@@ -990,16 +1179,31 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
         <button class="fbtn">Contraseñas</button>
         <button class="fbtn">Comentarios</button>
         <button class="fbtn">Clientes</button>
+        <button class="fbtn">Contenido</button>
       </div>
       <table class="tbl">
         <thead><tr><th>Fecha</th><th>Quién</th><th>Acción</th><th>Sobre</th><th>Detalle</th></tr></thead>
         <tbody>
               <tr>
-                <td class="tbl-email">Hoy · 09:44</td>
+                <td class="tbl-email">Hoy · 10:05</td>
+                <td class="tbl-name">Marta Díaz</td>
+                <td class="tbl-email">Publicó landing</td>
+                <td class="tbl-name">Viax</td>
+                <td class="tbl-email">Cambió el título de portada · versión 7</td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Hoy · 09:50</td>
                 <td class="tbl-name">Juan Ramírez</td>
+                <td class="tbl-email">Publicó en web</td>
+                <td class="tbl-name">Marcela Ríos</td>
+                <td class="tbl-email">Referencia de Eflexy al home</td>
+              </tr>
+              <tr>
+                <td class="tbl-email">Hoy · 09:44</td>
+                <td class="tbl-name">Soporte</td>
                 <td class="tbl-email">Desbloqueó cuenta</td>
                 <td class="tbl-name">Diego Fuentes</td>
-                <td class="tbl-email">Tras 3 intentos fallidos</td>
+                <td class="tbl-email">Ticket #T-0053 · tras 3 intentos fallidos</td>
               </tr>
               <tr>
                 <td class="tbl-email">Hoy · 09:12</td>
@@ -1017,17 +1221,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
               </tr>
               <tr>
                 <td class="tbl-email">Ayer · 18:05</td>
-                <td class="tbl-name">Juan Ramírez</td>
-                <td class="tbl-email">Reseteó contraseña</td>
+                <td class="tbl-name">Soporte</td>
+                <td class="tbl-email">Cambió contraseña</td>
                 <td class="tbl-name">Ana Ríos</td>
-                <td class="tbl-email">Clave temporal enviada</td>
+                <td class="tbl-email">Ticket #T-0050</td>
               </tr>
               <tr>
                 <td class="tbl-email">Ayer · 15:20</td>
                 <td class="tbl-name">Marta Díaz</td>
-                <td class="tbl-email">Dio de alta cliente</td>
+                <td class="tbl-email">Registró alta</td>
                 <td class="tbl-name">Rosa Delgado</td>
-                <td class="tbl-email">Contrató Qubo</td>
+                <td class="tbl-email">Qubo · ticket #T-0017 aprobado por Soporte</td>
               </tr>
               <tr>
                 <td class="tbl-email">Ayer · 10:02</td>
@@ -1045,22 +1249,87 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
               </tr>
         </tbody>
       </table>
-      <div class="hint">Las acciones marcadas como <b>Sistema</b> las ejecuta la propia plataforma: por ejemplo, el bloqueo automático al tercer intento fallido.</div>
+      <div class="hint">Las acciones de <b>Sistema</b> las ejecuta la plataforma (por ejemplo, el bloqueo al tercer intento). Las de <b>Soporte</b> llegan con su número de ticket.</div>
     </div>
     </div>
 
   </main>
 </div>
 
+
+<div class="modal-overlay" id="mReg" onclick="if(event.target===this)cerrarRegistro()">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">Registrar alta</div><button class="modal-close" onclick="cerrarRegistro()">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px">Pide el alta en <a href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="color:var(--amber)">Soporte ↗</a> y anota aquí el número de ticket. Marketing no crea usuarios: si Soporte ya dio el OK, márcalo y el cliente queda <b style="color:var(--text)">Activo</b>; si no, queda en <b style="color:var(--text)">Alta en Soporte</b> hasta que lo confirmes.</p>
+      <p id="rOrigen" style="display:none;font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;padding:10px 12px;border:1px solid var(--b1);border-radius:4px;background:var(--bg3)"></p>
+      <div class="fld"><label>Ticket de Soporte</label><input class="inp" id="rTicket" placeholder="#T-0000"></div>
+      <div class="twocol" style="gap:12px">
+        <div class="fld"><label>Cliente / empresa</label><input class="inp" id="rEmpresa"></div>
+        <div class="fld"><label>Plataformas con acceso</label><div id="rPlats" style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;padding-top:4px"></div></div>
+      </div>
+      <div class="twocol" style="gap:12px">
+        <div class="fld"><label>Usuario dado de alta</label><input class="inp" id="rNombre"></div>
+        <div class="fld"><label>Correo del usuario</label><input class="inp" id="rCorreo" placeholder="nombre@empresa.com"></div>
+      </div>
+      <label class="check-ok" style="display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--text);margin:4px 0 16px;cursor:pointer"><input type="checkbox" id="rOk" style="margin-top:2px;accent-color:#22c55e">Soporte ya dio el OK: el cliente ya tiene acceso</label>
+      <div style="display:flex;justify-content:flex-end;gap:10px"><button class="btn-sm btn-sm-ghost" onclick="cerrarRegistro()">Cancelar</button><button class="btn-sm btn-sm-primary" onclick="guardarRegistro()">Registrar alta</button></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="mAnot" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="width:440px">
+    <div class="modal-hdr"><div class="modal-title">Anotar ticket de Soporte</div><button class="modal-close" onclick="$('mAnot').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px">Abrimos <a href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener" style="color:var(--amber)">Soporte</a> en otra pestaña. Crea ahí el ticket pidiendo el alta y anota aquí el número que te dio. <b style="color:var(--text)">Soporte no está conectado</b>: el número se escribe a mano.</p>
+      <div class="fld"><label>Solicitud</label><div id="aNombre" style="font-size:13px;font-weight:700"></div></div>
+      <div class="fld"><label>Número de ticket</label><input class="inp" id="aTicket" placeholder="#T-0000" onkeydown="if(event.key==='Enter')guardarAnotar()"></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px"><button class="btn-sm btn-sm-ghost" onclick="$('mAnot').classList.remove('open')">Más tarde</button><button class="btn-sm btn-sm-primary" onclick="guardarAnotar()">Anotar ticket</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="mPlat" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="width:460px">
+    <div class="modal-hdr"><div class="modal-title" id="pTitulo">Registrar acceso</div><button class="modal-close" onclick="$('mPlat').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px" id="pTexto"></p>
+      <div class="fld"><label>Cliente</label><div style="font-size:13px;font-weight:700">Carlos López · Transportes Colón</div></div>
+      <div class="fld" id="pPlatFld"><label>Plataforma</label><select class="inp" id="pPlat"></select></div>
+      <div class="fld"><label>Ticket de Soporte</label><input class="inp" id="pTicket" placeholder="#T-0000"></div>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--text);margin:4px 0 16px;cursor:pointer"><input type="checkbox" id="pOk" style="margin-top:2px;accent-color:#22c55e"><span id="pOkTxt"></span></label>
+      <div style="display:flex;justify-content:flex-end;gap:10px"><button class="btn-sm btn-sm-ghost" onclick="$('mPlat').classList.remove('open')">Cancelar</button><button class="btn-sm btn-sm-primary" onclick="guardarPlat()" id="pBtn">Registrar</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="mCta" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="width:460px">
+    <div class="modal-hdr"><div class="modal-title" id="cTitulo"></div><button class="modal-close" onclick="$('mCta').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px" id="cTexto"></p>
+      <div class="fld" id="cCliFld"><label>Cliente</label><select class="inp" id="cCli"></select></div>
+      <div class="fld" id="cCliFijo" style="display:none"><label>Cliente</label><div style="font-size:13px;font-weight:700" id="cCliNom"></div></div>
+      <div class="fld" id="cMotFld"><label>Motivo</label><select class="inp" id="cMot"><option>Pedido del cliente</option><option>Falta de pago</option><option>Seguridad</option><option>Otro</option></select></div>
+      <div class="fld"><label>Ticket de Soporte</label><input class="inp" id="cTicket" placeholder="#T-0000"></div>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--text);margin:4px 0 16px;cursor:pointer"><input type="checkbox" id="cOk" style="margin-top:2px;accent-color:#22c55e"><span id="cOkTxt"></span></label>
+      <div style="display:flex;justify-content:flex-end;gap:10px"><button class="btn-sm btn-sm-ghost" onclick="$('mCta').classList.remove('open')">Cancelar</button><button class="btn-sm btn-sm-primary" id="cBtn" onclick="guardarCta()"></button></div>
+    </div>
+  </div>
+</div>
 <script>
 // ── Navegación entre vistas
+var PADRE = { ficha: 'clientes', landing: 'productos' };
 function mostrar(vista) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
   const v = document.getElementById('v-' + vista);
   if (v) v.classList.add('on');
+  const activa = PADRE[vista] || vista;
   document.querySelectorAll('.sb-item').forEach(i =>
-    i.classList.toggle('active', i.dataset.view === vista));
-  window.scrollTo({top: 0, behavior: 'smooth'});
+    i.classList.toggle('active', i.dataset.view === activa));
+  document.querySelector('.main').scrollTo({top: 0, behavior: 'smooth'});
 }
 function irA(el) { mostrar(el.dataset.view); }
 function irAVista(vista) { mostrar(vista); }
@@ -1074,6 +1343,451 @@ document.querySelectorAll('.toolbar').forEach(tb => {
     });
   });
 });
+
+function $(id) { return document.getElementById(id); }
+function aviso(t) {
+  let el = $('toast');
+  if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; document.body.appendChild(el); }
+  el.textContent = t; el.classList.add('on');
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2200);
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// ── Clientes: último acceso y ficha
+(function () {
+  const ultimos = ['Hoy · 08:12', 'Ayer · 19:30', 'Hace 6 días', 'Nunca', 'Hace 41 días', 'Hoy · 07:55', 'Ayer · 11:02', 'Hace 9 días'];
+  document.querySelectorAll('#v-clientes tbody tr').forEach((tr, i) => {
+    const td = document.createElement('td');
+    td.className = 'tbl-email';
+    td.textContent = ultimos[i] || '—';
+    if (/41 días|Nunca/.test(td.textContent)) td.style.color = '#ef4444';
+    tr.insertBefore(td, tr.children[6]);
+    const ra = tr.querySelector('.rowact');
+    const b = document.createElement('button');
+    b.className = 'mini ok'; b.textContent = 'Ficha';
+    b.onclick = () => mostrar('ficha');
+    ra.insertBefore(b, ra.firstChild);
+    const n = tr.querySelector('.tbl-name');
+    n.style.cursor = 'pointer'; n.title = 'Ver ficha';
+    n.onclick = () => mostrar('ficha');
+  });
+})();
+
+// ── Analítica
+const AN = {
+  embudo: [['Solicitudes', 48], ['Contactadas', 31], ['Demo', 14], ['Cerradas', 6]],
+  prod: [['VIAX', 18], ['QUBO', 11], ['FLETEX', 8], ['EFLETEXIA BI', 7], ['PLATAFORMA T2', 4]],
+  pais: [['Perú', 14], ['México', 9], ['Colombia', 8], ['Guatemala', 6], ['Ecuador', 5], ['Costa Rica', 3], ['Otros', 3]],
+  rango: { 7: .24, 30: 1, 90: 2.7 }
+};
+let anR = 30;
+AN.pais.forEach(p => $('anPais').insertAdjacentHTML('beforeend', `<option>${p[0]}</option>`));
+AN.prod.forEach(p => $('anProd').insertAdjacentHTML('beforeend', `<option>${p[0]}</option>`));
+function share(lista, nombre) {
+  if (!nombre) return 1;
+  const tot = lista.reduce((a, x) => a + x[1], 0);
+  const it = lista.find(x => x[0] === nombre);
+  return it ? it[1] / tot : 0;
+}
+function barras(id, lista, f, sel) {
+  const vals = lista.map(x => [x[0], sel && x[0] !== sel ? 0 : Math.round(x[1] * f)]);
+  const max = Math.max(1, ...vals.map(v => v[1]));
+  $(id).innerHTML = vals.map(v => `<div class="hb"><span class="hb-l">${esc(v[0])}</span><span class="hb-t"><span class="hb-f" style="width:${v[1] / max * 100}%;display:block"></span></span><span class="hb-v">${v[1]}</span></div>`).join('');
+}
+function pintarAnalitica() {
+  const pais = $('anPais').value, prod = $('anProd').value;
+  const fr = AN.rango[anR];
+  const fp = share(AN.pais, pais), fq = share(AN.prod, prod);
+  const emb = AN.embudo.map(e => [e[0], Math.max(0, Math.round(e[1] * fr * fp * fq))]);
+  const top = Math.max(1, emb[0][1]);
+  $('anFunnel').innerHTML = emb.map((e, i) => {
+    const prev = i ? emb[i - 1][1] : 0;
+    const r = i ? (prev ? Math.round(e[1] / prev * 100) + '% de la etapa anterior' : '—') : 'entraron en el rango';
+    return `<div class="fstage" style="cursor:default"><div class="fs-l">${e[0]}</div><div class="fs-n">${e[1]}</div><div class="fs-r">${r}</div><div class="fs-bar" style="width:${e[1] / top * 100}%"></div></div>`;
+  }).join('');
+  const cierre = emb[0][1] ? (emb[3][1] / emb[0][1] * 100).toFixed(1) : '0';
+  $('anComNota').innerHTML = `Tasa de cierre: <b>${cierre}%</b> · tiempo medio hasta el primer contacto: <b>5 h</b>.`;
+  barras('anProdBars', AN.prod, fr * fp, prod);
+  barras('anPaisBars', AN.pais, fr * fq, pais);
+  const f = fp * fq;
+  const act = Math.round(104 * (anR === 7 ? .62 : anR === 90 ? 1.12 : 1) * f);
+  const uso = [
+    [Math.min(act, Math.round(128 * f)) + ' / ' + Math.round(128 * f), 'clientes activos en el rango'],
+    [Math.round(2340 * fr * f).toLocaleString('es'), 'ingresos a las soluciones'],
+    [Math.round(6 * fr * f), 'altas registradas con ticket de Soporte'],
+    [Math.round(24 * f), 'clientes sin entrar hace más de 30 días']
+  ];
+  $('anUso').innerHTML = uso.map(u => `<div class="mk"><div class="mk-v">${u[0]}</div><div class="mk-l">${u[1]}</div></div>`).join('');
+}
+$('anRango').querySelectorAll('.fbtn').forEach(b => b.addEventListener('click', () => { anR = +b.dataset.r; pintarAnalitica(); }));
+$('anPais').onchange = pintarAnalitica;
+$('anProd').onchange = pintarAnalitica;
+pintarAnalitica();
+
+// ── Solicitudes como embudo
+const MESA = 'https://portal-usuarios.dtdevops.com/';
+const ETAPAS = [['nueva', 'Nueva', 'st-pending'], ['contactada', 'Contactada', 'st-blue'], ['demo', 'Demo', 'st-purple'], ['alta', 'Dada de alta', 'st-active'], ['sin', 'Sin interés', 'st-inactive']];
+const ALTAS = ['alta'];
+const SOL = [
+  { f: 'Hoy · 09:20', n: 'Jorge Lazo', e: 'Andina Cargo', p: 'Perú', pr: 'QUBO', r: 'Sin asignar', et: 'nueva' },
+  { f: 'Hoy · 08:05', n: 'Rocío Paredes', e: 'Distribuidora Sur', p: 'Ecuador', pr: 'EFLETEXIA BI', r: 'Sin asignar', et: 'nueva' },
+  { f: 'Hoy · 06:41', n: 'Hugo Ramírez', e: 'Transportes Colón', p: 'Guatemala', pr: 'VIAX', r: 'Marta Díaz', et: 'nueva' },
+  { f: 'Ayer · 18:02', n: 'Sara Molina', e: 'Logística Pacífico', p: 'Colombia', pr: 'PLATAFORMA T2', r: 'Sin asignar', et: 'nueva' },
+  { f: 'Ayer · 16:12', n: 'Elena Ruiz', e: 'Log Andes', p: 'Perú', pr: 'VIAX', r: 'Juan Ramírez', et: 'contactada' },
+  { f: 'Ayer · 11:30', n: 'Pablo Sierra', e: 'Cargo Norte', p: 'México', pr: 'VIAX', r: 'Marta Díaz', et: 'demo', c: 'p.sierra@cargonorte.mx' },
+  { f: '28 sep', n: 'Tomás Vega', e: 'Ruta Sur', p: 'Perú', pr: 'VIAX', r: 'Marta Díaz', et: 'alta', tk: '#T-0051', c: 't.vega@rutasur.pe' },
+  { f: '25 sep', n: 'Iris Campos', e: 'Carga Rápida', p: 'México', pr: 'VIAX', r: 'Juan Ramírez', et: 'demo', c: 'iris@cargarapida.mx' },
+  { f: '22 sep', n: 'Andrea Lima', e: 'TransAndes', p: 'Colombia', pr: 'VIAX', r: 'Juan Ramírez', et: 'alta', tk: '#T-0046' },
+  { f: '12 sep', n: 'Lucía Barrios', e: 'Frío Express', p: 'Costa Rica', pr: 'QUBO', r: 'Juan Ramírez', et: 'sin' }
+];
+let solEt = '';
+function pintarSol() {
+  const resp = $('solResp').value, prod = $('solProd').value;
+  const base = SOL.filter(s => (!resp || s.r === resp) && (!prod || s.pr === prod));
+  $('solFunnel').style.gridTemplateColumns = 'repeat(5,1fr)';
+  $('solFunnel').innerHTML = ETAPAS.map(e => {
+    const n = base.filter(s => s.et === e[0]).length;
+    return `<div class="fstage${solEt === e[0] ? ' on' : ''}" onclick="filtrarEtapa('${e[0]}')"><div class="fs-l">${e[1]}</div><div class="fs-n">${n}</div><div class="fs-r">${solEt === e[0] ? 'filtrando · clic para quitar' : 'clic para filtrar'}</div></div>`;
+  }).join('');
+  const filas = base.filter(s => !solEt || s.et === solEt);
+  $('solTabla').innerHTML = filas.map(s => {
+    const i = SOL.indexOf(s);
+    const et = ETAPAS.find(e => e[0] === s.et);
+    const opts = ETAPAS.map(e => `<option value="${e[0]}"${e[0] === s.et ? ' selected' : ''}>${e[1]}${ALTAS.includes(e[0]) && e[0] !== s.et ? ' → Clientes' : ''}</option>`).join('');
+    const ropts = ['Sin asignar', 'Marta Díaz', 'Juan Ramírez'].map(r => `<option${r === s.r ? ' selected' : ''}>${r}</option>`).join('');
+    const alta = s.et === 'demo' ? `<button class="mini ok" onclick="irARegistrar(${i})">Registrar alta</button>`
+      : s.et === 'alta' ? `<span class="tbl-id">${s.tk}</span>` : '';
+    return `<tr><td class="tbl-email">${s.f}</td><td class="tbl-name">${esc(s.n)}</td><td class="tbl-email">${esc(s.e)}</td><td class="tbl-email">${s.p}</td>
+      <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">${s.pr}</span></td>
+      <td><select class="sel" style="padding:5px 8px;font-size:11.5px${s.r === 'Sin asignar' ? ';color:var(--amber)' : ''}" onchange="SOL[${i}].r=this.value;pintarSol()">${ropts}</select></td>
+      <td><span class="status ${et[2]}">${et[1].toUpperCase()}</span></td>
+      <td><div class="rowact"><select class="sel" style="padding:5px 8px;font-size:11.5px" onchange="moverEtapa(${i},this.value)">${opts}</select>${alta}</div></td></tr>`;
+  }).join('') || '<tr><td colspan="8" class="tbl-email" style="text-align:center;padding:22px">No hay solicitudes con este filtro.</td></tr>';
+}
+// ── Todo lo que sea alta se hace en Clientes → Registrar alta
+let regIdx = -1, regFila = null;
+function irARegistrar(i) {
+  mostrar('clientes');
+  abrirRegistro(i);
+  aviso('El alta se registra aquí, en Clientes');
+}
+function abrirRegistro(i, fila) {
+  regIdx = i; regFila = fila || (i >= 0 ? SOL[i].fila : null) || null;
+  const s = i >= 0 ? SOL[i] : (fila ? {
+      n: fila.children[1].textContent.trim(), c: fila.children[2].textContent.trim(),
+      pr: fila.children[3].textContent.trim().split(' · ')[0], tk: fila.children[4].textContent.trim(), e: '' } : {});
+  $('rOrigen').innerHTML = i >= 0
+    ? `Viene de la solicitud de <b style="color:var(--text)">${esc(s.n)}</b>. Al guardar, la solicitud pasa a <b style="color:var(--text)">Dada de alta</b>; si cancelas, queda como está.`
+    : fila ? `Confirmas el alta de <b style="color:var(--text)">${esc(s.n)}</b>, que estaba esperando a Soporte.` : '';
+  $('rOrigen').style.display = (i >= 0 || fila) ? 'block' : 'none';
+  $('rTicket').value = s.tk || ''; $('rEmpresa').value = s.e || ''; $('rNombre').value = s.n || '';
+  $('rCorreo').value = s.c || ''; $('rOk').checked = false;
+  const pre = s.pr && s.pr !== 'PLATAFORMA T2' ? s.pr : 'VIAX';
+  $('rPlats').innerHTML = PLATS.map(x => `<label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" value="${x}"${x === pre ? ' checked' : ''} style="accent-color:#FF6B1A">${x}</label>`).join('');
+  $('mReg').classList.add('open');
+}
+function cerrarRegistro() { $('mReg').classList.remove('open'); }
+function guardarRegistro() {
+  let tk = $('rTicket').value.trim().toUpperCase(); const nom = $('rNombre').value.trim(), cor = $('rCorreo').value.trim();
+  if (!/^#?T-\d{3,}$/.test(tk)) { aviso('Escribe el número de ticket que te dio Soporte (por ejemplo #T-0051)'); return; }
+  if (tk[0] !== '#') tk = '#' + tk;
+  if (!nom || !cor) { aviso('Completa el usuario y su correo'); return; }
+  const plats = [...document.querySelectorAll('#rPlats input:checked')].map(x => x.value);
+  if (!plats.length) { aviso('Marca al menos una plataforma'); return; }
+  const ok = $('rOk').checked;
+  const estado = ok ? '<span class="status st-active">ACTIVO</span>' : '<span class="status st-pending">ALTA EN SOPORTE</span>';
+  let tr = regFila;
+  if (!tr) {
+    tr = document.createElement('tr');
+    const tb = document.querySelector('#v-clientes tbody');
+    tb.insertBefore(tr, tb.firstChild);
+  }
+  tr.innerHTML = `<td class="tbl-id">#C-0092</td><td class="tbl-name">${esc(nom)}</td><td class="tbl-email">${esc(cor)}</td>
+    <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">${plats.join(' · ')}</span></td>
+    <td class="tbl-id" style="color:var(--amber)">${esc(tk)}</td><td class="tbl-email">Hoy</td><td class="tbl-email">Nunca</td>
+    <td>${estado}</td>
+    <td><div class="rowact"><button class="mini ok" onclick="mostrar('ficha')">Ficha</button><a class="mini" href="${MESA}" target="_blank" rel="noopener" style="text-decoration:none">Soporte ↗</a></div></td>`;
+  if (regIdx >= 0) { SOL[regIdx].et = 'alta'; SOL[regIdx].tk = tk; SOL[regIdx].fila = tr; tr.dataset.sol = regIdx; pintarSol(); }
+  const accion = ok ? 'Registró alta' : 'Registró pedido de alta';
+  document.querySelector('#v-bitacora tbody').insertAdjacentHTML('afterbegin',
+    `<tr><td class="tbl-email">Ahora</td><td class="tbl-name">Juan Ramírez</td><td class="tbl-email">${accion}</td><td class="tbl-name">${esc(nom)}</td><td class="tbl-email">${plats.join(', ')} · ticket ${esc(tk)}${ok ? ' aprobado por Soporte' : ' esperando a Soporte'}</td></tr>`);
+  pintarBloq();
+  cerrarRegistro();
+  aviso(ok ? 'Alta registrada: ' + nom + ' queda Activo' : nom + ' queda en Alta en Soporte hasta que confirmes el OK');
+}
+function confirmarDesdeFila(tr) {
+  const k = tr.dataset.sol;
+  if (k != null && k !== '') abrirRegistro(+k); else abrirRegistro(-1, tr);
+}
+function filtrarEtapa(e) { solEt = solEt === e ? '' : e; pintarSol(); }
+function moverEtapa(i, e) {
+  if (ALTAS.includes(e) && SOL[i].et !== e) { pintarSol(); irARegistrar(i); return; }
+  if (ALTAS.includes(SOL[i].et) && !ALTAS.includes(e)) { pintarSol(); aviso('Ya tiene un alta registrada en Clientes: los cambios de cuenta se piden a Soporte'); return; }
+  SOL[i].et = e;
+  const nom = ETAPAS.find(x => x[0] === e)[1];
+  aviso(SOL[i].n + ' pasó a ' + nom + ' · queda en la bitácora');
+  pintarSol();
+}
+$('solResp').onchange = pintarSol;
+$('solProd').onchange = pintarSol;
+pintarSol();
+
+// ── Comentarios: aprobar y publicar en web por separado
+const COM = [
+  { t: 'El manifiesto de pesos sale impreso con la orden y dejamos de tener problemas en balanza.', a: 'ERNESTO CABRERA', p: 'QUBO', c: 'HACE 2 H', st: 'pend', web: false },
+  { t: 'Entro, filtro por mi compañía y ahí está todo: viajes en ruta, alertas y cierre del mes.', a: 'SOFÍA HERRERA', p: 'EFLETEXIA BI', c: 'HACE 5 H', st: 'pend', web: false },
+  { t: 'Cualquiera del equipo cotiza en minutos y con el mismo criterio.', a: 'PATRICIA NÚÑEZ', p: 'FLETEX', c: 'AYER', st: 'pend', web: false },
+  { t: 'Las restricciones de altura y horario vienen cargadas, y eso nos quitó dos o tres sustos por semana.', a: 'JULIO BENÍTEZ', p: 'VIAX', c: 'AYER', st: 'pend', web: false },
+  { t: 'Mis conductores ahora cierran el viaje con fotos y yo lo veo al instante desde la Torre.', a: 'ANDREA LIMA', p: 'VIAX', c: '30 SEP', st: 'apro', web: false },
+  { t: 'El agente recibe, orienta y deja registro a cualquier hora.', a: 'MARCELA RÍOS', p: 'EFLEXY', c: '12 SEP', st: 'apro', web: true },
+  { t: 'Buen producto.', a: 'CLIENTE ANÓNIMO', p: 'QUBO', c: '08 SEP', st: 'rech', web: false }
+];
+let comF = 'pend';
+function pintarCom() {
+  const lista = COM.map((c, i) => [c, i]).filter(([c]) =>
+    comF === 'web' ? c.web : comF === 'apro' ? c.st === 'apro' : c.st === comF);
+  $('comLista').innerHTML = lista.map(([c, i]) => {
+    let acc;
+    if (c.st === 'pend') acc = `<button class="mini ok" onclick="comAccion(${i},'apro')">Aprobar</button><button class="mini warn" onclick="comAccion(${i},'rech')">Rechazar</button>`;
+    else if (c.st === 'apro') acc = `<span class="status st-active">APROBADO</span><label class="sw" style="margin-left:10px"><input type="checkbox"${c.web ? ' checked' : ''} onchange="comWeb(${i},this.checked)"><span class="tr"></span><span class="sw-t">${c.web ? 'En la web' : 'Publicar en web'}</span></label>`;
+    else acc = `<span class="status st-blocked">RECHAZADO</span><button class="mini" style="margin-left:6px" onclick="comAccion(${i},'pend')">Volver a revisar</button>`;
+    return `<div class="qrow"><div class="quote">“${esc(c.t)}”</div><div class="qmeta">${c.a} · ${c.p} · ${c.c}</div><div class="qactions" style="align-items:center">${acc}</div></div>`;
+  }).join('') || '<div class="qrow tbl-email">No hay comentarios en esta pestaña.</div>';
+  $('comFiltros').querySelectorAll('.fbtn').forEach(b => {
+    const n = COM.filter(c => b.dataset.f === 'web' ? c.web : b.dataset.f === 'apro' ? c.st === 'apro' : c.st === b.dataset.f).length;
+    b.textContent = b.textContent.replace(/ \(\d+\)$/, '') + ' (' + n + ')';
+  });
+}
+function comAccion(i, st) {
+  COM[i].st = st; if (st !== 'apro') COM[i].web = false;
+  aviso(st === 'apro' ? 'Aprobado. Ahora puedes publicarlo en la web.' : st === 'rech' ? 'Comentario rechazado' : 'Devuelto a revisión');
+  pintarCom();
+}
+function comWeb(i, on) {
+  if (on && COM.filter(c => c.web).length >= 6) { aviso('Ya hay 6 referencias en la web: retira una primero'); pintarCom(); return; }
+  COM[i].web = on;
+  aviso(on ? 'Publicado en la sección de referencias del home' : 'Retirado de la web; sigue aprobado');
+  pintarCom();
+}
+$('comFiltros').querySelectorAll('.fbtn').forEach(b => b.addEventListener('click', () => { comF = b.dataset.f; pintarCom(); }));
+pintarCom();
+
+// ── Editor de contenido de landings
+const LANDINGS = {
+  viax: { nom: 'Viax', url: 'viax.html', t: 'El conductor gana. El viaje queda documentado.', s: 'Navegación para carga pesada y un programa de millas que premia al conductor que registra cada paso del viaje.', cta: 'Solicitar información',
+    sec: [['La trazabilidad depende de quien va al volante', 'Sin el conductor, la Torre de Control no ve lo que pasa en ruta.'], ['Una app que el conductor sí quiere abrir', 'Rutas con restricciones reales, registro por voz y evidencias en el lugar.'], ['Cuatro niveles, una meta cada mes', 'Bronce, Plata, Oro y Diamante según cómo documenta sus viajes.'], ['Millas que valen porque se ganan', 'Se canjean por beneficios para el conductor y su familia.']] },
+  eflexy: { nom: 'Eflexy', url: 'eflexy.html', t: 'El robot que nunca duerme.', s: 'Distribución autónoma de última milla en campus y zonas comerciales.', cta: 'Quiero una demo',
+    sec: [['Súper poderes', 'Navegación autónoma y confirmación por código o biometría.'], ['Un cerebro, múltiples cuerpos', 'Una sola plataforma controla toda la flota.'], ['Para cada industria', 'Retail, salud, campus y hotelería.']] },
+  fletex: { nom: 'Fletex', url: 'fletex.html', t: 'Conoce tu costo real antes de poner precio.', s: 'Simulador de tarifas de transporte con el costo técnico concepto por concepto.', cta: 'Cotiza con el número exacto',
+    sec: [['Cada cotización, con el costo real detrás', 'Combustible, peajes, tiempos y margen por corredor.'], ['Tu red de rutas, ya calculada', 'Tarifario completo listo para cotizar.'], ['El mismo motor, en cualquier país', 'Parámetros por país y moneda.']] },
+  qubo: { nom: 'Qubo', url: 'qubo.html', t: 'Cada unidad sale llena y dentro de la ley.', s: 'Simulador de cubicaje y distribución de carga con límites de peso por eje.', cta: 'Solicitar información',
+    sec: [['Armar el despacho es un rompecabezas', 'Qubo arma las olas y el plano de estiba.'], ['Los límites de peso, siempre a la vista', 'Manifiesto por ejes antes de salir.'], ['Menos viajes para la misma carga', 'Aprovecha cada centímetro de la flota.']] },
+  bi: { nom: 'Efletexia BI', url: 'efletexia-bi.html', t: 'Toda la operación, en un solo lugar.', s: 'Seguimiento, alertas, reportes y proyectos en un solo tablero.', cta: 'Solicitar información',
+    sec: [['El dato existe. Encontrarlo es el problema.', 'Todo lo de la operación en una sola entrada.'], ['Seis módulos. Una sola entrada.', 'Cada uno se habilita por persona.'], ['Tú decides quién ve cada reporte', 'Permisos por módulo para cada usuario.']] }
+};
+let edK = 'viax';
+function editarLanding(k) {
+  edK = k; const L = LANDINGS[k];
+  $('edCrumb').textContent = L.nom; $('edTitulo').textContent = L.nom;
+  $('edHeroT').value = L.t; $('edHeroS').value = L.s; $('edCta').value = L.cta;
+  $('edVer').onclick = () => window.open(L.url, '_blank');
+  $('prevUrl').textContent = 'efletexia.com/soluciones/' + (k === 'bi' ? 'efletexia-bi' : k);
+  $('edEstado').className = 'status ' + (k === 'viax' ? 'st-active' : 'st-pending');
+  $('edEstado').textContent = k === 'viax' ? 'PUBLICADA · VERSIÓN 7' : 'OCULTA · EN CONSTRUCCIÓN';
+  pintarSecciones(); pintarPrev();
+  mostrar('landing');
+}
+function pintarSecciones() {
+  const sec = LANDINGS[edK].sec;
+  $('edSecciones').innerHTML = sec.map((s, i) => `
+    <div class="sec-ed${i === 0 ? ' open' : ''}">
+      <div class="sec-ed-h" onclick="this.parentNode.classList.toggle('open')">
+        <span class="num">${String(i + 1).padStart(2, '0')}</span><span class="tit">${esc(s[0])}</span>
+        <button class="mv" title="Subir" onclick="event.stopPropagation();moverSec(${i},-1)">↑</button>
+        <button class="mv" title="Bajar" onclick="event.stopPropagation();moverSec(${i},1)">↓</button>
+        <button class="mv" title="Quitar" onclick="event.stopPropagation();quitarSec(${i})">✕</button>
+      </div>
+      <div class="sec-ed-b">
+        <div class="fld"><label>Título de la sección</label><input class="inp" value="${esc(s[0])}" oninput="LANDINGS[edK].sec[${i}][0]=this.value;this.closest('.sec-ed').querySelector('.tit').textContent=this.value;pintarPrev()"></div>
+        <div class="fld"><label>Texto</label><textarea class="inp" oninput="LANDINGS[edK].sec[${i}][1]=this.value;pintarPrev()">${esc(s[1])}</textarea></div>
+        <div class="fld" style="margin-bottom:0"><label>Imagen</label><div class="img-drop">Arrastra una imagen o haz clic para elegirla</div></div>
+      </div>
+    </div>`).join('');
+}
+function pintarPrev() {
+  const L = LANDINGS[edK];
+  L.t = $('edHeroT').value; L.s = $('edHeroS').value; L.cta = $('edCta').value;
+  $('prevT').textContent = L.t; $('prevS').textContent = L.s; $('prevC').textContent = L.cta;
+  $('prevSecs').innerHTML = L.sec.map(s => `<div class="prev-sec"><b>${esc(s[0])}</b><p>${esc(s[1])}</p></div>`).join('');
+  $('edEdit').textContent = 'Cambios sin publicar · Juan Ramírez';
+}
+function moverSec(i, d) {
+  const a = LANDINGS[edK].sec, j = i + d;
+  if (j < 0 || j >= a.length) return;
+  [a[i], a[j]] = [a[j], a[i]]; pintarSecciones(); pintarPrev();
+}
+function quitarSec(i) { LANDINGS[edK].sec.splice(i, 1); pintarSecciones(); pintarPrev(); }
+function agregarSeccion() {
+  LANDINGS[edK].sec.push(['Nueva sección', 'Escribe aquí el texto de la sección.']);
+  pintarSecciones(); pintarPrev();
+  const all = document.querySelectorAll('#edSecciones .sec-ed'); all[all.length - 1].classList.add('open');
+}
+function publicarLanding() {
+  const k = edK;
+  if (k !== 'viax') { aviso('Cambios guardados. La landing de ' + LANDINGS[k].nom + ' sigue oculta hasta que la muestres en Productos'); return; }
+  $('edEstado').className = 'status st-active'; $('edEstado').textContent = 'PUBLICADA · VERSIÓN 8';
+  $('edEdit').textContent = 'Publicada por Juan Ramírez · ahora';
+  aviso('Landing de Viax publicada · queda en la bitácora');
+}
+
+// ── Plataformas con acceso de un cliente (registro de lo que Soporte ya hizo)
+const PLATS = ['VIAX', 'QUBO', 'FLETEX', 'EFLETEXIA BI', 'EFLEXY'];
+const FICHA = [
+  { p: 'QUBO', st: 'activo', tk: '#T-0031', f: '12 ago 2026' },
+  { p: 'VIAX', st: 'activo', tk: '#T-0044', f: '03 sep 2026' }
+];
+let platModo = 'alta', platIdx = -1;
+function pintarFicha() {
+  $('fPlats').innerHTML = FICHA.map((x, i) => `<tr>
+    <td><span style="font-size:11px;color:var(--amber);font-family:var(--mono)">${x.p}</span></td>
+    <td><span class="status ${x.st === 'activo' ? 'st-active' : 'st-inactive'}">${x.st === 'activo' ? 'ACTIVO' : 'RETIRADO'}</span></td>
+    <td class="tbl-id">${x.tk}${x.tkR ? ' · retiro ' + x.tkR : ''}</td>
+    <td class="tbl-email">${x.st === 'activo' ? x.f : 'hasta ' + x.fR}</td>
+    <td>${x.st === 'activo' ? `<button class="mini warn" onclick="abrirPlat('retiro',${i})">Registrar retiro</button>` : ''}</td></tr>`).join('');
+  const act = FICHA.filter(x => x.st === 'activo').map(x => x.p).join(' · ') || '—';
+  document.querySelectorAll('#v-clientes tbody tr').forEach(tr => {
+    if (tr.children[2] && tr.children[2].textContent.trim() === 'carlos.lopez@gmail.com') tr.children[3].querySelector('span').textContent = act;
+  });
+}
+function abrirPlat(modo, i) {
+  platModo = modo; platIdx = i == null ? -1 : i;
+  $('pTicket').value = ''; $('pOk').checked = false;
+  if (modo === 'alta') {
+    const libres = PLATS.filter(p => !FICHA.some(x => x.p === p && x.st === 'activo'));
+    if (!libres.length) { aviso('Este cliente ya tiene acceso a las 5 plataformas'); return; }
+    $('pTitulo').textContent = 'Registrar acceso a otra plataforma';
+    $('pTexto').innerHTML = 'Para cuando el cliente adquiere otro producto. Primero <b>Soporte</b> le da el acceso con un ticket; después lo registras aquí.';
+    $('pPlatFld').style.display = 'block';
+    $('pPlat').innerHTML = libres.map(p => `<option>${p}</option>`).join('');
+    $('pOkTxt').textContent = 'Confirmo que Soporte ya le dio el acceso';
+    $('pBtn').textContent = 'Registrar acceso';
+  } else {
+    $('pTitulo').textContent = 'Registrar retiro de ' + FICHA[platIdx].p;
+    $('pTexto').innerHTML = 'Cuando el cliente deja un producto. <b>Soporte</b> le quita el acceso con un ticket; aquí solo queda registrado.';
+    $('pPlatFld').style.display = 'none';
+    $('pOkTxt').textContent = 'Confirmo que Soporte ya le quitó el acceso';
+    $('pBtn').textContent = 'Registrar retiro';
+  }
+  $('mPlat').classList.add('open');
+}
+function guardarPlat() {
+  let tk = $('pTicket').value.trim().toUpperCase();
+  if (!/^#?T-\d{3,}$/.test(tk)) { aviso('Escribe el número de ticket de Soporte (por ejemplo #T-0062)'); return; }
+  if (tk[0] !== '#') tk = '#' + tk;
+  if (!$('pOk').checked) { aviso('Primero confirma lo que hizo Soporte'); return; }
+  let plat, accion;
+  if (platModo === 'alta') {
+    plat = $('pPlat').value; accion = 'Registró acceso';
+    const prev = FICHA.find(x => x.p === plat);
+    if (prev) Object.assign(prev, { st: 'activo', tk, f: 'hoy', tkR: null }); else FICHA.push({ p: plat, st: 'activo', tk, f: 'hoy' });
+  } else {
+    const x = FICHA[platIdx]; plat = x.p; accion = 'Registró retiro';
+    x.st = 'retirado'; x.tkR = tk; x.fR = 'hoy';
+  }
+  const bt = document.querySelector('#v-bitacora tbody');
+  const br = document.createElement('tr');
+  br.innerHTML = `<td class="tbl-email">Ahora</td><td class="tbl-name">Juan Ramírez</td><td class="tbl-email">${accion}</td><td class="tbl-name">Carlos López</td><td class="tbl-email">${plat} · ticket ${tk} de Soporte</td>`;
+  bt.insertBefore(br, bt.firstChild);
+  const tl = document.querySelector('#v-ficha .tl');
+  tl.insertAdjacentHTML('afterbegin', `<div class="tl-i"><div class="tl-d">AHORA</div><div class="tl-t">Juan Ramírez ${accion.toLowerCase()} en <b>${plat}</b> · ticket ${tk}</div></div>`);
+  $('mPlat').classList.remove('open');
+  aviso(accion + ': ' + plat + ' · queda en la ficha y en la bitácora');
+  pintarFicha();
+}
+pintarFicha();
+
+// ── Bloqueos y desbloqueos: los hace Soporte; marketing los registra con ticket
+const BLOQ = [
+  { c: 'Diego Fuentes', m: '3 intentos fallidos', f: 'Hoy · 09:42', r: 'Sistema' },
+  { c: 'Nadia Ocampo', m: 'Captcha no superado', f: 'Hoy · 09:10', r: 'Sistema' }
+];
+let ctaModo = 'bloqueo', ctaCli = '';
+function filaCliente(nom) {
+  return [...document.querySelectorAll('#v-clientes tbody tr')].find(tr => tr.children[1] && tr.children[1].textContent.trim() === nom);
+}
+function estadoCliente(nom, bloq) {
+  const tr = filaCliente(nom);
+  if (tr) { const sp = tr.children[7].querySelector('.status'); sp.className = 'status ' + (bloq ? 'st-blocked' : 'st-active'); sp.textContent = bloq ? 'BLOQUEADO' : 'ACTIVO'; }
+}
+function pintarBloq() {
+  $('bloqLista').innerHTML = BLOQ.map((b, i) => `<tr><td class="tbl-name">${esc(b.c)}</td><td class="tbl-email">${esc(b.m)}</td><td class="tbl-email">${b.f}</td>
+    <td class="tbl-email">${b.r === 'Sistema' ? 'Sistema' : esc(b.r) + ' · ' + b.tk}</td>
+    <td><div class="rowact"><a class="mini" href="${MESA}" target="_blank" rel="noopener" style="text-decoration:none">Pedir a Soporte ↗</a><button class="mini ok" onclick="abrirCta('desbloqueo','${esc(b.c)}')">Registrar desbloqueo</button></div></td></tr>`).join('')
+    || '<tr><td colspan="5" class="tbl-email" style="text-align:center;padding:18px">No hay cuentas bloqueadas.</td></tr>';
+  const bloqCarlos = BLOQ.some(b => b.c === 'Carlos López');
+  $('fEstado').innerHTML = `<span class="status ${bloqCarlos ? 'st-blocked' : 'st-active'}">${bloqCarlos ? 'BLOQUEADA' : 'ACTIVA'}</span>
+    <button class="mini ${bloqCarlos ? 'ok' : 'warn'}" style="margin-left:8px" onclick="abrirCta('${bloqCarlos ? 'desbloqueo' : 'bloqueo'}','Carlos López')">${bloqCarlos ? 'Registrar desbloqueo' : 'Registrar bloqueo'}</button>`;
+  const pend = [...document.querySelectorAll('#v-clientes tbody tr')].filter(t => t.children[7] && /ALTA EN SOPORTE/.test(t.children[7].textContent)).length;
+  document.querySelectorAll('.kpi-label').forEach(l => { if (l.textContent === 'Altas esperando a Soporte') l.closest('.kpi').querySelector('.kpi-val span').textContent = pend; });
+  document.querySelectorAll('.kpi-label').forEach(l => { if (l.textContent === 'Cuentas bloqueadas') l.closest('.kpi').querySelector('.kpi-val span').textContent = BLOQ.length; });
+  // en cada fila de Clientes: registrar bloqueo o desbloqueo según su estado
+  document.querySelectorAll('#v-clientes tbody tr').forEach(tr => {
+    const ra = tr.querySelector('.rowact'); if (!ra || !tr.children[7]) return;
+    ra.style.flexWrap = 'nowrap';
+    const ln = ra.querySelector('a.mini'); if (ln) { ln.textContent = 'Soporte ↗'; ln.title = 'Pedir un cambio a Soporte'; }
+    const nom = tr.children[1].textContent.trim();
+    const bloq = /BLOQUEADO/.test(tr.children[7].textContent);
+    let b = ra.querySelector('.bq');
+    if (!b) { b = document.createElement('button'); b.className = 'mini bq'; ra.appendChild(b); }
+    if (/ALTA EN SOPORTE/.test(tr.children[7].textContent)) { b.className = 'mini bq ok'; b.textContent = 'Confirmar alta'; b.onclick = () => confirmarDesdeFila(tr); return; }
+    b.className = 'mini bq ' + (bloq ? 'ok' : 'warn');
+    b.textContent = bloq ? 'Registrar desbloqueo' : 'Registrar bloqueo';
+    b.onclick = () => abrirCta(bloq ? 'desbloqueo' : 'bloqueo', nom);
+  });
+}
+function abrirCta(modo, cli) {
+  ctaModo = modo; ctaCli = cli || '';
+  $('cTicket').value = ''; $('cOk').checked = false; $('cMot').selectedIndex = 0;
+  const bloq = modo === 'bloqueo';
+  $('cTitulo').textContent = bloq ? 'Registrar bloqueo' : 'Registrar desbloqueo';
+  $('cTexto').innerHTML = bloq
+    ? 'Para cuando <b>Soporte</b> bloqueó la cuenta (por pedido del cliente, falta de pago o seguridad). Aquí solo queda registrado, con su ticket.'
+    : '<b>Soporte</b> desbloquea la cuenta en sus sistemas. Cuando te confirme, regístralo aquí con el número de ticket.';
+  $('cMotFld').style.display = bloq ? 'block' : 'none';
+  if (cli) { $('cCliFld').style.display = 'none'; $('cCliFijo').style.display = 'block'; $('cCliNom').textContent = cli; }
+  else {
+    $('cCliFld').style.display = 'block'; $('cCliFijo').style.display = 'none';
+    const noms = [...document.querySelectorAll('#v-clientes tbody tr')].map(tr => tr.children[1].textContent.trim()).filter(n => !BLOQ.some(b => b.c === n));
+    $('cCli').innerHTML = noms.map(n => `<option>${esc(n)}</option>`).join('');
+  }
+  $('cOkTxt').textContent = bloq ? 'Confirmo que Soporte ya bloqueó la cuenta' : 'Confirmo que Soporte ya desbloqueó la cuenta';
+  $('cBtn').textContent = bloq ? 'Registrar bloqueo' : 'Registrar desbloqueo';
+  $('mCta').classList.add('open');
+}
+function guardarCta() {
+  let tk = $('cTicket').value.trim().toUpperCase();
+  if (!/^#?T-\d{3,}$/.test(tk)) { aviso('Escribe el número de ticket de Soporte (por ejemplo #T-0064)'); return; }
+  if (tk[0] !== '#') tk = '#' + tk;
+  if (!$('cOk').checked) { aviso('Primero confirma lo que hizo Soporte'); return; }
+  const cli = ctaCli || $('cCli').value;
+  let accion, det;
+  if (ctaModo === 'bloqueo') {
+    BLOQ.unshift({ c: cli, m: $('cMot').value, f: 'Ahora', r: 'Juan Ramírez', tk });
+    accion = 'Registró bloqueo'; det = $('cMot').value + ' · ticket ' + tk + ' de Soporte';
+  } else {
+    const k = BLOQ.findIndex(b => b.c === cli); if (k >= 0) BLOQ.splice(k, 1);
+    accion = 'Registró desbloqueo'; det = 'Ticket ' + tk + ' de Soporte';
+  }
+  estadoCliente(cli, ctaModo === 'bloqueo');
+  const bt = document.querySelector('#v-bitacora tbody');
+  bt.insertAdjacentHTML('afterbegin', `<tr><td class="tbl-email">Ahora</td><td class="tbl-name">Juan Ramírez</td><td class="tbl-email">${accion}</td><td class="tbl-name">${esc(cli)}</td><td class="tbl-email">${det}</td></tr>`);
+  if (cli === 'Carlos López') document.querySelector('#v-ficha .tl').insertAdjacentHTML('afterbegin', `<div class="tl-i"><div class="tl-d">AHORA</div><div class="tl-t">Juan Ramírez ${accion.toLowerCase()} · ticket ${tk}</div></div>`);
+  $('mCta').classList.remove('open');
+  aviso(accion + ': ' + cli + ' · queda en Clientes, en la ficha y en la bitácora');
+  pintarBloq();
+}
+pintarBloq();
+editarLanding('viax'); mostrar('resumen');
 </script>
 
 </body>

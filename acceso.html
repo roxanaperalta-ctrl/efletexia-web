@@ -186,7 +186,7 @@ h1{font-size:29px;font-weight:700;letter-spacing:-1px;margin-bottom:10px}
 
       <div class="pie">
         <a href="index.html">Inicio</a>
-        <a href="index.html#contacto">Soporte</a>
+        <a href="https://portal-usuarios.dtdevops.com/" target="_blank" rel="noopener">Soporte</a>
         <a href="https://wa.me/+522223284900" target="_blank" rel="noopener">WhatsApp</a>
       </div>
     </div>
@@ -318,7 +318,8 @@ function aviso(texto, tipo) {
   m.textContent = texto;
 }
 function recuperar() {
-  aviso('Escríbele a soporte para restablecer tu contraseña. En esta maqueta la opción no está habilitada.', 'err');
+  aviso('Los cambios de contraseña los hace Soporte. Te abrimos Soporte para que dejes tu pedido.', 'ok');
+  window.open('https://portal-usuarios.dtdevops.com/', '_blank', 'noopener');
 }
 function liberar() {
   if (!$('noRobot').checked) return;
